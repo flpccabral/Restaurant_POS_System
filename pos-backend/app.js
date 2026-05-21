@@ -95,6 +95,10 @@ app.use("/api/attribute", require("./routes/attributeRoute"));
 app.use("/api/recipe", require("./routes/recipeRoute"));
 app.use("/api/stock", require("./routes/stockRoute"));
 
+// Fase 4 - Purchase Orders & Suppliers
+app.use("/api/supplier", require("./routes/supplierRoutes"));
+app.use("/api/purchase-orders", require("./routes/purchaseOrderRoutes"));
+
 // Global Error Handler
 app.use(globalErrorHandler);
 
