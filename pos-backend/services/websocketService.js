@@ -223,6 +223,72 @@ const emitDeviceApproved = (io, device) => {
     console.log(`[WebSocket] device:approved emitted for device ${device._id}`);
 };
 
+/**
+ * Emite evento KDS: item atualizado
+ * @param {SocketIO.Server} io - Instância do Socket.io
+ * @param {string} storeId - ID da loja
+ * @param {Object} data - Dados da atualização
+ */
+const emitKDSItemUpdated = (io, storeId, data) => {
+    io.to(`store:${storeId}`).emit('kds:item-updated', data);
+    console.log(`[WebSocket] kds:item-updated emitted for station ${data.station}`);
+};
+
+/**
+ * Emite evento KDS: pedido pronto
+ * @param {SocketIO.Server} io - Instância do Socket.io
+ * @param {string} storeId - ID da loja
+ * @param {Object} data - Dados do pedido
+ */
+const emitKDSOrderReady = (io, storeId, data) => {
+    io.to(`store:${storeId}`).emit('kds:order-ready', data);
+    console.log(`[WebSocket] kds:order-ready emitted for order ${data.orderNumber}`);
+};
+
+/**
+ * Emite evento KDS: pedido servido
+ * @param {SocketIO.Server} io - Instância do Socket.io
+ * @param {string} storeId - ID da loja
+ * @param {Object} data - Dados do pedido
+ */
+const emitKDSOrderServed = (io, storeId, data) => {
+    io.to(`store:${storeId}`).emit('kds:order-served', data);
+    console.log(`[WebSocket] kds:order-served emitted for order ${data.orderNumber}`);
+};
+
+/**
+ * Emite evento KDS: pedido priorizado (rush)
+ * @param {SocketIO.Server} io - Instância do Socket.io
+ * @param {string} storeId - ID da loja
+ * @param {Object} data - Dados do pedido
+ */
+const emitKDSOrderRushed = (io, storeId, data) => {
+    io.to(`store:${storeId}`).emit('kds:order-rushed', data);
+    console.log(`[WebSocket] kds:order-rushed emitted for order ${data.orderNumber}`);
+};
+
+/**
+ * Emite evento KDS: pedido cancelado
+ * @param {SocketIO.Server} io - Instância do Socket.io
+ * @param {string} storeId - ID da loja
+ * @param {Object} data - Dados do pedido
+ */
+const emitKDSOrderCancelled = (io, storeId, data) => {
+    io.to(`store:${storeId}`).emit('kds:order-cancelled', data);
+    console.log(`[WebSocket] kds:order-cancelled emitted for order ${data.orderNumber}`);
+};
+
+/**
+ * Emite evento KDS: pedido sincronizado
+ * @param {SocketIO.Server} io - Instância do Socket.io
+ * @param {string} storeId - ID da loja
+ * @param {Object} data - Dados do pedido
+ */
+const emitKDSOrderSynced = (io, storeId, data) => {
+    io.to(`store:${storeId}`).emit('kds:order-synced', data);
+    console.log(`[WebSocket] kds:order-synced emitted for order ${data.orderNumber}`);
+};
+
 module.exports = {
     emitOrderCreated,
     emitOrderUpdated,
@@ -232,5 +298,11 @@ module.exports = {
     emitAlertCreated,
     emitRecipeProduced,
     emitDeviceRegistered,
-    emitDeviceApproved
+    emitDeviceApproved,
+    emitKDSItemUpdated,
+    emitKDSOrderReady,
+    emitKDSOrderServed,
+    emitKDSOrderRushed,
+    emitKDSOrderCancelled,
+    emitKDSOrderSynced
 };

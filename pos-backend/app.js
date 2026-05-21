@@ -105,6 +105,9 @@ app.use("/api/dashboard", require("./routes/dashboardRoutes"));
 // Fase 6 - Subscription & Billing (SaaS)
 app.use("/api/subscription", require("./routes/subscriptionRoutes"));
 
+// Fase 7 - Kitchen Display System (KDS)
+app.use("/api/kds", require("./routes/kdsRoutes"));
+
 // Global Error Handler
 app.use(globalErrorHandler);
 
