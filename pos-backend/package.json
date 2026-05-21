@@ -4,23 +4,33 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon app.js",
-    "start": "node app.js"
+    "start": "node app.js",
+    "db:clean": "node scripts/migration-cleanup.js",
+    "db:seed": "node scripts/seed.js",
+    "db:reset": "npm run db:clean && npm run db:seed",
+    "db:migrate": "node scripts/migrate-all.js"
   },
-  "keywords": [],
+  "keywords": [
+    "pos",
+    "restaurant",
+    "saas",
+    "multi-tenant"
+  ],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "Restaurant POS System - Multi-Store SaaS Platform",
   "dependencies": {
-    "bcrypt": "^5.1.1",
+    "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
-    "crypto": "^1.0.1",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "http-errors": "^2.0.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.9.5",
-    "razorpay": "^2.9.5"
+    "razorpay": "^2.9.5",
+    "socket.io": "^4.8.1",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.9"
