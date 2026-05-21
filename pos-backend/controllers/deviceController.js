@@ -2,6 +2,7 @@ const createHttpError = require("http-errors");
 const Device = require("../models/deviceModel");
 const User = require("../models/userModel");
 const SessionLog = require("../models/sessionLogModel");
+const ws = require("../services/websocketService");
 
 /**
  * Listar todos os dispositivos (Admin apenas)
@@ -147,6 +148,10 @@ const approveDevice = async (req, res, next) => {
             action: 'device_approved',
             metadata: { deviceNickname: device.nickname }
         });
+
+        // Emit WebSocket event
+        const io = req.app.get('io');
+        ws.emitDeviceApproved(io, device);
 
         res.status(200).json({
             success: true,

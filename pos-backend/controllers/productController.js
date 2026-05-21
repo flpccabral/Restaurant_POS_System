@@ -2,6 +2,7 @@ const createHttpError = require("http-errors");
 const Product = require("../models/productModel");
 const Category = require("../models/categoryModel");
 const { generateUniqueSku } = require("../utils/slugGenerator");
+const ws = require("../services/websocketService");
 
 /**
  * Criar produto
@@ -235,6 +236,9 @@ const updateProduct = async (req, res, next) => {
             return next(error);
         }
 
+        // Determinar loja
+        const storeRef = req.user.isMasterAdmin ? req.storeId : req.user.store;
+
         // Atualizar campos básicos
         if (name !== undefined) product.name = name;
         if (description !== undefined) product.description = description;
@@ -245,7 +249,6 @@ const updateProduct = async (req, res, next) => {
 
         // Atualizar categoria se fornecida
         if (categoryId) {
-            const storeRef = req.user.isMasterAdmin ? req.storeId : req.user.store;
             const category = await Category.findOne({
                 _id: categoryId,
                 store: storeRef
@@ -260,6 +263,17 @@ const updateProduct = async (req, res, next) => {
         }
 
         await product.save();
+
+        // Emit WebSocket event se disponibilidade mudou
+        if (isActive !== undefined || isCurrent !== undefined) {
+            const io = req.app.get('io');
+            ws.emitProductAvailability(io, storeRef, {
+                productId: product._id,
+                productName: product.name,
+                isActive: product.isActive,
+                isCurrent: product.isCurrent
+            });
+        }
 
         const populatedProduct = await Product.findById(product._id)
             .populate('category', 'name')

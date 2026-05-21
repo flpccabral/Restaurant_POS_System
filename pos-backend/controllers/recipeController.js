@@ -4,6 +4,7 @@ const Product = require("../models/productModel");
 const GlobalIngredient = require("../models/globalIngredientModel");
 const recipeService = require("../services/recipeService");
 const StockBalance = require("../models/stockBalanceModel");
+const ws = require("../services/websocketService");
 
 /**
  * Criar receita (Ficha Técnica)
@@ -322,7 +323,33 @@ const deductStock = async (req, res, next) => {
             return next(error);
         }
 
+        // Determinar loja para evento WebSocket
+        const storeRef = req.user.isMasterAdmin ? req.storeId : req.user.store;
+
         const result = await recipeService.deductStock(id, quantity, req.user._id);
+
+        // Emit WebSocket events para cada ingrediente baixado
+        const io = req.app.get('io');
+
+        if (result.deducted && result.deducted.length > 0) {
+            for (const item of result.deducted) {
+                ws.emitInventoryUpdated(io, storeRef, {
+                    type: 'recipe_deduction',
+                    ingredientId: item.ingredientId,
+                    ingredientName: item.ingredientName,
+                    quantity: item.quantityDeducted,
+                    balance: item.balanceAfter,
+                    unit: item.unit
+                });
+            }
+        }
+
+        // Emitir evento de receita produzida
+        ws.emitRecipeProduced(io, storeRef, {
+            recipeId: id,
+            quantity: quantity,
+            ingredients: result.deducted
+        });
 
         if (!result.success) {
             res.status(400).json({

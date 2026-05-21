@@ -4,6 +4,7 @@ const StockMovement = require("../models/stockMovementModel");
 const StockAlert = require("../models/stockAlertModel");
 const GlobalIngredient = require("../models/globalIngredientModel");
 const recipeService = require("../services/recipeService");
+const ws = require("../services/websocketService");
 
 /**
  * Obter saldo de estoque
@@ -180,6 +181,17 @@ const stockIn = async (req, res, next) => {
         }
         await stockBalance.save();
 
+        // Emit WebSocket event
+        const io = req.app.get('io');
+        ws.emitInventoryUpdated(io, storeRef, {
+            type: 'stock_in',
+            ingredientId: ingredientId,
+            ingredientName: stockBalance.ingredient?.name,
+            quantity: quantity,
+            balance: stockBalance.balance,
+            unit: stockBalance.unit
+        });
+
         res.status(200).json({
             success: true,
             message: "Stock entry registered successfully!",
@@ -218,6 +230,17 @@ const stockOut = async (req, res, next) => {
             unit: 'auto',
             reason: reason || 'Saída manual de estoque',
             user: req.user._id
+        });
+
+        // Emit WebSocket event
+        const io = req.app.get('io');
+        ws.emitInventoryUpdated(io, storeRef, {
+            type: 'stock_out',
+            ingredientId: ingredientId,
+            ingredientName: movement.ingredient?.name,
+            quantity: quantity,
+            balance: movement.balanceAfter,
+            unit: movement.unit
         });
 
         res.status(200).json({
@@ -276,6 +299,18 @@ const stockAdjustment = async (req, res, next) => {
         // Atualizar saldo
         stockBalance.balance = quantity;
         await stockBalance.save();
+
+        // Emit WebSocket event
+        const io = req.app.get('io');
+        ws.emitInventoryUpdated(io, storeRef, {
+            type: 'adjustment',
+            ingredientId: ingredientId,
+            ingredientName: stockBalance.ingredient?.name,
+            quantity: Math.abs(quantity - movement.balanceBefore),
+            balance: quantity,
+            unit: stockBalance.unit,
+            previousBalance: movement.balanceBefore
+        });
 
         res.status(200).json({
             success: true,
@@ -367,6 +402,12 @@ const checkStockAlerts = async (req, res, next) => {
         const storeRef = req.user.isMasterAdmin ? req.storeId : req.user.store;
 
         const alerts = await StockAlert.checkAndCreateAlerts(storeRef);
+
+        // Emit WebSocket events para novos alertas
+        const io = req.app.get('io');
+        for (const alert of alerts) {
+            ws.emitAlertCreated(io, alert);
+        }
 
         res.status(200).json({
             success: true,

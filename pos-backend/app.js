@@ -22,22 +22,43 @@ app.set('io', io);
 
 // Socket.io connection handling
 io.on('connection', (socket) => {
-    console.log(`Socket connected: ${socket.id}`);
+    console.log(`[WebSocket] Socket connected: ${socket.id}`);
 
     // Join store room for real-time updates
     socket.on('join:store', (storeId) => {
         socket.join(`store:${storeId}`);
-        console.log(`Socket ${socket.id} joined store:${storeId}`);
+        console.log(`[WebSocket] Socket ${socket.id} joined store:${storeId}`);
     });
 
-    // Order status updates
+    // Join multiple rooms (for users with access to multiple stores)
+    socket.on('join:stores', (storeIds) => {
+        if (Array.isArray(storeIds)) {
+            storeIds.forEach(id => {
+                socket.join(`store:${id}`);
+                console.log(`[WebSocket] Socket ${socket.id} joined store:${id}`);
+            });
+        }
+    });
+
+    // Order status updates (client-to-client relay)
     socket.on('order:status', (data) => {
         socket.to(`store:${data.storeId}`).emit('order:status', data);
     });
 
+    // Leave store room (when user logs out or switches store)
+    socket.on('leave:store', (storeId) => {
+        socket.leave(`store:${storeId}`);
+        console.log(`[WebSocket] Socket ${socket.id} left store:${storeId}`);
+    });
+
     // Disconnect
     socket.on('disconnect', () => {
-        console.log(`Socket disconnected: ${socket.id}`);
+        console.log(`[WebSocket] Socket disconnected: ${socket.id}`);
+    });
+
+    // Error handling
+    socket.on('error', (error) => {
+        console.error(`[WebSocket] Error on socket ${socket.id}:`, error.message);
     });
 });
 
