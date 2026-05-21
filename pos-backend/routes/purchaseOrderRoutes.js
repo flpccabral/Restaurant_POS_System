@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const authMiddleware = require("../middlewares/authMiddleware");
+const { isVerifiedUser } = require("../middlewares/tokenVerification");
 const {
     getPurchaseOrders,
     getPurchaseOrderById,
@@ -16,7 +16,7 @@ const {
 } = require("../controllers/purchaseOrderController");
 
 // Proteger todas as rotas
-router.use(authMiddleware);
+router.use(isVerifiedUser);
 
 // Rotas
 router.get("/", getPurchaseOrders);

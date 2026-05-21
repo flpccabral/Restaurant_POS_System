@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const authMiddleware = require("../middlewares/authMiddleware");
+const { isVerifiedUser } = require("../middlewares/tokenVerification");
 const {
     getDashboardKPIs,
     getSalesReport,
@@ -13,7 +13,7 @@ const {
 } = require("../controllers/dashboardController");
 
 // Proteger todas as rotas
-router.use(authMiddleware);
+router.use(isVerifiedUser);
 
 // KPIs Gerais
 router.get("/kpi", getDashboardKPIs);

@@ -114,7 +114,11 @@ app.use("/api/pdv", require("./routes/pdvRoutes"));
 // Global Error Handler
 app.use(globalErrorHandler);
 
-// Server
-server.listen(PORT, () => {
-    console.log(`☑️  POS Server is listening on port ${PORT} (with Socket.io)`);
-});
+// Server - only start if not in test mode
+if (process.env.NODE_ENV !== 'test') {
+    server.listen(PORT, () => {
+        console.log(`☑️  POS Server is listening on port ${PORT} (with Socket.io)`);
+    });
+}
+
+module.exports = { app, server };

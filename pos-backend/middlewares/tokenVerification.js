@@ -16,7 +16,16 @@ const Role = require("../models/roleModel");
  */
 const isVerifiedUser = async (req, res, next) => {
     try {
-        const { accessToken } = req.cookies;
+        let accessToken = null;
+
+        // Try to get token from cookies first
+        if (req.cookies && req.cookies.accessToken) {
+            accessToken = req.cookies.accessToken;
+        }
+        // Fall back to Authorization header (for API tests and mobile apps)
+        else if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
+            accessToken = req.headers.authorization.split(' ')[1];
+        }
 
         if (!accessToken) {
             const error = createHttpError(401, "Please provide token!");
@@ -57,6 +66,7 @@ const isVerifiedUser = async (req, res, next) => {
         next();
 
     } catch (error) {
+        console.error('[tokenVerification] Error:', error.message);
         const err = createHttpError(401, "Invalid Token!");
         next(err);
     }

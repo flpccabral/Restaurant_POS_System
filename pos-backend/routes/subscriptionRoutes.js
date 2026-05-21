@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const authMiddleware = require("../middlewares/authMiddleware");
+const { isVerifiedUser } = require("../middlewares/tokenVerification");
 const {
     getPlans,
     getPlanById,
@@ -16,7 +16,7 @@ const {
 } = require("../controllers/subscriptionController");
 
 // Proteger todas as rotas
-router.use(authMiddleware);
+router.use(isVerifiedUser);
 
 // Rotas públicas (dentro do auth)
 router.get("/", getPlans);

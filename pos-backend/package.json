@@ -5,6 +5,15 @@
   "scripts": {
     "dev": "nodemon app.js",
     "start": "node app.js",
+    "test": "jest --coverage --detectOpenHandles --forceExit",
+    "test:watch": "jest --watch",
+    "test:phase1": "jest tests/phase1-auth.test.js",
+    "test:phase2": "jest tests/phase2-recipe.test.js",
+    "test:phase4": "jest tests/phase4-suppliers.test.js",
+    "test:phase5": "jest tests/phase5-dashboard.test.js",
+    "test:phase6": "jest tests/phase6-subscription.test.js",
+    "test:phase7": "jest tests/phase7-kds.test.js",
+    "test:phase8": "jest tests/phase8-pdv.test.js",
     "db:clean": "node scripts/migration-cleanup.js",
     "db:seed": "node scripts/seed.js",
     "db:reset": "npm run db:clean && npm run db:seed",
@@ -33,6 +42,9 @@
     "uuid": "^11.1.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.9"
+    "jest": "^30.4.2",
+    "mongodb-memory-server": "^11.1.0",
+    "nodemon": "^3.1.9",
+    "supertest": "^7.2.2"
   }
 }

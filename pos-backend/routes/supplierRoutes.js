@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const authMiddleware = require("../middlewares/authMiddleware");
+const { isVerifiedUser } = require("../middlewares/tokenVerification");
 const {
     getSuppliers,
     getSupplierById,
@@ -12,7 +12,7 @@ const {
 } = require("../controllers/supplierController");
 
 // Proteger todas as rotas
-router.use(authMiddleware);
+router.use(isVerifiedUser);
 
 // Rotas
 router.get("/", getSuppliers);

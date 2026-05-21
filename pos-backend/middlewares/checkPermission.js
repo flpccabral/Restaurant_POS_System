@@ -195,7 +195,19 @@ const checkRole = (roles) => {
             // Normalizar roles para array
             const rolesArray = Array.isArray(roles) ? roles : [roles];
 
-            // Carregar role do usuário
+            // Se user.role for string (legacy/simple mode), verificar diretamente
+            if (typeof user.role === 'string') {
+                if (!rolesArray.includes(user.role)) {
+                    const error = createHttpError(
+                        403,
+                        `Access denied: Role ${user.role} not authorized`
+                    );
+                    return next(error);
+                }
+                return next();
+            }
+
+            // Carregar role dinâmica do usuário (ObjectId)
             const userRole = await Role.findById(user.role);
 
             if (!userRole) {

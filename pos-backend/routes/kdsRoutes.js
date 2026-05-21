@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const authMiddleware = require("../middlewares/authMiddleware");
+const { isVerifiedUser } = require("../middlewares/tokenVerification");
 const {
     getKDSConfig,
     updateKDSConfig,
@@ -17,7 +17,7 @@ const {
 } = require("../controllers/kdsController");
 
 // Proteger todas as rotas
-router.use(authMiddleware);
+router.use(isVerifiedUser);
 
 // Configuração
 router.get("/config", getKDSConfig);
