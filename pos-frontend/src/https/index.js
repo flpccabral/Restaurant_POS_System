@@ -25,3 +25,8 @@ export const addOrder = (data) => axiosWrapper.post("/api/order/", data);
 export const getOrders = () => axiosWrapper.get("/api/order");
 export const updateOrderStatus = ({ orderId, orderStatus }) =>
   axiosWrapper.put(`/api/order/${orderId}`, { orderStatus });
+
+// Dashboard Endpoints
+export const getDashboardKPIs = (params) => axiosWrapper.get("/api/dashboard/kpi", { params });
+export const getSalesReport = (params) => axiosWrapper.get("/api/dashboard/sales", { params });
+export const getTopProducts = (params) => axiosWrapper.get("/api/dashboard/products/top", { params });

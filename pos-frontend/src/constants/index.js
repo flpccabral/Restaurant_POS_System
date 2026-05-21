@@ -380,7 +380,7 @@ export const menus = [
   { id: 8, name: "Salads", bgColor: "#5b45b0" ,icon: "🥗", items: salads }
 ]
 
-export const metricsData = [
+export const oldMetricsData = [
   { title: "Revenue", value: "₹50,846.90", percentage: "12%", color: "#025cca", isIncrease: false },
   { title: "Outbound Clicks", value: "10,342", percentage: "16%", color: "#02ca3a", isIncrease: true },
   { title: "Total Customer", value: "19,720", percentage: "10%", color: "#f6b100", isIncrease: true },

@@ -1,11 +1,17 @@
 const createHttpError = require("http-errors");
 const Order = require("../models/orderModel");
 const { default: mongoose } = require("mongoose");
+const ws = require("../services/websocketService");
 
 const addOrder = async (req, res, next) => {
   try {
     const order = new Order(req.body);
     await order.save();
+
+    // Emit WebSocket event
+    const io = req.app.get('io');
+    ws.emitOrderCreated(io, order);
+
     res
       .status(201)
       .json({ success: true, message: "Order created!", data: order });
@@ -54,15 +60,29 @@ const updateOrder = async (req, res, next) => {
       return next(error);
     }
 
+    // Buscar pedido atual para capturar status anterior
+    const oldOrder = await Order.findById(id);
+    if (!oldOrder) {
+      const error = createHttpError(404, "Order not found!");
+      return next(error);
+    }
+
+    const oldStatus = oldOrder.orderStatus;
+
+    // Atualizar pedido
     const order = await Order.findByIdAndUpdate(
       id,
       { orderStatus },
       { new: true }
     );
 
-    if (!order) {
-      const error = createHttpError(404, "Order not found!");
-      return next(error);
+    // Emit WebSocket events
+    const io = req.app.get('io');
+    ws.emitOrderUpdated(io, order);
+
+    // Se status mudou, emitir evento específico
+    if (oldStatus !== orderStatus) {
+      ws.emitOrderStatusChanged(io, order.store, order, oldStatus);
     }
 
     res
