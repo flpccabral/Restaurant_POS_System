@@ -99,6 +99,9 @@ app.use("/api/stock", require("./routes/stockRoute"));
 app.use("/api/supplier", require("./routes/supplierRoutes"));
 app.use("/api/purchase-orders", require("./routes/purchaseOrderRoutes"));
 
+// Fase 5 - Dashboard & Analytics
+app.use("/api/dashboard", require("./routes/dashboardRoutes"));
+
 // Global Error Handler
 app.use(globalErrorHandler);
 
