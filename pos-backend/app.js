@@ -102,6 +102,9 @@ app.use("/api/purchase-orders", require("./routes/purchaseOrderRoutes"));
 // Fase 5 - Dashboard & Analytics
 app.use("/api/dashboard", require("./routes/dashboardRoutes"));
 
+// Fase 6 - Subscription & Billing (SaaS)
+app.use("/api/subscription", require("./routes/subscriptionRoutes"));
+
 // Global Error Handler
 app.use(globalErrorHandler);
 
