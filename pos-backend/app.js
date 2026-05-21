@@ -108,6 +108,9 @@ app.use("/api/subscription", require("./routes/subscriptionRoutes"));
 // Fase 7 - Kitchen Display System (KDS)
 app.use("/api/kds", require("./routes/kdsRoutes"));
 
+// Fase 8 - Mobile & PDV APIs
+app.use("/api/pdv", require("./routes/pdvRoutes"));
+
 // Global Error Handler
 app.use(globalErrorHandler);
 
