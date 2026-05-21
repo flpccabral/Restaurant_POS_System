@@ -36,6 +36,12 @@ const globalIngredientSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Supplier'
     },
+    minimumStock: {
+        type: Number,
+        default: 0,
+        min: 0,
+        comment: 'Estoque mínimo sugerido para alerta de reposição'
+    },
     isActive: {
         type: Boolean,
         default: true

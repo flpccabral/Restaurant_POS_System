@@ -67,6 +67,13 @@ app.use("/api/table", require("./routes/tableRoute"));
 app.use("/api/payment", require("./routes/paymentRoute"));
 app.use("/api/device", require("./routes/deviceRoute"));
 
+// Fase 2 - Menu & Recipe Engine
+app.use("/api/category", require("./routes/categoryRoute"));
+app.use("/api/product", require("./routes/productRoute"));
+app.use("/api/attribute", require("./routes/attributeRoute"));
+app.use("/api/recipe", require("./routes/recipeRoute"));
+app.use("/api/stock", require("./routes/stockRoute"));
+
 // Global Error Handler
 app.use(globalErrorHandler);
 
