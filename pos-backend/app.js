@@ -111,6 +111,9 @@ app.use("/api/kds", require("./routes/kdsRoutes"));
 // Fase 8 - Mobile & PDV APIs
 app.use("/api/pdv", require("./routes/pdvRoutes"));
 
+// Fase 5.1A - Produção interna e subprodutos
+app.use("/api/production", require("./routes/productionRoute"));
+
 // Global Error Handler
 app.use(globalErrorHandler);
 

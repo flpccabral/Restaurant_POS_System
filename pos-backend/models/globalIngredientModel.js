@@ -45,9 +45,43 @@ const globalIngredientSchema = new mongoose.Schema({
     isActive: {
         type: Boolean,
         default: true
+    },
+    // Campos Fase 5.1A — produção interna e subprodutos
+    itemType: {
+        type: String,
+        enum: ['raw_material', 'prepared', 'byproduct', 'packaging', 'consumable'],
+        default: 'raw_material',
+        index: true,
+        comment: 'Tipo do item no estoque (Fase 5.1A)'
+    },
+    productionState: {
+        type: String,
+        enum: ['raw', 'cleaned', 'ground', 'seasoned', 'portioned', 'assembled', 'cooked', 'frozen', 'ready_to_use', 'ready_to_sell', 'waste'],
+        default: 'raw',
+        index: true,
+        comment: 'Estado operacional do item (Fase 5.1A)'
+    },
+    isByproduct: {
+        type: Boolean,
+        default: false,
+        index: true,
+        comment: 'True se é subproduto de produção interna (Fase 5.1A)'
+    },
+    parentIngredient: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'GlobalIngredient',
+        comment: 'Ingrediente bruto de origem para subprodutos/preparados (Fase 5.1A)'
+    },
+    compatibleOperations: {
+        type: [String],
+        enum: ['bar', 'hamburgueria', 'pizzaria', 'arabe', 'cozinha', 'geral'],
+        default: ['geral'],
+        comment: 'Quais operações podem usar este item (Fase 5.1A)'
     }
 }, { timestamps: true });
 
 globalIngredientSchema.index({ category: 1, isActive: 1 });
+globalIngredientSchema.index({ itemType: 1, productionState: 1, isActive: 1 });
+globalIngredientSchema.index({ isByproduct: 1, isActive: 1 });
 
 module.exports = mongoose.model("GlobalIngredient", globalIngredientSchema);
