@@ -3,9 +3,26 @@ const Order = require("../models/orderModel");
 const { default: mongoose } = require("mongoose");
 const ws = require("../services/websocketService");
 
+/**
+ * MULTI-TENANCY FIX: Helper to build store-scoped filter
+ * Ensures every query is limited to the user's store.
+ * Non-admin users are always scoped to their own store.
+ * Master admins can optionally filter by storeId query param.
+ */
+const storeFilter = (req) => {
+  // req.storeId is set by storeIsolation middleware (string)
+  // req.user.store is the ObjectId from the user document
+  const storeRef = req.storeId || req.user?.store;
+  return storeRef ? { store: storeRef } : {};
+};
+
 const addOrder = async (req, res, next) => {
   try {
-    const order = new Order(req.body);
+    // MULTI-TENANCY LOCK: Force the order to belong to the authenticated user's store
+    const order = new Order({
+      ...req.body,
+      store: req.storeId || req.user.store,
+    });
     await order.save();
 
     // Emit WebSocket event
@@ -29,7 +46,8 @@ const getOrderById = async (req, res, next) => {
       return next(error);
     }
 
-    const order = await Order.findById(id);
+    // MULTI-TENANCY LOCK: Scoped to user's store — prevents accessing orders from other stores
+    const order = await Order.findOne({ _id: id, ...storeFilter(req) }).populate("table");
     if (!order) {
       const error = createHttpError(404, "Order not found!");
       return next(error);
@@ -43,7 +61,8 @@ const getOrderById = async (req, res, next) => {
 
 const getOrders = async (req, res, next) => {
   try {
-    const orders = await Order.find().populate("table");
+    // MULTI-TENANCY LOCK: All queries scoped to user's store
+    const orders = await Order.find(storeFilter(req)).populate("table");
     res.status(200).json({ data: orders });
   } catch (error) {
     next(error);
@@ -60,8 +79,8 @@ const updateOrder = async (req, res, next) => {
       return next(error);
     }
 
-    // Buscar pedido atual para capturar status anterior
-    const oldOrder = await Order.findById(id);
+    // MULTI-TENANCY LOCK: Only find orders belonging to user's store
+    const oldOrder = await Order.findOne({ _id: id, ...storeFilter(req) });
     if (!oldOrder) {
       const error = createHttpError(404, "Order not found!");
       return next(error);
@@ -69,9 +88,9 @@ const updateOrder = async (req, res, next) => {
 
     const oldStatus = oldOrder.orderStatus;
 
-    // Atualizar pedido
-    const order = await Order.findByIdAndUpdate(
-      id,
+    // MULTI-TENANCY LOCK: Update only within the same store scope
+    const order = await Order.findOneAndUpdate(
+      { _id: id, ...storeFilter(req) },
       { orderStatus },
       { new: true }
     );
@@ -80,7 +99,7 @@ const updateOrder = async (req, res, next) => {
     const io = req.app.get('io');
     ws.emitOrderUpdated(io, order);
 
-    // Se status mudou, emitir evento específico
+    // If status changed, emit specific event (now uses corrected 'store' field)
     if (oldStatus !== orderStatus) {
       ws.emitOrderStatusChanged(io, order.store, order, oldStatus);
     }

@@ -140,8 +140,8 @@ const login = async (req, res, next) => {
         res.cookie('accessToken', accessToken, {
             maxAge: 1000 * 60 * 60 *24 * 30,
             httpOnly: true,
-            sameSite: 'none',
-            secure: true
+            sameSite: config.nodeEnv === 'production' ? 'none' : 'lax',
+            secure: config.nodeEnv === 'production'
         })
 
         // Registrar dispositivo

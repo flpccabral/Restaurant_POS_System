@@ -12,7 +12,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: [config.socketCorsOrigin || "http://localhost:5173"],
+        origin: config.corsOrigins,
         credentials: true
     }
 });
@@ -68,7 +68,7 @@ connectDB();
 // Middlewares
 app.use(cors({
     credentials: true,
-    origin: [config.socketCorsOrigin || "http://localhost:5173"]
+    origin: config.corsOrigins
 }));
 app.use(express.json());
 app.use(cookieParser());

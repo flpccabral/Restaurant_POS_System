@@ -5,11 +5,10 @@ const {
     getDashboardKPIs,
     getSalesReport,
     getTopProducts,
-    getSupplierAnalytics,
-    getInventoryAnalytics,
     getCMVReport,
-    getUserStats,
-    exportReport
+    getVarianceAnalysis,
+    getInventoryAnalytics,
+    getUserStats
 } = require("../controllers/dashboardController");
 
 // Proteger todas as rotas
@@ -21,12 +20,9 @@ router.get("/kpi", getDashboardKPIs);
 // Relatórios
 router.get("/sales", getSalesReport);
 router.get("/products/top", getTopProducts);
-router.get("/suppliers", getSupplierAnalytics);
-router.get("/inventory", getInventoryAnalytics);
 router.get("/cmv", getCMVReport);
+router.get("/variance", getVarianceAnalysis);
+router.get("/inventory", getInventoryAnalytics);
 router.get("/users", getUserStats);
-
-// Exportação
-router.get("/export", exportReport);
 
 module.exports = router;
