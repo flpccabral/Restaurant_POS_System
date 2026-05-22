@@ -96,6 +96,31 @@ const recipeSchema = new mongoose.Schema({
         min: 1,
         comment: 'Quantidade de porções que a receita rende'
     },
+    yieldUnit: {
+        type: String,
+        comment: 'Unidade de rendimento (ex: porcao, unidade, kg)'
+    },
+    version: {
+        type: Number,
+        default: 1,
+        comment: 'Versao da receita — incrementa a cada alteracao significativa'
+    },
+    totalCost: {
+        type: Number,
+        default: 0,
+        min: 0,
+        comment: 'Custo total calculado da receita'
+    },
+    costPerYield: {
+        type: Number,
+        default: 0,
+        min: 0,
+        comment: 'Custo por porcao/unidade de rendimento'
+    },
+    lastCalculatedAt: {
+        type: Date,
+        comment: 'Data do ultimo calculo de custo'
+    },
     isActive: {
         type: Boolean,
         default: true,
@@ -107,6 +132,27 @@ const recipeSchema = new mongoose.Schema({
 recipeSchema.index({ store: 1, sku: 1 }, { unique: true });
 recipeSchema.index({ store: 1, product: 1 });
 recipeSchema.index({ store: 1, isActive: 1 });
+recipeSchema.index({ product: 1, isActive: 1 });
+
+// Validacao: ingredientes sem duplicata, netQuantity > 0
+recipeSchema.pre('validate', function(next) {
+    if (this.ingredients && this.ingredients.length > 0) {
+        const seen = new Set();
+        for (const item of this.ingredients) {
+            const key = item.ingredient?.toString();
+            if (key) {
+                if (seen.has(key)) {
+                    return next(new Error(`Duplicate ingredient in recipe: ${key}`));
+                }
+                seen.add(key);
+            }
+            if (item.netQuantity !== undefined && item.netQuantity <= 0) {
+                return next(new Error(`Ingredient netQuantity must be greater than 0`));
+            }
+        }
+    }
+    next();
+});
 
 // Método para calcular quantidade com perda
 recipeIngredientSchema.methods.getQuantityWithLoss = function() {

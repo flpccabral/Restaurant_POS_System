@@ -21,7 +21,7 @@ const globalIngredientSchema = new mongoose.Schema({
     },
     baseUnit: {
         type: String,
-        enum: ['g', 'kg', 'ml', 'L', 'unidade'],
+        enum: ['g', 'kg', 'ml', 'L', 'unidade', 'pacote', 'caixa'],
         required: true
     },
     conversionToBase: {

@@ -3,6 +3,7 @@ const Recipe = require("../models/recipeModel");
 const Product = require("../models/productModel");
 const GlobalIngredient = require("../models/globalIngredientModel");
 const recipeService = require("../services/recipeService");
+const unitConversion = require("../services/unitConversionService");
 const StockBalance = require("../models/stockBalanceModel");
 const ws = require("../services/websocketService");
 
@@ -53,7 +54,13 @@ const createRecipe = async (req, res, next) => {
         const validatedIngredients = [];
         for (const item of ingredients) {
             if (!item.ingredientId || !item.netQuantity || !item.unit) {
-                continue; // Pular ingredientes inválidos
+                const error = createHttpError(400, "Each ingredient requires ingredientId, netQuantity, and unit");
+                return next(error);
+            }
+
+            if (item.netQuantity <= 0) {
+                const error = createHttpError(400, "Ingredient netQuantity must be greater than 0");
+                return next(error);
             }
 
             // Verificar se ingrediente existe
@@ -61,6 +68,22 @@ const createRecipe = async (req, res, next) => {
             if (!ingredient) {
                 const error = createHttpError(400, `Ingredient not found: ${item.ingredientId}`);
                 return next(error);
+            }
+
+            // Validar compatibilidade de unidades
+            const unitCheck = unitConversion.validateUnit(item.unit, ingredient.baseUnit);
+            if (!unitCheck.valid) {
+                const error = createHttpError(400, `Unit incompatibility for ingredient ${ingredient.name}: ${unitCheck.reason}`);
+                return next(error);
+            }
+
+            // Verificar substituto se fornecido
+            if (item.substituteId) {
+                const substitute = await GlobalIngredient.findById(item.substituteId);
+                if (!substitute) {
+                    const error = createHttpError(400, `Substitute ingredient not found: ${item.substituteId}`);
+                    return next(error);
+                }
             }
 
             validatedIngredients.push({
@@ -236,12 +259,25 @@ const updateRecipe = async (req, res, next) => {
 
             for (const item of ingredients) {
                 if (!item.ingredientId || !item.netQuantity || !item.unit) {
-                    continue;
+                    const error = createHttpError(400, "Each ingredient requires ingredientId, netQuantity, and unit");
+                    return next(error);
+                }
+
+                if (item.netQuantity <= 0) {
+                    const error = createHttpError(400, "Ingredient netQuantity must be greater than 0");
+                    return next(error);
                 }
 
                 const ingredient = await GlobalIngredient.findById(item.ingredientId);
                 if (!ingredient) {
-                    continue; // Pular ingredientes inválidos
+                    const error = createHttpError(400, `Ingredient not found: ${item.ingredientId}`);
+                    return next(error);
+                }
+
+                const unitCheck = unitConversion.validateUnit(item.unit, ingredient.baseUnit);
+                if (!unitCheck.valid) {
+                    const error = createHttpError(400, `Unit incompatibility for ingredient ${ingredient.name}: ${unitCheck.reason}`);
+                    return next(error);
                 }
 
                 validatedIngredients.push({
@@ -254,6 +290,7 @@ const updateRecipe = async (req, res, next) => {
             }
 
             recipe.ingredients = validatedIngredients;
+            recipe.version = (recipe.version || 1) + 1;
         }
 
         await recipe.save();
@@ -434,6 +471,310 @@ const toggleRecipeStatus = async (req, res, next) => {
     }
 };
 
+/**
+ * Validar receita sem salvar (simulacao)
+ */
+const validateRecipe = async (req, res, next) => {
+    try {
+        const { sku, product, variation, name, ingredients, yieldQuantity } = req.body;
+
+        const errors = [];
+
+        if (!sku) errors.push('SKU is required');
+        if (!product) errors.push('Product is required');
+        if (!variation) errors.push('Variation is required');
+        if (!name) errors.push('Name is required');
+
+        if (!ingredients || !Array.isArray(ingredients) || ingredients.length === 0) {
+            errors.push('At least one ingredient is required');
+        } else {
+            const seen = new Set();
+            for (const item of ingredients) {
+                if (!item.ingredientId) errors.push('Ingredient missing ingredientId');
+                if (!item.netQuantity || item.netQuantity <= 0) errors.push(`Ingredient netQuantity must be > 0`);
+                if (!item.unit) errors.push('Ingredient unit is required');
+
+                if (item.ingredientId) {
+                    const ingredient = await GlobalIngredient.findById(item.ingredientId);
+                    if (!ingredient) {
+                        errors.push(`Ingredient not found: ${item.ingredientId}`);
+                    } else {
+                        const unitCheck = unitConversion.validateUnit(item.unit, ingredient.baseUnit);
+                        if (!unitCheck.valid) {
+                            errors.push(`Unit incompatibility for ${ingredient.name}: ${unitCheck.reason}`);
+                        }
+                    }
+                }
+
+                const key = item.ingredientId?.toString();
+                if (key && seen.has(key)) {
+                    errors.push(`Duplicate ingredient: ${key}`);
+                }
+                if (key) seen.add(key);
+            }
+        }
+
+        if (product) {
+            const storeRef = req.user.isMasterAdmin ? req.storeId : req.user.store;
+            const productDoc = await Product.findOne({ _id: product, store: storeRef });
+            if (!productDoc) {
+                errors.push('Product not found or does not belong to this store');
+            } else {
+                const hasVariation = productDoc.variations.some(v => v.sku === variation);
+                if (!hasVariation) {
+                    errors.push(`Product does not have variation with SKU: ${variation}`);
+                }
+            }
+        }
+
+        res.status(errors.length > 0 ? 400 : 200).json({
+            success: errors.length === 0,
+            valid: errors.length === 0,
+            errors
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
+ * Listar produtos sem ficha tecnica valida
+ */
+const getProductsWithoutRecipe = async (req, res, next) => {
+    try {
+        const storeRef = req.user.isMasterAdmin ? req.storeId : req.user.store;
+
+        const products = await Product.find({ store: storeRef, isActive: true })
+            .populate('category', 'name');
+
+        const recipes = await Recipe.find({ store: storeRef, isActive: true })
+            .select('product variation sku isActive');
+
+        const recipeMap = new Map();
+        for (const r of recipes) {
+            recipeMap.set(`${r.product.toString()}:${r.variation}`, r);
+        }
+
+        const withoutRecipe = [];
+        for (const product of products) {
+            if (!product.variations || product.variations.length === 0) {
+                withoutRecipe.push({
+                    productId: product._id,
+                    productName: product.name,
+                    category: product.category,
+                    missingAllRecipes: true
+                });
+                continue;
+            }
+
+            for (const variation of product.variations) {
+                if (!variation.isActive) continue;
+                const key = `${product._id.toString()}:${variation.sku}`;
+                if (!recipeMap.has(key)) {
+                    withoutRecipe.push({
+                        productId: product._id,
+                        productName: product.name,
+                        variationId: variation.variationId,
+                        variationName: variation.name,
+                        sku: variation.sku,
+                        missingRecipe: true
+                    });
+                }
+            }
+        }
+
+        res.status(200).json({
+            success: true,
+            count: withoutRecipe.length,
+            data: withoutRecipe
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
+ * Listar produtos vendaveis (com ficha tecnica ativa e valida)
+ */
+const getSellableProducts = async (req, res, next) => {
+    try {
+        const storeRef = req.user.isMasterAdmin ? req.storeId : req.user.store;
+
+        const recipes = await Recipe.find({ store: storeRef, isActive: true })
+            .populate('product', 'name category')
+            .select('product variation sku name isActive totalCost');
+
+        const sellable = recipes
+            .filter(r => r.product && r.product.isActive)
+            .map(r => ({
+                productId: r.product._id,
+                productName: r.product.name,
+                category: r.product.category,
+                variation: r.variation,
+                sku: r.sku,
+                recipeName: r.name,
+                recipeId: r._id,
+                totalCost: r.totalCost || 0,
+                sellable: true
+            }));
+
+        res.status(200).json({
+            success: true,
+            count: sellable.length,
+            data: sellable
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
+ * Listar produtos nao vendaveis (sem ficha tecnica ou ficha inativa)
+ */
+const getNonSellableProducts = async (req, res, next) => {
+    try {
+        const storeRef = req.user.isMasterAdmin ? req.storeId : req.user.store;
+
+        const products = await Product.find({ store: storeRef, isActive: true })
+            .populate('category', 'name');
+
+        const recipes = await Recipe.find({ store: storeRef })
+            .select('product variation sku isActive');
+
+        const recipeMap = new Map();
+        for (const r of recipes) {
+            recipeMap.set(`${r.product.toString()}:${r.variation}`, r);
+        }
+
+        const nonSellable = [];
+        for (const product of products) {
+            if (!product.variations || product.variations.length === 0) {
+                nonSellable.push({
+                    productId: product._id,
+                    productName: product.name,
+                    reason: 'no_variations'
+                });
+                continue;
+            }
+
+            for (const variation of product.variations) {
+                if (!variation.isActive) continue;
+                const key = `${product._id.toString()}:${variation.sku}`;
+                const recipe = recipeMap.get(key);
+                if (!recipe) {
+                    nonSellable.push({
+                        productId: product._id,
+                        productName: product.name,
+                        variation: variation.name,
+                        sku: variation.sku,
+                        reason: 'no_recipe'
+                    });
+                } else if (!recipe.isActive) {
+                    nonSellable.push({
+                        productId: product._id,
+                        productName: product.name,
+                        variation: variation.name,
+                        sku: variation.sku,
+                        reason: 'recipe_inactive'
+                    });
+                }
+            }
+        }
+
+        res.status(200).json({
+            success: true,
+            count: nonSellable.length,
+            data: nonSellable
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
+ * Simular consumo sem executar baixa (preparacao Fase 5)
+ */
+const simulateConsumption = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const { quantity, locationId } = req.query;
+
+        const result = await recipeService.simulateConsumption(
+            id,
+            parseInt(quantity) || 1,
+            locationId
+        );
+
+        res.status(200).json({
+            success: true,
+            data: result
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
+ * Verificar se produto e vendavel (tem ficha tecnica ativa)
+ */
+const checkProductSellability = async (req, res, next) => {
+    try {
+        const { productId } = req.params;
+        const { variation } = req.query;
+
+        const storeRef = req.user.isMasterAdmin ? req.storeId : req.user.store;
+
+        const product = await Product.findOne({ _id: productId, store: storeRef, isActive: true });
+        if (!product) {
+            const error = createHttpError(404, 'Product not found or inactive');
+            return next(error);
+        }
+
+        const variationSku = variation || (product.variations?.[0]?.sku);
+        if (!variationSku) {
+            return res.status(200).json({
+                success: true,
+                data: { productId, sellable: false, reason: 'no_variations' }
+            });
+        }
+
+        const recipe = await Recipe.findOne({
+            store: storeRef,
+            product: productId,
+            variation: variationSku,
+            isActive: true
+        });
+
+        if (!recipe) {
+            return res.status(200).json({
+                success: true,
+                data: {
+                    productId,
+                    product: product.name,
+                    sku: variationSku,
+                    sellable: false,
+                    reason: 'no_active_recipe'
+                }
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            data: {
+                productId,
+                product: product.name,
+                sku: variationSku,
+                sellable: true,
+                recipeId: recipe._id,
+                recipeName: recipe.name,
+                totalCost: recipe.totalCost || 0
+            }
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     createRecipe,
     getRecipes,
@@ -444,5 +785,11 @@ module.exports = {
     checkStockAvailability,
     deductStock,
     toggleRecipeStatus,
-    deleteRecipe
+    deleteRecipe,
+    validateRecipe,
+    getProductsWithoutRecipe,
+    getSellableProducts,
+    getNonSellableProducts,
+    checkProductSellability,
+    simulateConsumption
 };

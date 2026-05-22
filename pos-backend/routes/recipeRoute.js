@@ -9,7 +9,13 @@ const {
     checkStockAvailability,
     deductStock,
     toggleRecipeStatus,
-    deleteRecipe
+    deleteRecipe,
+    validateRecipe,
+    getProductsWithoutRecipe,
+    getSellableProducts,
+    getNonSellableProducts,
+    checkProductSellability,
+    simulateConsumption
 } = require("../controllers/recipeController");
 const { isVerifiedUser } = require("../middlewares/tokenVerification");
 const { storeIsolation } = require("../middlewares/storeIsolation");
@@ -23,7 +29,7 @@ router.use(isVerifiedUser);
 router.use(storeIsolation);
 router.use(deviceApproval);
 
-// Rotas
+// CRUD
 router.post("/", checkPermission('inventory', 'create'), createRecipe);
 router.get("/", getRecipes);
 router.get("/sku/:sku", getRecipeBySku);
@@ -32,9 +38,17 @@ router.put("/:id", checkPermission('inventory', 'update'), updateRecipe);
 router.put("/:id/toggle-status", checkPermission('inventory', 'update'), toggleRecipeStatus);
 router.delete("/:id", checkPermission('inventory', 'delete'), deleteRecipe);
 
-// Rotas de cálculo e estoque
+// Calculo e estoque
 router.get("/:id/cost", calculateRecipeCost);
 router.get("/:id/stock/check", checkStockAvailability);
 router.post("/:id/stock/deduct", checkPermission('inventory', 'adjust'), deductStock);
+
+// Validacao e vendabilidade
+router.post("/validate", validateRecipe);
+router.get("/without-recipe", getProductsWithoutRecipe);
+router.get("/sellable", getSellableProducts);
+router.get("/non-sellable", getNonSellableProducts);
+router.get("/product/:productId/sellable", checkProductSellability);
+router.get("/:id/stock/simulate", simulateConsumption);
 
 module.exports = router;

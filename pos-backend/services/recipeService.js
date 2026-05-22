@@ -9,12 +9,11 @@
  */
 
 const mongoose = require('mongoose');
+const unitConversion = require('./unitConversionService');
 
 /**
- * Calcula o custo total de uma receita
- * @param {string} recipeId - ID da receita
- * @param {Object} ingredientPrices - Mapa de preços de ingredientes (opcional)
- * @returns {Promise<Object>} - Custo total e detalhamento
+ * Calcula o custo total de uma receita convertendo unidades para baseUnit.
+ * Persiste totalCost, costPerYield e lastCalculatedAt no documento Recipe.
  */
 const calculateCost = async (recipeId, ingredientPrices = null) => {
     const Recipe = mongoose.model('Recipe');
@@ -30,10 +29,29 @@ const calculateCost = async (recipeId, ingredientPrices = null) => {
 
     for (const item of recipe.ingredients) {
         const ingredient = item.ingredient;
-        // Fórmula: quantidade com perda = netQuantity × (1 + lossFactor/100)
-        const quantityWithLoss = item.netQuantity * (1 + item.lossFactor / 100);
+        if (!ingredient) {
+            missingPrices.push({ ingredientId: 'unknown', ingredientName: 'Ingredient not found' });
+            continue;
+        }
 
-        // Obter preço do ingrediente
+        // Converter quantidade para unidade base do ingrediente
+        const grossQuantity = item.netQuantity * (1 + item.lossFactor / 100);
+        const factors = ingredient.conversionToBase ? Object.fromEntries(ingredient.conversionToBase) : {};
+        let quantityInBase = grossQuantity;
+        let appliedUnit = ingredient.baseUnit;
+
+        if (item.unit !== ingredient.baseUnit) {
+            try {
+                const converted = unitConversion.toBaseUnit(grossQuantity, item.unit, ingredient.baseUnit, factors);
+                quantityInBase = converted.quantityInBase;
+                appliedUnit = ingredient.baseUnit;
+            } catch (err) {
+                // Se nao consegue converter, usa quantidade bruta diretamente
+                quantityInBase = grossQuantity;
+            }
+        }
+
+        // Obter preço do ingrediente (preco por unidade base)
         let unitCost = 0;
         if (ingredientPrices && ingredientPrices[ingredient._id.toString()]) {
             unitCost = ingredientPrices[ingredient._id.toString()];
@@ -46,28 +64,41 @@ const calculateCost = async (recipeId, ingredientPrices = null) => {
             });
         }
 
-        const itemCost = quantityWithLoss * unitCost;
+        const itemCost = quantityInBase * unitCost;
         totalCost += itemCost;
 
         breakdown.push({
             ingredientId: ingredient._id,
             ingredientName: ingredient.name,
             netQuantity: item.netQuantity,
+            recipeUnit: item.unit,
             lossFactor: item.lossFactor,
-            quantityWithLoss: Math.round(quantityWithLoss * 1000) / 1000,
+            grossQuantity: Math.round(grossQuantity * 1000) / 1000,
+            quantityInBaseUnit: Math.round(quantityInBase * 1000) / 1000,
+            baseUnit: appliedUnit,
             unitCost: unitCost,
             totalCost: Math.round(itemCost * 100) / 100,
             hasPrice: !!unitCost
         });
     }
 
+    const totalCostRounded = Math.round(totalCost * 100) / 100;
+    const costPerYieldRounded = Math.round((totalCost / recipe.yieldQuantity) * 100) / 100;
+
+    // Persistir custos no documento Recipe
+    recipe.totalCost = totalCostRounded;
+    recipe.costPerYield = costPerYieldRounded;
+    recipe.lastCalculatedAt = new Date();
+    await recipe.save();
+
     return {
         recipeId,
         recipeName: recipe.name,
         sku: recipe.sku,
-        totalCost: Math.round(totalCost * 100) / 100,
-        costPerYield: Math.round((totalCost / recipe.yieldQuantity) * 100) / 100,
+        totalCost: totalCostRounded,
+        costPerYield: costPerYieldRounded,
         yieldQuantity: recipe.yieldQuantity,
+        yieldUnit: recipe.yieldUnit,
         hasIncompleteCost: missingPrices.length > 0,
         missingPrices,
         breakdown
@@ -85,11 +116,20 @@ const deductStock = async (recipeId, quantity = 1, userId = null) => {
     const Recipe = mongoose.model('Recipe');
     const StockBalance = mongoose.model('StockBalance');
     const StockMovement = mongoose.model('StockMovement');
+    const StockLocation = mongoose.model('StockLocation');
 
     const recipe = await Recipe.findById(recipeId).populate('ingredients.ingredient');
     if (!recipe) {
         throw new Error('Recipe not found');
     }
+
+    // Obter localização padrão da loja (STORE)
+    const Store = mongoose.model('Store');
+    const store = await Store.findById(recipe.store);
+    if (!store) {
+        throw new Error('Store not found for recipe');
+    }
+    const storeLocation = await StockLocation.getOrCreateStoreLocation(recipe.store, store.name);
 
     const results = {
         success: true,
@@ -100,19 +140,20 @@ const deductStock = async (recipeId, quantity = 1, userId = null) => {
 
     // Processar cada ingrediente
     for (const item of recipe.ingredients) {
-        // Fórmula de baixa: netQuantity × (1 + lossFactor/100) × quantity
-        const requiredQuantity = item.netQuantity * (1 + item.lossFactor / 100) * quantity;
-
         try {
-            // Buscar saldo do ingrediente
+            // Buscar saldo do ingrediente na localização da loja
             let stockBalance = await StockBalance.findOne({
-                store: recipe.store,
+                location: storeLocation._id,
                 ingredient: item.ingredient
-            });
+            }).populate('ingredient');
 
             if (!stockBalance) {
                 throw new Error(`Stock not found for ingredient: ${item.ingredient}`);
             }
+
+            // Calcular quantidade a baixar com conversao de unidade
+            const consumption = unitConversion.calculateConsumption(item, quantity, stockBalance.ingredient);
+            const requiredQuantity = consumption.quantityInBase;
 
             // Verificar se tem saldo suficiente
             if (stockBalance.balance >= requiredQuantity) {
@@ -124,10 +165,11 @@ const deductStock = async (recipeId, quantity = 1, userId = null) => {
                 // Registrar movimento
                 await StockMovement.create({
                     store: recipe.store,
+                    location: storeLocation._id,
                     ingredient: item.ingredient,
                     type: 'recipe_deduction',
                     quantity: requiredQuantity,
-                    unit: item.unit,
+                    unit: consumption.appliedUnit,
                     balanceBefore,
                     balanceAfter: stockBalance.balance,
                     reason: `Baixa da receita: ${recipe.name}`,
@@ -138,7 +180,10 @@ const deductStock = async (recipeId, quantity = 1, userId = null) => {
                         recipeName: recipe.name,
                         variation: recipe.variation,
                         quantityProduced: quantity,
-                        lossFactor: item.lossFactor
+                        lossFactor: item.lossFactor,
+                        recipeUnit: item.unit,
+                        recipeQuantity: item.netQuantity,
+                        convertedQuantity: consumption.grossQuantity
                     }
                 });
 
@@ -146,14 +191,15 @@ const deductStock = async (recipeId, quantity = 1, userId = null) => {
                     ingredientId: item.ingredient,
                     ingredientName: stockBalance.ingredient?.name || item.ingredient,
                     quantityDeducted: Math.round(requiredQuantity * 1000) / 1000,
-                    unit: item.unit,
+                    unit: consumption.appliedUnit,
+                    recipeUnit: item.unit,
                     balanceAfter: stockBalance.balance
                 });
             } else {
                 // Saldo insuficiente - tentar substituto
                 if (item.substitute) {
                     const substituteStock = await StockBalance.findOne({
-                        store: recipe.store,
+                        location: storeLocation._id,
                         ingredient: item.substitute
                     }).populate('ingredient');
 
@@ -165,10 +211,11 @@ const deductStock = async (recipeId, quantity = 1, userId = null) => {
 
                         await StockMovement.create({
                             store: recipe.store,
+                            location: storeLocation._id,
                             ingredient: item.substitute,
                             type: 'recipe_deduction',
                             quantity: requiredQuantity,
-                            unit: item.unit,
+                            unit: consumption.appliedUnit,
                             balanceBefore,
                             balanceAfter: substituteStock.balance,
                             reason: `Substituição na receita: ${recipe.name}`,
@@ -188,7 +235,7 @@ const deductStock = async (recipeId, quantity = 1, userId = null) => {
                             substituteIngredientId: item.substitute,
                             substituteName: substituteStock.ingredient?.name || item.substitute,
                             quantityDeducted: Math.round(requiredQuantity * 1000) / 1000,
-                            unit: item.unit,
+                            unit: consumption.appliedUnit,
                             balanceAfter: substituteStock.balance
                         });
                     } else {
@@ -222,11 +269,17 @@ const deductStock = async (recipeId, quantity = 1, userId = null) => {
 const checkStockAvailability = async (recipeId, quantity = 1) => {
     const Recipe = mongoose.model('Recipe');
     const StockBalance = mongoose.model('StockBalance');
+    const StockLocation = mongoose.model('StockLocation');
+    const Store = mongoose.model('Store');
 
     const recipe = await Recipe.findById(recipeId).populate('ingredients.ingredient');
     if (!recipe) {
         throw new Error('Recipe not found');
     }
+
+    // Obter localizacao da loja
+    const store = await Store.findById(recipe.store);
+    const storeLocation = store ? await StockLocation.getOrCreateStoreLocation(recipe.store, store.name) : null;
 
     const results = {
         recipeId,
@@ -237,33 +290,54 @@ const checkStockAvailability = async (recipeId, quantity = 1) => {
     };
 
     for (const item of recipe.ingredients) {
-        const requiredQuantity = item.netQuantity * (1 + item.lossFactor / 100) * quantity;
+        // Calcular quantidade necessaria com conversao de unidade
+        const grossQuantity = item.netQuantity * (1 + item.lossFactor / 100) * quantity;
 
         const stockBalance = await StockBalance.findOne({
-            store: recipe.store,
+            location: storeLocation?._id,
             ingredient: item.ingredient
         }).populate('ingredient');
 
-        const hasStock = stockBalance && stockBalance.balance >= requiredQuantity;
+        let requiredInBaseUnit = grossQuantity;
+        let baseUnit = item.unit;
+
+        if (stockBalance?.ingredient) {
+            const factors = stockBalance.ingredient.conversionToBase ? Object.fromEntries(stockBalance.ingredient.conversionToBase) : {};
+            if (item.unit !== stockBalance.ingredient.baseUnit) {
+                try {
+                    const converted = unitConversion.toBaseUnit(grossQuantity, item.unit, stockBalance.ingredient.baseUnit, factors);
+                    requiredInBaseUnit = converted.quantityInBase;
+                    baseUnit = stockBalance.ingredient.baseUnit;
+                } catch (err) {
+                    requiredInBaseUnit = grossQuantity;
+                }
+            } else {
+                baseUnit = stockBalance.ingredient.baseUnit;
+            }
+        }
+
+        const hasStock = stockBalance && stockBalance.balance >= requiredInBaseUnit;
         let substituteAvailable = false;
         let substituteName = null;
 
         if (!hasStock && item.substitute) {
             const substituteStock = await StockBalance.findOne({
-                store: recipe.store,
+                location: storeLocation?._id,
                 ingredient: item.substitute
             }).populate('ingredient');
 
-            substituteAvailable = substituteStock && substituteStock.balance >= requiredQuantity;
+            substituteAvailable = substituteStock && substituteStock.balance >= requiredInBaseUnit;
             substituteName = substituteStock?.ingredient?.name || null;
         }
 
         results.ingredients.push({
             ingredientId: item.ingredient,
             ingredientName: stockBalance?.ingredient?.name || 'Unknown',
-            required: Math.round(requiredQuantity * 1000) / 1000,
+            required: Math.round(requiredInBaseUnit * 1000) / 1000,
+            requiredInRecipeUnit: Math.round(grossQuantity * 1000) / 1000,
+            recipeUnit: item.unit,
             available: stockBalance?.balance || 0,
-            unit: item.unit,
+            baseUnit,
             hasStock,
             hasSubstitute: !!item.substitute,
             substituteAvailable,
@@ -360,10 +434,106 @@ const generateShoppingList = async (storeId) => {
     };
 };
 
+/**
+ * Simula consumo de ingredientes sem executar baixa (preparacao Fase 5).
+ * Calcula quanto seria baixado do estoque para uma dada receita e quantidade,
+ * incluindo conversao de unidades, mas SEM alterar saldos ou criar movimentacoes.
+ *
+ * @param {string} recipeId - ID da receita
+ * @param {number} quantity - Quantidade de receitas sendo produzidas
+ * @param {string} [locationId] - ID da localizacao de estoque (opcional, usa STORE da loja)
+ * @returns {Promise<Object>} - Simulacao do consumo
+ */
+const simulateConsumption = async (recipeId, quantity = 1, locationId = null) => {
+    const Recipe = mongoose.model('Recipe');
+    const StockBalance = mongoose.model('StockBalance');
+    const StockLocation = mongoose.model('StockLocation');
+    const Store = mongoose.model('Store');
+
+    const recipe = await Recipe.findById(recipeId).populate('ingredients.ingredient');
+    if (!recipe) {
+        throw new Error('Recipe not found');
+    }
+    if (!recipe.isActive) {
+        throw new Error('Recipe is inactive — cannot simulate consumption');
+    }
+
+    // Obter localizacao
+    let targetLocation = locationId
+        ? await StockLocation.findById(locationId)
+        : null;
+
+    if (!targetLocation) {
+        const store = await Store.findById(recipe.store);
+        targetLocation = store
+            ? await StockLocation.getOrCreateStoreLocation(recipe.store, store.name)
+            : null;
+    }
+
+    const simulation = {
+        recipeId,
+        recipeName: recipe.name,
+        sku: recipe.sku,
+        quantity,
+        wouldDeduct: [],
+        wouldFail: [],
+        totalEstimatedCost: 0,
+        allIngredientsAvailable: true
+    };
+
+    for (const item of recipe.ingredients) {
+        if (!recipe.ingredients) continue;
+
+        const consumption = unitConversion.calculateConsumption(item, quantity, item.ingredient);
+
+        const stockBalance = targetLocation
+            ? await StockBalance.findOne({ location: targetLocation._id, ingredient: item.ingredient }).populate('ingredient')
+            : null;
+
+        const available = stockBalance?.balance || 0;
+        const hasEnough = available >= consumption.quantityInBase;
+
+        const estimatedItemCost = consumption.quantityInBase * (item.ingredient?.averageCost || 0);
+        simulation.totalEstimatedCost += estimatedItemCost;
+
+        simulation.wouldDeduct.push({
+            ingredientId: item.ingredient._id,
+            ingredientName: item.ingredient.name,
+            recipeUnit: item.unit,
+            recipeQuantity: item.netQuantity,
+            lossFactor: item.lossFactor,
+            grossQuantity: consumption.grossQuantity,
+            stockUnit: consumption.appliedUnit,
+            quantityInStockUnit: consumption.quantityInBase,
+            available,
+            hasEnough,
+            estimatedCost: Math.round(estimatedItemCost * 100) / 100
+        });
+
+        if (!hasEnough) {
+            simulation.allIngredientsAvailable = false;
+            simulation.wouldFail.push({
+                ingredientId: item.ingredient._id,
+                ingredientName: item.ingredient.name,
+                required: consumption.quantityInBase,
+                available,
+                shortfall: consumption.quantityInBase - available,
+                unit: consumption.appliedUnit,
+                hasSubstitute: !!item.substitute
+            });
+        }
+    }
+
+    simulation.totalEstimatedCost = Math.round(simulation.totalEstimatedCost * 100) / 100;
+
+    return simulation;
+};
+
 module.exports = {
     calculateCost,
     deductStock,
     checkStockAvailability,
     getRestockAlerts,
-    generateShoppingList
+    generateShoppingList,
+    simulateConsumption
 };
