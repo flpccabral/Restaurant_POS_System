@@ -17,7 +17,10 @@
     "db:clean": "node scripts/migration-cleanup.js",
     "db:seed": "node scripts/seed.js",
     "db:reset": "npm run db:clean && npm run db:seed",
-    "db:migrate": "node scripts/migrate-all.js"
+    "db:migrate": "node scripts/migrate-all.js",
+    "db:migrate:store-isolation": "node migration-store-isolation.js",
+    "db:migrate:store-isolation:dry": "node migration-store-isolation.js --dry-run --auto-yes",
+    "db:migrate:store-isolation:auto": "node migration-store-isolation.js --auto-yes"
   },
   "keywords": [
     "pos",
