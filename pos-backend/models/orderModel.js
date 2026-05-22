@@ -20,7 +20,10 @@ const orderItemSchema = new mongoose.Schema({
         balanceAfter: Number
     }],
     stockDeductionStatus: { type: String, default: 'pending', enum: ['pending', 'deducted', 'no_recipe', 'insufficient_stock', 'error'] },
-    stockMovements: [{ type: mongoose.Schema.Types.ObjectId, ref: 'StockMovement' }]
+    stockMovements: [{ type: mongoose.Schema.Types.ObjectId, ref: 'StockMovement' }],
+    // Campos Fase 5.5 — reversão por item
+    stockReversalStatus: { type: String, default: 'not_applicable', enum: ['not_applicable', 'reversed', 'partial'], comment: 'Reversão por item (Fase 5.5)' },
+    stockReversalMovements: [{ type: mongoose.Schema.Types.ObjectId, ref: 'StockMovement', comment: 'Movimentos de reversão do item (Fase 5.5)' }]
 }, { _id: true });
 
 const orderSchema = new mongoose.Schema({
@@ -55,7 +58,12 @@ const orderSchema = new mongoose.Schema({
     },
     // Campos Fase 5 — CMV total e status de baixa
     totalCOGS: { type: Number, default: 0, comment: 'CMV total do pedido (soma dos items)' },
-    stockDeductionStatus: { type: String, default: 'pending', enum: ['pending', 'completed', 'partial', 'failed', 'no_recipes'] }
+    stockDeductionStatus: { type: String, default: 'pending', enum: ['pending', 'completed', 'partial', 'failed', 'no_recipes'] },
+    // Campos Fase 5.5 — reversão de baixa
+    stockReversalStatus: { type: String, default: 'not_applicable', enum: ['not_applicable', 'pending', 'reversed', 'partial', 'failed'], comment: 'Status da reversão de estoque (Fase 5.5)' },
+    stockReversedAt: { type: Date, comment: 'Timestamp da reversão (Fase 5.5)' },
+    stockReversalReason: { type: String, maxlength: 500, comment: 'Motivo da reversão (Fase 5.5)' },
+    stockReversalMovements: [{ type: mongoose.Schema.Types.ObjectId, ref: 'StockMovement', comment: 'Movimentos de reversão (Fase 5.5)' }]
 }, { timestamps: true });
 
 // Compound index for efficient store-scoped order queries

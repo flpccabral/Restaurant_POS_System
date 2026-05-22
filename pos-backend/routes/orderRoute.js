@@ -1,5 +1,6 @@
 const express = require("express");
 const { addOrder, getOrders, getOrderById, updateOrder } = require("../controllers/orderController");
+const { reverseOrderStock, cancelOrder } = require("../controllers/orderReversalController");
 const { isVerifiedUser } = require("../middlewares/tokenVerification");
 const { storeIsolation } = require("../middlewares/storeIsolation");
 const { checkPermission } = require("../middlewares/checkPermission");
@@ -15,5 +16,11 @@ router.route("/")
 router.route("/:id")
   .get(isVerifiedUser, storeIsolation, checkPermission("orders", "read"), getOrderById)
   .put(isVerifiedUser, storeIsolation, checkPermission("orders", "update"), updateOrder);
+
+// Fase 5.5 — Reversão de estoque
+router.post("/:id/reverse-stock", isVerifiedUser, storeIsolation, checkPermission("inventory", "adjust"), reverseOrderStock);
+
+// Fase 5.5 — Cancelamento operacional
+router.post("/:id/cancel", isVerifiedUser, storeIsolation, checkPermission("orders", "cancel"), cancelOrder);
 
 module.exports = router;

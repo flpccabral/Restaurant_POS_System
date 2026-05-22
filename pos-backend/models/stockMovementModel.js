@@ -54,7 +54,9 @@ const stockMovementSchema = new mongoose.Schema({
             'production_consumption',
             'production_output',
             'production_byproduct',
-            'production_waste'
+            'production_waste',
+            // Fase 5.5 — reversão de baixa por venda
+            'recipe_deduction_reversal'
         ],
         required: true,
         index: true
@@ -101,6 +103,11 @@ const stockMovementSchema = new mongoose.Schema({
         ref: 'ProductionBatch',
         comment: 'Vincula movimento a uma producao interna (Fase 5.1A)'
     },
+    reversalOf: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'StockMovement',
+        comment: 'Movimento original sendo revertido (Fase 5.5)'
+    },
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
@@ -138,6 +145,7 @@ stockMovementSchema.index({ originLocation: 1, createdAt: -1 }, { sparse: true }
 stockMovementSchema.index({ destinationLocation: 1, createdAt: -1 }, { sparse: true });
 stockMovementSchema.index({ recipe: 1, createdAt: -1 }, { sparse: true });
 stockMovementSchema.index({ productionBatch: 1, createdAt: -1 }, { sparse: true });
+stockMovementSchema.index({ reversalOf: 1, createdAt: -1 }, { sparse: true });
 stockMovementSchema.index({ location: 1, ingredient: 1, createdAt: -1 });
 
 // Metodo estatico para criar movimento
@@ -159,7 +167,7 @@ stockMovementSchema.statics.createMovement = async function(data) {
     let balanceAfter = balanceBefore;
 
     // Calcular novo saldo
-    if (data.type === 'purchase_receipt' || data.type === 'transfer_in' || data.type === 'inventory_count_adjustment' || data.type === 'production_output' || data.type === 'production_byproduct') {
+    if (data.type === 'purchase_receipt' || data.type === 'transfer_in' || data.type === 'inventory_count_adjustment' || data.type === 'production_output' || data.type === 'production_byproduct' || data.type === 'recipe_deduction_reversal') {
         balanceAfter += data.quantity;
     } else if (['recipe_deduction', 'waste', 'transfer_out', 'adjustment', 'production_consumption', 'production_waste'].includes(data.type)) {
         if (balanceBefore < data.quantity) {
@@ -183,6 +191,7 @@ stockMovementSchema.statics.createMovement = async function(data) {
         recipe: data.recipe || null,
         product: data.product || null,
         productionBatch: data.productionBatch || null,
+        reversalOf: data.reversalOf || null,
         user: data.user,
         notes: data.notes,
         metadata: data.metadata || {}

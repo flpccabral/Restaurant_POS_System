@@ -5,6 +5,7 @@ const Payment = require("../models/paymentModel");
 const Order = require("../models/orderModel");
 const SessionLog = require("../models/sessionLogModel");
 const orderCheckoutService = require("../services/orderCheckoutService");
+const stockReversalService = require("../services/stockReversalService");
 const ws = require("../services/websocketService");
 
 /**
@@ -400,6 +401,28 @@ const refundPayment = async (req, res, next) => {
 
         await payment.refund(amount, reason);
 
+        // Reverter estoque se o pagamento tinha baixa automática
+        let stockReversalResult = null;
+        if (payment.order) {
+            const order = await Order.findById(payment.order);
+            if (order && (order.stockDeductionStatus === 'completed' || order.stockDeductionStatus === 'partial') && order.stockReversalStatus !== 'reversed') {
+                try {
+                    stockReversalResult = await stockReversalService.reverseOrderStockDeduction({
+                        orderId: order._id.toString(),
+                        reason: `Estorno de pagamento: ${reason || 'sem motivo'}`,
+                        userId: req.user._id
+                    });
+
+                    // Atualizar status do pedido
+                    order.orderStatus = 'cancelled';
+                    await order.save();
+                } catch (reversalErr) {
+                    // Log o erro mas não falha o refund financeiro
+                    console.error(`Stock reversal failed for order ${order._id}: ${reversalErr.message}`);
+                }
+            }
+        }
+
         // Log
         await SessionLog.create({
             user: req.user._id,
@@ -408,14 +431,23 @@ const refundPayment = async (req, res, next) => {
             metadata: {
                 paymentId: payment.paymentId,
                 reason,
-                amount
+                amount,
+                stockReversed: stockReversalResult !== null,
+                stockReversalMovements: stockReversalResult?.originalMovementCount || 0
             }
         });
 
         res.status(200).json({
             success: true,
             message: "Payment refunded successfully!",
-            data: payment
+            data: {
+                ...payment.toObject(),
+                stockReversal: stockReversalResult ? {
+                    reversed: true,
+                    movementsReversed: stockReversalResult.originalMovementCount,
+                    reason: stockReversalResult.reversalReason
+                } : null
+            }
         });
     } catch (error) {
         next(error);
