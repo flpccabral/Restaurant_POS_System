@@ -13,6 +13,17 @@ const {
     generateShoppingList,
     getRestockAlerts
 } = require("../controllers/stockController");
+const {
+    createTransfer,
+    validateTransfer,
+    getTransferHistory,
+    getAvailableLocations
+} = require("../controllers/transferController");
+const {
+    createInterStoreTransfer,
+    validateInterStoreTransfer,
+    listStores
+} = require("../controllers/interStoreTransferController");
 const { isVerifiedUser } = require("../middlewares/tokenVerification");
 const { storeIsolation } = require("../middlewares/storeIsolation");
 const { deviceApproval } = require("../middlewares/deviceApproval");
@@ -44,5 +55,16 @@ router.post("/alerts/:id/resolve", checkPermission('inventory', 'read'), resolve
 // Lista de compras e reposição
 router.get("/restock-alerts", getRestockAlerts);
 router.get("/shopping-list", generateShoppingList);
+
+// Rotas de transferência
+router.post("/transfer", checkPermission('inventory', 'transfer'), createTransfer);
+router.get("/transfer/validate", checkPermission('inventory', 'read'), validateTransfer);
+router.get("/transfer/history", checkPermission('inventory', 'read'), getTransferHistory);
+router.get("/locations", checkPermission('inventory', 'read'), getAvailableLocations);
+
+// Fase 5.1D — Transferência inter-store
+router.post("/transfer/inter-store", checkPermission('inventory', 'transfer'), createInterStoreTransfer);
+router.get("/transfer/inter-store/validate", checkPermission('inventory', 'read'), validateInterStoreTransfer);
+router.get("/stores", checkPermission('inventory', 'read'), listStores);
 
 module.exports = router;

@@ -38,6 +38,12 @@ const storeSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
+    operationType: {
+        type: String,
+        enum: ['bar', 'hamburgueria', 'pizzaria', 'arabe', 'cozinha', 'geral'],
+        default: 'geral',
+        index: true
+    },
     subscriptionPlan: {
         type: String,
         enum: ['basic', 'pro', 'enterprise'],
