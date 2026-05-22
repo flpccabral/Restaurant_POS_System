@@ -4,6 +4,7 @@ const CashSession = require("../models/cashSessionModel");
 const Payment = require("../models/paymentModel");
 const Order = require("../models/orderModel");
 const SessionLog = require("../models/sessionLogModel");
+const orderCheckoutService = require("../services/orderCheckoutService");
 const ws = require("../services/websocketService");
 
 /**
@@ -179,7 +180,7 @@ const performSuprimento = async (req, res, next) => {
 };
 
 /**
- * Processar pagamento
+ * Processar pagamento com baixa automática transacional de estoque (Fase 5)
  */
 const processPayment = async (req, res, next) => {
     try {
@@ -202,12 +203,83 @@ const processPayment = async (req, res, next) => {
         }
 
         // Verificar permissão
-        if (!req.user.isMasterAdmin && order.storeId.toString() !== storeRef.toString()) {
+        if (!req.user.isMasterAdmin && order.store.toString() !== storeRef.toString()) {
             const error = createHttpError(403, "Access denied!");
             return next(error);
         }
 
-        // Criar pagamento
+        // Se pedido já está pago, evitar duplicação
+        if (order.orderStatus === 'paid') {
+            const error = createHttpError(400, "Order is already paid!");
+            return next(error);
+        }
+
+        // Iniciar transação MongoDB para baixa de estoque
+        const session = await mongoose.startSession();
+        session.startTransaction();
+
+        let stockDeductionResult = null;
+        let stockDeductionError = null;
+
+        try {
+            // Processar baixa automática de estoque (Fase 5)
+            stockDeductionResult = await orderCheckoutService.processOrderStockDeduction({
+                storeId: storeRef,
+                orderId: orderId,
+                orderItems: order.items,
+                userId: req.user._id,
+                session
+            });
+
+            // Atualizar itens do pedido com CMV e dados da receita
+            for (const itemResult of stockDeductionResult.items) {
+                const item = order.items.id(itemResult.itemId);
+                if (item) {
+                    if (itemResult.recipeId) {
+                        item.recipe = itemResult.recipeId;
+                        item.recipeVersion = itemResult.recipeVersion;
+                    }
+                    item.cogs = itemResult.cogs;
+                    item.ingredientCosts = itemResult.ingredientCosts;
+                    item.stockDeductionStatus = itemResult.stockDeductionStatus;
+                    if (itemResult.movements && itemResult.movements.length > 0) {
+                        item.stockMovements = itemResult.movements;
+                    }
+                }
+            }
+
+            // Atualizar CMV total e status de baixa do pedido
+            order.totalCOGS = stockDeductionResult.totalCOGS;
+
+            if (stockDeductionResult.errors.length === 0) {
+                order.stockDeductionStatus = 'completed';
+            } else if (stockDeductionResult.items.some(i => i.stockDeductionStatus === 'deducted')) {
+                order.stockDeductionStatus = 'partial';
+            } else if (stockDeductionResult.items.every(i => i.stockDeductionStatus === 'no_recipe')) {
+                order.stockDeductionStatus = 'no_recipes';
+            } else {
+                order.stockDeductionStatus = 'failed';
+            }
+
+            await order.save({ session });
+
+            // Commit da transação
+            await session.commitTransaction();
+        } catch (deductionError) {
+            // Rollback da transação
+            await session.abortTransaction();
+            stockDeductionError = deductionError.message || 'Stock deduction failed';
+        } finally {
+            session.endSession();
+        }
+
+        // Se houve erro crítico de estoque, retornar erro ao checkout
+        if (stockDeductionError && stockDeductionResult && stockDeductionResult.items.some(i => i.stockDeductionStatus === 'insufficient_stock' || i.stockDeductionStatus === 'error')) {
+            const error = createHttpError(400, `Stock deduction failed: ${stockDeductionError}`);
+            return next(error);
+        }
+
+        // Criar pagamento (fora da transação de estoque — pagamento deve persistir mesmo se algo falhar)
         const payment = await Payment.create({
             store: storeRef,
             order: orderId,
@@ -223,9 +295,9 @@ const processPayment = async (req, res, next) => {
         });
 
         // Atualizar sessão de caixa se existir
-        const session = await CashSession.getActiveSession(storeRef, req.user._id);
-        if (session) {
-            await session.addPayment({
+        const session_cash = await CashSession.getActiveSession(storeRef, req.user._id);
+        if (session_cash) {
+            await session_cash.addPayment({
                 paymentId: payment._id,
                 orderNumber: payment.orderNumber,
                 amount: payment.amount,
@@ -247,7 +319,10 @@ const processPayment = async (req, res, next) => {
                 paymentId: payment.paymentId,
                 orderId,
                 amount,
-                method
+                method,
+                totalCOGS: order.totalCOGS,
+                stockDeductionStatus: order.stockDeductionStatus,
+                stockDeductionError
             }
         });
 
@@ -255,10 +330,40 @@ const processPayment = async (req, res, next) => {
         const io = req.app.get('io');
         ws.emitOrderStatusChanged(io, storeRef, order, order.orderStatus);
 
+        // Se houve emissão de estoque, emitir evento de inventário
+        if (stockDeductionResult && stockDeductionResult.items.length > 0) {
+            for (const itemResult of stockDeductionResult.items) {
+                if (itemResult.ingredientCosts && itemResult.ingredientCosts.length > 0) {
+                    ws.emitInventoryUpdated(io, storeRef, {
+                        type: 'sale_deduction',
+                        orderId,
+                        items: itemResult.ingredientCosts.map(ic => ({
+                            ingredientId: ic.ingredient,
+                            ingredientName: ic.ingredientName,
+                            quantityDeducted: ic.quantity,
+                            unit: ic.unit,
+                            balanceAfter: ic.balanceAfter,
+                            cost: ic.cost
+                        }))
+                    });
+                }
+            }
+        }
+
+        const responseData = {
+            ...payment.toObject(),
+            stockDeduction: stockDeductionResult ? {
+                totalCOGS: stockDeductionResult.totalCOGS,
+                status: order.stockDeductionStatus,
+                itemsProcessed: stockDeductionResult.items.length,
+                errors: stockDeductionResult.errors
+            } : null
+        };
+
         res.status(200).json({
             success: true,
             message: "Payment processed successfully!",
-            data: payment
+            data: responseData
         });
     } catch (error) {
         next(error);
@@ -455,7 +560,7 @@ const getPDVSummary = async (req, res, next) => {
 
         // Pedidos pendentes
         const pendingOrders = await Order.countDocuments({
-            storeId: new mongoose.Types.ObjectId(storeRef),
+            store: new mongoose.Types.ObjectId(storeRef),
             orderStatus: { $in: ['pending', 'preparing'] }
         });
 
@@ -464,7 +569,7 @@ const getPDVSummary = async (req, res, next) => {
         today.setHours(0, 0, 0, 0);
 
         const todayOrders = await Order.countDocuments({
-            storeId: new mongoose.Types.ObjectId(storeRef),
+            store: new mongoose.Types.ObjectId(storeRef),
             createdAt: { $gte: today }
         });
 
