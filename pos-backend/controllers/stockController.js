@@ -2,16 +2,29 @@ const createHttpError = require("http-errors");
 const StockBalance = require("../models/stockBalanceModel");
 const StockMovement = require("../models/stockMovementModel");
 const StockAlert = require("../models/stockAlertModel");
+const StockLocation = require("../models/stockLocationModel");
 const GlobalIngredient = require("../models/globalIngredientModel");
 const recipeService = require("../services/recipeService");
 const ws = require("../services/websocketService");
+
+/**
+ * Resolve a localização padrão (STORE) para uma store
+ */
+const resolveStoreLocation = async (storeRef) => {
+    const Store = require("../models/storeModel");
+    const store = await Store.findById(storeRef);
+    if (!store) {
+        throw createHttpError(404, "Store not found!");
+    }
+    return await StockLocation.getOrCreateStoreLocation(storeRef, store.name);
+};
 
 /**
  * Obter saldo de estoque
  */
 const getStockBalance = async (req, res, next) => {
     try {
-        const { ingredient, needsRestock } = req.query;
+        const { ingredient, needsRestock, locationType } = req.query;
         const filter = {};
 
         // Aplicar store isolation
@@ -19,6 +32,17 @@ const getStockBalance = async (req, res, next) => {
             filter.store = req.user.store;
         } else if (req.storeId) {
             filter.store = req.storeId;
+        }
+
+        // Filtro por tipo de localização
+        if (locationType) {
+            const StockLocation = require("../models/stockLocationModel");
+            const locations = await StockLocation.find({
+                store: filter.store,
+                type: locationType,
+                isActive: true
+            });
+            filter.location = { $in: locations.map(l => l._id) };
         }
 
         // Filtros opcionais
@@ -32,6 +56,7 @@ const getStockBalance = async (req, res, next) => {
 
         const stockItems = await StockBalance.find(filter)
             .populate('ingredient', 'name category unit')
+            .populate('location', 'name type')
             .populate('supplier', 'name email')
             .sort({ balance: 1 });
 
@@ -64,6 +89,9 @@ const updateStockBalance = async (req, res, next) => {
         // Determinar loja
         const storeRef = req.user.isMasterAdmin ? req.storeId : req.user.store;
 
+        // Resolver localização padrão da loja
+        const storeLocation = await resolveStoreLocation(storeRef);
+
         // Verificar se ingrediente existe
         const ingredient = await GlobalIngredient.findById(ingredientId);
         if (!ingredient) {
@@ -71,15 +99,17 @@ const updateStockBalance = async (req, res, next) => {
             return next(error);
         }
 
-        // Buscar ou criar saldo
+        // Buscar ou criar saldo por localização
         let stockBalance = await StockBalance.findOne({
             store: storeRef,
+            location: storeLocation._id,
             ingredient: ingredientId
         });
 
         if (!stockBalance) {
             stockBalance = await StockBalance.create({
                 store: storeRef,
+                location: storeLocation._id,
                 ingredient: ingredientId,
                 balance: 0,
                 reserved: 0,
@@ -132,9 +162,13 @@ const stockIn = async (req, res, next) => {
         // Determinar loja
         const storeRef = req.user.isMasterAdmin ? req.storeId : req.user.store;
 
+        // Resolver localização padrão da loja
+        const storeLocation = await resolveStoreLocation(storeRef);
+
         // Buscar saldo
         let stockBalance = await StockBalance.findOne({
             store: storeRef,
+            location: storeLocation._id,
             ingredient: ingredientId
         }).populate('ingredient');
 
@@ -147,6 +181,7 @@ const stockIn = async (req, res, next) => {
 
             stockBalance = await StockBalance.create({
                 store: storeRef,
+                location: storeLocation._id,
                 ingredient: ingredientId,
                 balance: 0,
                 reserved: 0,
@@ -221,11 +256,15 @@ const stockOut = async (req, res, next) => {
         // Determinar loja
         const storeRef = req.user.isMasterAdmin ? req.storeId : req.user.store;
 
+        // Resolver localização padrão da loja
+        const storeLocation = await resolveStoreLocation(storeRef);
+
         // Criar movimento de saída
         const movement = await StockMovement.createMovement({
             store: storeRef,
+            location: storeLocation._id,
             ingredient: ingredientId,
-            type: 'out',
+            type: 'waste',
             quantity,
             unit: 'auto',
             reason: reason || 'Saída manual de estoque',
@@ -272,9 +311,13 @@ const stockAdjustment = async (req, res, next) => {
         // Determinar loja
         const storeRef = req.user.isMasterAdmin ? req.storeId : req.user.store;
 
+        // Resolver localização padrão da loja
+        const storeLocation = await resolveStoreLocation(storeRef);
+
         // Buscar saldo
         const stockBalance = await StockBalance.findOne({
             store: storeRef,
+            location: storeLocation._id,
             ingredient: ingredientId
         });
 
@@ -286,8 +329,9 @@ const stockAdjustment = async (req, res, next) => {
         // Criar movimento de ajuste
         const movement = await StockMovement.create({
             store: storeRef,
+            location: storeLocation._id,
             ingredient: ingredientId,
-            type: 'adjustment',
+            type: 'inventory_count_adjustment',
             quantity,
             unit: stockBalance.unit,
             balanceBefore: stockBalance.balance,
@@ -352,6 +396,9 @@ const getStockHistory = async (req, res, next) => {
 
         const movements = await StockMovement.find(filter)
             .populate('ingredient', 'name category')
+            .populate('location', 'name type')
+            .populate('originLocation', 'name type')
+            .populate('destinationLocation', 'name type')
             .populate('user', 'name email')
             .populate('recipe', 'name')
             .sort({ createdAt: -1 })

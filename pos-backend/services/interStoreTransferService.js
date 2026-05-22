@@ -68,9 +68,10 @@ const createInterStoreTransfer = async ({
     session.startTransaction();
 
     try {
-        // 1. Validar stores ativas (findById preserves identity, unlike find with $in)
-        const originStore = await Store.findById(originStoreId).session(session);
-        const destStore = await Store.findById(destinationStoreId).session(session);
+        // 1. Validar stores ativas
+        const [originStore, destStore] = await Store.find({
+            _id: { $in: [originStoreId, destinationStoreId] }
+        }).session(session);
 
         if (!originStore || !destStore) {
             throw new Error('Origin or destination store not found');

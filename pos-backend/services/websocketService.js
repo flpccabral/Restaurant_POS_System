@@ -289,6 +289,32 @@ const emitKDSOrderSynced = (io, storeId, data) => {
     console.log(`[WebSocket] kds:order-synced emitted for order ${data.orderNumber}`);
 };
 
+/**
+ * Emite evento de transferência de estoque
+ * @param {SocketIO.Server} io - Instância do Socket.io
+ * @param {string} storeId - ID da loja
+ * @param {Object} data - Dados da transferência
+ */
+const emitTransferCompleted = (io, storeId, data) => {
+    const eventData = {
+        event: 'transfer:completed',
+        data: {
+            storeId: storeId,
+            ingredientId: data.ingredientId,
+            ingredientName: data.ingredientName,
+            quantity: data.quantity,
+            unit: data.unit,
+            origin: data.origin,
+            destination: data.destination,
+            timestamp: new Date().toISOString()
+        },
+        timestamp: new Date().toISOString()
+    };
+
+    io.to(`store:${storeId}`).emit('transfer:completed', eventData.data);
+    console.log(`[WebSocket] transfer:completed emitted for store ${storeId}`);
+};
+
 module.exports = {
     emitOrderCreated,
     emitOrderUpdated,
@@ -304,5 +330,6 @@ module.exports = {
     emitKDSOrderServed,
     emitKDSOrderRushed,
     emitKDSOrderCancelled,
-    emitKDSOrderSynced
+    emitKDSOrderSynced,
+    emitTransferCompleted
 };

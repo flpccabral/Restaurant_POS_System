@@ -97,13 +97,10 @@ const requireStore = async (req, res, next) => {
 const getStoreFilter = (req, additionalFilters = {}) => {
     const filter = { ...additionalFilters };
 
-    // Se req.storeId existe e não é null, aplicar filtro
+    // All models use the field `store` (not `storeId`)
     if (req.storeId) {
-        filter.storeId = req.storeId;
-    }
-
-    // Para modelos que usam ref Store em vez de storeId string
-    if (req.user?.store && !req.isMasterAdmin) {
+        filter.store = req.storeId;
+    } else if (req.user?.store && !req.isMasterAdmin) {
         filter.store = req.user.store;
     }
 
@@ -121,8 +118,9 @@ const getStoreFilter = (req, additionalFilters = {}) => {
 const applyStoreToAggregation = (req, pipeline) => {
     const storeMatch = {};
 
+    // All models use the field `store` (not `storeId`)
     if (req.storeId) {
-        storeMatch.storeId = req.storeId;
+        storeMatch.store = req.storeId;
     } else if (req.user?.store && !req.isMasterAdmin) {
         storeMatch.store = req.user.store;
     }

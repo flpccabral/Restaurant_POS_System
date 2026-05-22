@@ -12,8 +12,15 @@ const stockBalanceSchema = new mongoose.Schema({
     store: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Store',
+        index: true,
+        comment: 'Contexto operacional. Opcional quando location e estoque central compartilhado.'
+    },
+    location: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'StockLocation',
         required: true,
-        index: true
+        index: true,
+        comment: 'Localizacao fisica do estoque — fonte primaria do saldo'
     },
     ingredient: {
         type: mongoose.Schema.Types.ObjectId,
@@ -30,18 +37,18 @@ const stockBalanceSchema = new mongoose.Schema({
         type: Number,
         default: 0,
         min: 0,
-        comment: 'Quantidade reservada (não disponível)'
+        comment: 'Quantidade reservada (nao disponivel)'
     },
     available: {
         type: Number,
         default: 0,
-        comment: 'Quantidade disponível (balance - reserved)'
+        comment: 'Quantidade disponivel (balance - reserved)'
     },
     minimumStock: {
         type: Number,
         default: 0,
         min: 0,
-        comment: 'Estoque mínimo para alerta de reposição'
+        comment: 'Estoque minimo para alerta de reposicao'
     },
     unit: {
         type: String,
@@ -52,11 +59,11 @@ const stockBalanceSchema = new mongoose.Schema({
         type: Number,
         default: 0,
         min: 0,
-        comment: 'Preço da última compra'
+        comment: 'Preco da ultima compra'
     },
     lastPurchaseDate: {
         type: Date,
-        comment: 'Data da última compra'
+        comment: 'Data da ultima compra'
     },
     supplier: {
         type: mongoose.Schema.Types.ObjectId,
@@ -65,12 +72,13 @@ const stockBalanceSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
-// Índice composto para unicidade
-stockBalanceSchema.index({ store: 1, ingredient: 1 }, { unique: true });
-stockBalanceSchema.index({ store: 1, balance: 1 });
-stockBalanceSchema.index({ store: 1, minimumStock: 1 });
+// Indice unico por location + ingrediente (fonte de verdade do saldo)
+stockBalanceSchema.index({ location: 1, ingredient: 1 }, { unique: true });
+stockBalanceSchema.index({ store: 1, location: 1 }, { sparse: true });
+stockBalanceSchema.index({ store: 1, balance: 1 }, { sparse: true });
+stockBalanceSchema.index({ store: 1, minimumStock: 1 }, { sparse: true });
 
-// Virtual para verificar se está abaixo do mínimo
+// Virtual para verificar se esta abaixo do minimo
 stockBalanceSchema.virtual('needsRestock').get(function() {
     return this.available <= this.minimumStock;
 });
@@ -86,7 +94,7 @@ stockBalanceSchema.pre('save', function(next) {
     next();
 });
 
-// Método para adicionar saldo
+// Metodo para adicionar saldo
 stockBalanceSchema.methods.addBalance = async function(quantity, price = null) {
     this.balance += quantity;
     if (price !== null) {
@@ -97,7 +105,7 @@ stockBalanceSchema.methods.addBalance = async function(quantity, price = null) {
     return this;
 };
 
-// Método para remover saldo (baixa)
+// Metodo para remover saldo (baixa)
 stockBalanceSchema.methods.removeBalance = async function(quantity, reason = 'consumption') {
     if (this.balance < quantity) {
         throw new Error(`Insufficient stock. Available: ${this.balance}, Requested: ${quantity}`);
@@ -107,7 +115,7 @@ stockBalanceSchema.methods.removeBalance = async function(quantity, reason = 'co
     return this;
 };
 
-// Método para reservar quantidade
+// Metodo para reservar quantidade
 stockBalanceSchema.methods.reserve = async function(quantity) {
     if (this.available < quantity) {
         throw new Error(`Insufficient available stock. Available: ${this.available}, Requested: ${quantity}`);
@@ -117,7 +125,7 @@ stockBalanceSchema.methods.reserve = async function(quantity) {
     return this;
 };
 
-// Método para liberar reserva
+// Metodo para liberar reserva
 stockBalanceSchema.methods.releaseReservation = async function(quantity) {
     this.reserved = Math.max(0, this.reserved - quantity);
     await this.save();

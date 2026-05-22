@@ -119,7 +119,7 @@ const getDashboardKPIs = async (req, res, next) => {
         const orderAgg = await Order.aggregate([
             {
                 $match: {
-                    storeId,
+                    store: storeId,
                     orderDate: { $gte: start, $lte: end },
                     orderStatus: { $nin: ["cancelled"] }
                 }
@@ -220,7 +220,7 @@ const getSalesReport = async (req, res, next) => {
         const salesData = await Order.aggregate([
             {
                 $match: {
-                    storeId,
+                    store: storeId,
                     orderDate: { $gte: start, $lte: end },
                     orderStatus: { $nin: ["cancelled"] }
                 }
@@ -291,7 +291,7 @@ const getTopProducts = async (req, res, next) => {
         const topProducts = await Order.aggregate([
             {
                 $match: {
-                    storeId,
+                    store: storeId,
                     orderDate: { $gte: start, $lte: end },
                     orderStatus: { $nin: ["cancelled"] },
                     items: { $exists: true, $ne: [] }
@@ -348,7 +348,7 @@ const getCMVReport = async (req, res, next) => {
         const salesAgg = await Order.aggregate([
             {
                 $match: {
-                    storeId,
+                    store: storeId,
                     orderDate: { $gte: start, $lte: end },
                     orderStatus: { $nin: ["cancelled"] }
                 }
@@ -540,7 +540,7 @@ const getVarianceAnalysis = async (req, res, next) => {
         const orders = await Order.aggregate([
             {
                 $match: {
-                    storeId,
+                    store: storeId,
                     orderDate: { $gte: start, $lte: end },
                     orderStatus: { $nin: ["cancelled"] },
                     items: { $exists: true, $ne: [] }

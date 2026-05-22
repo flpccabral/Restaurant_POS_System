@@ -63,24 +63,24 @@ const migrateAll = async () => {
         // 3. Migrar orders
         console.log('\n📋 Migrating orders...');
         const orderResult = await Order.updateMany(
-            { storeId: { $exists: false } },
-            { $set: { storeId: store._id } }
+            { store: { $exists: false } },
+            { $set: { store: store._id } }
         );
         console.log(`✅ Updated ${orderResult.modifiedCount} orders`);
 
         // 4. Migrar tables
         console.log('\n🪑 Migrating tables...');
         const tableResult = await Table.updateMany(
-            { storeId: { $exists: false } },
-            { $set: { storeId: store._id } }
+            { store: { $exists: false } },
+            { $set: { store: store._id } }
         );
         console.log(`✅ Updated ${tableResult.modifiedCount} tables`);
 
         // 5. Migrar payments
         console.log('\n💳 Migrating payments...');
         const paymentResult = await Payment.updateMany(
-            { storeId: { $exists: false } },
-            { $set: { storeId: store._id } }
+            { store: { $exists: false } },
+            { $set: { store: store._id } }
         );
         console.log(`✅ Updated ${paymentResult.modifiedCount} payments`);
 

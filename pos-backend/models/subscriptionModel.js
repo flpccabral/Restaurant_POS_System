@@ -206,7 +206,7 @@ subscriptionSchema.methods.updateUsage = async function() {
     if (storeDoc) {
         this.usage.users = await User.countDocuments({ store: this.store });
         this.usage.devices = await Device.countDocuments({ store: this.store });
-        this.usage.orders = await Order.countDocuments({ storeId: this.store });
+        this.usage.orders = await Order.countDocuments({ store: this.store });
         this.usage.products = await Product.countDocuments({ store: this.store });
     }
 
