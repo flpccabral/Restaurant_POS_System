@@ -114,6 +114,10 @@ app.use("/api/pdv", require("./routes/pdvRoutes"));
 // Fase 5.1A - Produção interna e subprodutos
 app.use("/api/production", require("./routes/productionRoute"));
 
+// Fase 6 - Stock Policies & Observability
+app.use("/api/stock-policies", require("./routes/stockPolicyRoute"));
+app.use("/api/observability", require("./routes/observabilityRoute"));
+
 // Global Error Handler
 app.use(globalErrorHandler);
 
