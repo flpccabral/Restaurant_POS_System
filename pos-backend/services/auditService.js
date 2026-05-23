@@ -73,4 +73,144 @@ const queryLogs = async (filters = {}) => {
     .limit(filters.limit || 100);
 };
 
-module.exports = { logAction, queryLogs };
+/**
+ * Gera relatorio diario de auditoria — resumo de todas as acoes do dia.
+ *
+ * Agrupa por actionType, por loja, e retorna totalizadores uteis
+ * para a revisao diaria do piloto.
+ *
+ * @param {string} [date] - Data ISO (YYYY-MM-DD). Padrao: hoje.
+ * @param {ObjectId} [storeId] - Filtrar por loja (opcional).
+ * @returns {Promise<Object>} Relatorio diario
+ */
+const dailyReport = async (date, storeId) => {
+  try {
+    const startDate = date ? new Date(date) : new Date();
+    startDate.setHours(0, 0, 0, 0);
+    const endDate = new Date(startDate);
+    endDate.setDate(endDate.getDate() + 1);
+
+    const match = {
+      createdAt: { $gte: startDate, $lt: endDate }
+    };
+    if (storeId) match.store = storeId;
+
+    // Total de acoes
+    const totalActions = await OperationalAuditLog.countDocuments(match);
+
+    // Agrupamento por tipo de acao
+    const byType = await OperationalAuditLog.aggregate([
+      { $match: match },
+      { $group: { _id: "$actionType", count: { $sum: 1 } } },
+      { $sort: { count: -1 } }
+    ]);
+
+    const byTypeMap = {};
+    byType.forEach(item => { byTypeMap[item._id] = item.count; });
+
+    // Acoes com falha
+    const failures = await OperationalAuditLog.countDocuments({
+      ...match,
+      status: "failure"
+    });
+
+    // Agrupamento por loja (se nao filtrado por loja)
+    let byStore = [];
+    if (!storeId) {
+      byStore = await OperationalAuditLog.aggregate([
+        { $match: match },
+        {
+          $lookup: {
+            from: "stores",
+            localField: "store",
+            foreignField: "_id",
+            as: "storeInfo"
+          }
+        },
+        { $unwind: { path: "$storeInfo", preserveNullAndEmptyArrays: true } },
+        {
+          $group: {
+            _id: "$store",
+            storeName: { $first: "$storeInfo.name" },
+            count: { $sum: 1 }
+          }
+        },
+        { $sort: { count: -1 } }
+      ]);
+    }
+
+    // Acoes recentes (ultimas 10)
+    const recentQuery = OperationalAuditLog.find(match)
+      .sort({ createdAt: -1 })
+      .limit(10)
+      .populate("user", "name email")
+      .populate("store", "name")
+      .populate("ingredient", "name");
+
+    if (storeId) recentQuery.where("store", storeId);
+    const recent = await recentQuery;
+
+    // Acoes por usuario
+    const byUser = await OperationalAuditLog.aggregate([
+      { $match: match },
+      {
+        $lookup: {
+          from: "users",
+          localField: "user",
+          foreignField: "_id",
+          as: "userInfo"
+        }
+      },
+      { $unwind: { path: "$userInfo", preserveNullAndEmptyArrays: true } },
+      {
+        $group: {
+          _id: "$user",
+          userName: { $first: "$userInfo.name" },
+          count: { $sum: 1 }
+        }
+      },
+      { $sort: { count: -1 } }
+    ]);
+
+    return {
+      date: startDate.toISOString().split("T")[0],
+      totalActions,
+      byType: byTypeMap,
+      failures,
+      byStore: byStore.map(s => ({
+        storeId: s._id,
+        storeName: s.storeName || "Desconhecida",
+        count: s.count
+      })),
+      byUser: byUser.map(u => ({
+        userId: u._id,
+        userName: u.userName || "Desconhecido",
+        count: u.count
+      })),
+      recentActions: recent.map(r => ({
+        id: r._id,
+        actionType: r.actionType,
+        user: r.user ? { name: r.user.name, email: r.user.email } : null,
+        store: r.store ? r.store.name : null,
+        ingredient: r.ingredient ? r.ingredient.name : null,
+        status: r.status,
+        summary: r.summary,
+        createdAt: r.createdAt
+      }))
+    };
+  } catch (err) {
+    console.error("[AuditService] dailyReport failed:", err.message);
+    return {
+      date: date || "unknown",
+      error: err.message,
+      totalActions: 0,
+      byType: {},
+      failures: 0,
+      byStore: [],
+      byUser: [],
+      recentActions: []
+    };
+  }
+};
+
+module.exports = { logAction, queryLogs, dailyReport };

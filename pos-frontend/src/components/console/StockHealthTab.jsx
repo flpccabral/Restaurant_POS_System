@@ -22,19 +22,6 @@ const StockHealthTab = () => {
     staleTime: 60_000,
   });
 
-  if (!storeId) {
-    return <EmptyState message="Nenhuma loja associada ao usuário." />;
-  }
-
-  if (isLoading) return <LoadingState rows={8} />;
-  if (isError)
-    return (
-      <ErrorState
-        message="Falha ao carregar saúde do estoque."
-        onRetry={refetch}
-      />
-    );
-
   const ingredients = data?.data?.ingredients || [];
   const statusSummary = data?.data?.statusSummary || {};
 
@@ -47,6 +34,19 @@ const StockHealthTab = () => {
       return matchSearch && matchStatus;
     });
   }, [ingredients, filter, statusFilter]);
+
+  if (!storeId) {
+    return <EmptyState message="Nenhuma loja associada ao usuário." />;
+  }
+
+  if (isLoading) return <LoadingState rows={8} />;
+  if (isError)
+    return (
+      <ErrorState
+        message="Falha ao carregar saúde do estoque."
+        onRetry={refetch}
+      />
+    );
 
   if (ingredients.length === 0) {
     return <EmptyState message="Nenhum ingrediente com saldo cadastrado." />;

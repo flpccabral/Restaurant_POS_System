@@ -26,4 +26,22 @@ router.get(
   }
 );
 
+/**
+ * GET /api/audit/daily-report
+ * Relatorio diario de auditoria — sumariza acoes do dia.
+ * Query params: date (YYYY-MM-DD, padrao: hoje), store (ObjectId, opcional)
+ */
+router.get(
+  "/daily-report",
+  checkPermission("inventory", "read"),
+  async (req, res, next) => {
+    try {
+      const report = await auditService.dailyReport(req.query.date, req.query.store);
+      res.json({ success: true, data: report });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
 module.exports = router;

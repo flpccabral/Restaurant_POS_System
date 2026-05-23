@@ -46,15 +46,6 @@ const PolicyTab = () => {
     staleTime: 60_000,
   });
 
-  if (isLoading) return <LoadingState rows={6} />;
-  if (isError)
-    return (
-      <ErrorState
-        message="Falha ao carregar politicas de estoque."
-        onRetry={refetch}
-      />
-    );
-
   const policies = data?.data?.data || [];
 
   const filtered = useMemo(() => {
@@ -112,6 +103,15 @@ const PolicyTab = () => {
       // Error handled by hook via snackbar
     }
   };
+
+  if (isLoading) return <LoadingState rows={6} />;
+  if (isError)
+    return (
+      <ErrorState
+        message="Falha ao carregar politicas de estoque."
+        onRetry={refetch}
+      />
+    );
 
   if (policies.length === 0 && search === "" && priorityFilter === "all" && activeFilter === "all") {
     return (
