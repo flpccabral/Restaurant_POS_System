@@ -92,8 +92,15 @@ const createSupplier = async (req, res, next) => {
             return next(error);
         }
 
-        // Determinar loja
-        const storeRef = req.user.isMasterAdmin ? req.storeId : req.user.store;
+        // Determinar loja (CREATE precisa de store, mesmo para master admin)
+        const storeRef = req.user.isMasterAdmin
+            ? (req.body.store || req.storeId || req.user.store)
+            : req.user.store;
+
+        if (!storeRef) {
+            const error = createHttpError(400, "Store ID is required to create a supplier. Pass storeId in query or store in body.");
+            return next(error);
+        }
 
         // Verificar documento duplicado
         if (document) {
@@ -160,7 +167,7 @@ const updateSupplier = async (req, res, next) => {
             return next(error);
         }
 
-        const storeRef = req.user.isMasterAdmin ? req.storeId : req.user.store;
+        const storeRef = req.user.isMasterAdmin && req.storeId ? req.storeId : req.user.store;
 
         // Verificar documento duplicado (se alterado)
         if (req.body.document && req.body.document !== supplier.document) {
@@ -233,7 +240,7 @@ const toggleSupplierStatus = async (req, res, next) => {
         supplier.isActive = isActive;
         await supplier.save();
 
-        const storeRef = req.user.isMasterAdmin ? req.storeId : req.user.store;
+        const storeRef = req.user.isMasterAdmin && req.storeId ? req.storeId : req.user.store;
 
         // Log
         await SessionLog.create({
@@ -287,7 +294,7 @@ const deleteSupplier = async (req, res, next) => {
 
         await Supplier.findByIdAndDelete(id);
 
-        const storeRef = req.user.isMasterAdmin ? req.storeId : req.user.store;
+        const storeRef = req.user.isMasterAdmin && req.storeId ? req.storeId : req.user.store;
 
         // Log
         await SessionLog.create({

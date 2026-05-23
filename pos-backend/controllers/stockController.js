@@ -86,8 +86,15 @@ const updateStockBalance = async (req, res, next) => {
             return next(error);
         }
 
-        // Determinar loja
-        const storeRef = req.user.isMasterAdmin ? req.storeId : req.user.store;
+        // Determinar loja (mutation precisa de store, mesmo para master admin)
+        const storeRef = req.user.isMasterAdmin
+            ? (req.body.store || req.storeId || req.user.store)
+            : req.user.store;
+
+        if (!storeRef) {
+            const error = createHttpError(400, "Store ID is required for stock operations. Pass storeId in query or store in body.");
+            return next(error);
+        }
 
         // Resolver localização padrão da loja
         const storeLocation = await resolveStoreLocation(storeRef);
@@ -159,8 +166,15 @@ const stockIn = async (req, res, next) => {
             return next(error);
         }
 
-        // Determinar loja
-        const storeRef = req.user.isMasterAdmin ? req.storeId : req.user.store;
+        // Determinar loja (mutation precisa de store, mesmo para master admin)
+        const storeRef = req.user.isMasterAdmin
+            ? (req.body.store || req.storeId || req.user.store)
+            : req.user.store;
+
+        if (!storeRef) {
+            const error = createHttpError(400, "Store ID is required for stock operations. Pass storeId in query or store in body.");
+            return next(error);
+        }
 
         // Resolver localização padrão da loja
         const storeLocation = await resolveStoreLocation(storeRef);
@@ -253,8 +267,15 @@ const stockOut = async (req, res, next) => {
             return next(error);
         }
 
-        // Determinar loja
-        const storeRef = req.user.isMasterAdmin ? req.storeId : req.user.store;
+        // Determinar loja (mutation precisa de store, mesmo para master admin)
+        const storeRef = req.user.isMasterAdmin
+            ? (req.body.store || req.storeId || req.user.store)
+            : req.user.store;
+
+        if (!storeRef) {
+            const error = createHttpError(400, "Store ID is required for stock operations. Pass storeId in query or store in body.");
+            return next(error);
+        }
 
         // Resolver localização padrão da loja
         const storeLocation = await resolveStoreLocation(storeRef);
@@ -308,8 +329,15 @@ const stockAdjustment = async (req, res, next) => {
             return next(error);
         }
 
-        // Determinar loja
-        const storeRef = req.user.isMasterAdmin ? req.storeId : req.user.store;
+        // Determinar loja (mutation precisa de store, mesmo para master admin)
+        const storeRef = req.user.isMasterAdmin
+            ? (req.body.store || req.storeId || req.user.store)
+            : req.user.store;
+
+        if (!storeRef) {
+            const error = createHttpError(400, "Store ID is required for stock operations. Pass storeId in query or store in body.");
+            return next(error);
+        }
 
         // Resolver localização padrão da loja
         const storeLocation = await resolveStoreLocation(storeRef);
@@ -422,7 +450,7 @@ const getStockAlerts = async (req, res, next) => {
         const { status, type, severity } = req.query;
 
         // Determinar loja
-        const storeRef = req.user.isMasterAdmin ? req.storeId : req.user.store;
+        const storeRef = req.user.isMasterAdmin && req.storeId ? req.storeId : req.user.store;
 
         const alerts = await StockAlert.getStoreAlerts(storeRef, {
             status,
@@ -446,7 +474,7 @@ const getStockAlerts = async (req, res, next) => {
 const checkStockAlerts = async (req, res, next) => {
     try {
         // Determinar loja
-        const storeRef = req.user.isMasterAdmin ? req.storeId : req.user.store;
+        const storeRef = req.user.isMasterAdmin && req.storeId ? req.storeId : req.user.store;
 
         const alerts = await StockAlert.checkAndCreateAlerts(storeRef);
 
@@ -525,7 +553,7 @@ const resolveAlert = async (req, res, next) => {
 const generateShoppingList = async (req, res, next) => {
     try {
         // Determinar loja
-        const storeRef = req.user.isMasterAdmin ? req.storeId : req.user.store;
+        const storeRef = req.user.isMasterAdmin && req.storeId ? req.storeId : req.user.store;
 
         const shoppingList = await recipeService.generateShoppingList(storeRef);
 
@@ -544,7 +572,7 @@ const generateShoppingList = async (req, res, next) => {
 const getRestockAlerts = async (req, res, next) => {
     try {
         // Determinar loja
-        const storeRef = req.user.isMasterAdmin ? req.storeId : req.user.store;
+        const storeRef = req.user.isMasterAdmin && req.storeId ? req.storeId : req.user.store;
 
         const alerts = await recipeService.getRestockAlerts(storeRef);
 

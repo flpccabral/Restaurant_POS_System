@@ -115,8 +115,15 @@ const createPurchaseOrder = async (req, res, next) => {
             return next(error);
         }
 
-        // Determinar loja
-        const storeRef = req.user.isMasterAdmin ? req.storeId : req.user.store;
+        // Determinar loja (CREATE precisa de store, mesmo para master admin)
+        const storeRef = req.user.isMasterAdmin
+            ? (req.body.store || req.storeId || req.user.store)
+            : req.user.store;
+
+        if (!storeRef) {
+            const error = createHttpError(400, "Store ID is required to create a purchase order. Pass storeId in query or store in body.");
+            return next(error);
+        }
 
         // Verificar fornecedor
         const supplierDoc = await Supplier.findOne({
@@ -226,7 +233,7 @@ const updatePurchaseOrder = async (req, res, next) => {
             return next(error);
         }
 
-        const storeRef = req.user.isMasterAdmin ? req.storeId : req.user.store;
+        const storeRef = req.user.isMasterAdmin && req.storeId ? req.storeId : req.user.store;
 
         // Campos atualizáveis
         const updateableFields = [
@@ -291,7 +298,7 @@ const sendPurchaseOrder = async (req, res, next) => {
         const populatedOrder = await PurchaseOrder.findById(order._id)
             .populate('supplier', 'name tradeName');
 
-        const storeRef = req.user.isMasterAdmin ? req.storeId : req.user.store;
+        const storeRef = req.user.isMasterAdmin && req.storeId ? req.storeId : req.user.store;
 
         // Log
         await SessionLog.create({
@@ -336,7 +343,7 @@ const confirmPurchaseOrder = async (req, res, next) => {
 
         await order.confirm();
 
-        const storeRef = req.user.isMasterAdmin ? req.storeId : req.user.store;
+        const storeRef = req.user.isMasterAdmin && req.storeId ? req.storeId : req.user.store;
 
         // Log
         await SessionLog.create({
@@ -387,7 +394,7 @@ const approvePurchaseOrder = async (req, res, next) => {
 
         await order.save();
 
-        const storeRef = req.user.isMasterAdmin ? req.storeId : req.user.store;
+        const storeRef = req.user.isMasterAdmin && req.storeId ? req.storeId : req.user.store;
 
         // Log
         await SessionLog.create({
@@ -447,7 +454,7 @@ const receivePurchaseOrder = async (req, res, next) => {
             .populate('supplier', 'name tradeName')
             .populate('items.ingredient', 'name category');
 
-        const storeRef = req.user.isMasterAdmin ? req.storeId : req.user.store;
+        const storeRef = req.user.isMasterAdmin && req.storeId ? req.storeId : req.user.store;
 
         // Log
         await SessionLog.create({
@@ -514,7 +521,7 @@ const cancelPurchaseOrder = async (req, res, next) => {
 
         await order.cancel(reason);
 
-        const storeRef = req.user.isMasterAdmin ? req.storeId : req.user.store;
+        const storeRef = req.user.isMasterAdmin && req.storeId ? req.storeId : req.user.store;
 
         // Log
         await SessionLog.create({
@@ -564,7 +571,7 @@ const createFromAlert = async (req, res, next) => {
             .populate('supplier', 'name tradeName')
             .populate('items.ingredient', 'name category');
 
-        const storeRef = req.user.isMasterAdmin ? req.storeId : req.user.store;
+        const storeRef = req.user.isMasterAdmin && req.storeId ? req.storeId : req.user.store;
 
         // Log
         await SessionLog.create({

@@ -22,8 +22,15 @@ const createTransfer = async (req, res, next) => {
             return next(error);
         }
 
-        // Determinar loja
-        const storeRef = req.user.isMasterAdmin ? req.storeId : req.user.store;
+        // Determinar loja (mutation precisa de store, mesmo para master admin)
+        const storeRef = req.user.isMasterAdmin
+            ? (req.body.store || req.storeId || req.user.store)
+            : req.user.store;
+
+        if (!storeRef) {
+            const error = createHttpError(400, "Store ID is required for transfers. Pass storeId in query or store in body.");
+            return next(error);
+        }
 
         // Executar transferência
         const result = await transferService.createTransfer({
@@ -104,7 +111,7 @@ const validateTransfer = async (req, res, next) => {
         }
 
         // Determinar loja
-        const storeRef = req.user.isMasterAdmin ? req.storeId : req.user.store;
+        const storeRef = req.user.isMasterAdmin && req.storeId ? req.storeId : req.user.store;
 
         const validation = await transferService.validateTransfer(
             storeRef,
@@ -130,7 +137,7 @@ const getTransferHistory = async (req, res, next) => {
         const { locationId, ingredientId, startDate, endDate, limit } = req.query;
 
         // Determinar loja
-        const storeRef = req.user.isMasterAdmin ? req.storeId : req.user.store;
+        const storeRef = req.user.isMasterAdmin && req.storeId ? req.storeId : req.user.store;
 
         const history = await transferService.getTransferHistory(storeRef, {
             locationId,
@@ -158,7 +165,7 @@ const getAvailableLocations = async (req, res, next) => {
         const { type } = req.query;
 
         // Determinar loja
-        const storeRef = req.user.isMasterAdmin ? req.storeId : req.user.store;
+        const storeRef = req.user.isMasterAdmin && req.storeId ? req.storeId : req.user.store;
 
         const filter = {
             store: storeRef,

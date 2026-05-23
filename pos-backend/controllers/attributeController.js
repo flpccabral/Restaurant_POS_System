@@ -14,8 +14,15 @@ const createAttribute = async (req, res, next) => {
             return next(error);
         }
 
-        // Determinar loja
-        const storeRef = req.user.isMasterAdmin ? req.storeId : req.user.store;
+        // Determinar loja (CREATE precisa de store, mesmo para master admin)
+        const storeRef = req.user.isMasterAdmin
+            ? (req.body.store || req.storeId || req.user.store)
+            : req.user.store;
+
+        if (!storeRef) {
+            const error = createHttpError(400, "Store ID is required to create an attribute. Pass storeId in query or store in body.");
+            return next(error);
+        }
 
         // Verificar duplicidade
         const existing = await Attribute.findOne({

@@ -2,6 +2,7 @@ const createHttpError = require("http-errors");
 const Order = require("../models/orderModel");
 const { default: mongoose } = require("mongoose");
 const ws = require("../services/websocketService");
+const orderCheckoutService = require("../services/orderCheckoutService");
 
 /**
  * MULTI-TENANCY FIX: Helper to build store-scoped filter
@@ -112,4 +113,108 @@ const updateOrder = async (req, res, next) => {
   }
 };
 
-module.exports = { addOrder, getOrderById, getOrders, updateOrder };
+/**
+ * Processar baixa de estoque para pedido existente (Fase 8.4.2 — POS integration).
+ * Chamado pelo POS após criar o pedido, para acionar a pipeline real de baixa.
+ * Não cria pagamento — apenas processa a dedução de estoque.
+ */
+const processOrderStockDeduction = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const storeRef = req.storeId || req.user.store;
+        const userId = req.user._id;
+
+        // Buscar pedido com verificação de loja
+        const order = await Order.findOne({ _id: id, store: storeRef });
+
+        if (!order) {
+            const error = createHttpError(404, "Order not found!");
+            return next(error);
+        }
+
+        if (order.stockDeductionStatus === 'completed') {
+            return res.status(200).json({
+                success: true,
+                message: "Stock already deducted for this order",
+                data: { stockDeductionStatus: order.stockDeductionStatus }
+            });
+        }
+
+        // Iniciar transação MongoDB
+        const session = await mongoose.startSession();
+        session.startTransaction();
+
+        let stockDeductionResult = null;
+        let stockDeductionError = null;
+
+        try {
+            stockDeductionResult = await orderCheckoutService.processOrderStockDeduction({
+                storeId: storeRef,
+                orderId: id,
+                orderItems: order.items,
+                userId,
+                session
+            });
+
+            // Atualizar itens do pedido
+            for (const itemResult of stockDeductionResult.items) {
+                const item = order.items.id(itemResult.itemId);
+                if (item) {
+                    if (itemResult.recipeId) {
+                        item.recipe = itemResult.recipeId;
+                        item.recipeVersion = itemResult.recipeVersion;
+                    }
+                    item.cogs = itemResult.cogs;
+                    item.ingredientCosts = itemResult.ingredientCosts;
+                    item.stockDeductionStatus = itemResult.stockDeductionStatus;
+                    if (itemResult.movements && itemResult.movements.length > 0) {
+                        item.stockMovements = itemResult.movements;
+                    }
+                }
+            }
+
+            order.totalCOGS = stockDeductionResult.totalCOGS;
+
+            if (stockDeductionResult.errors.length === 0) {
+                order.stockDeductionStatus = 'completed';
+            } else if (stockDeductionResult.items.some(i => i.stockDeductionStatus === 'deducted')) {
+                order.stockDeductionStatus = 'partial';
+            } else if (stockDeductionResult.items.every(i => i.stockDeductionStatus === 'no_recipe')) {
+                order.stockDeductionStatus = 'no_recipes';
+            } else {
+                order.stockDeductionStatus = 'failed';
+            }
+
+            await order.save({ session });
+            await session.commitTransaction();
+        } catch (deductionError) {
+            await session.abortTransaction();
+            stockDeductionError = deductionError.message;
+        } finally {
+            session.endSession();
+        }
+
+        res.status(200).json({
+            success: !stockDeductionError,
+            message: stockDeductionError
+                ? `Stock deduction failed: ${stockDeductionError}`
+                : "Stock deduction processed!",
+            data: {
+                stockDeductionStatus: order.stockDeductionStatus,
+                totalCOGS: order.totalCOGS,
+                stockDeductionError,
+                items: stockDeductionResult?.items || []
+            }
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+module.exports = {
+    addOrder,
+    getOrderById,
+    getOrders,
+    updateOrder,
+    processOrderStockDeduction
+};

@@ -26,7 +26,7 @@ const createRecipe = async (req, res, next) => {
         }
 
         // Determinar loja
-        const storeRef = req.user.isMasterAdmin ? req.storeId : req.user.store;
+        const storeRef = req.user.isMasterAdmin && req.storeId ? req.storeId : req.user.store;
 
         // Verificar se produto existe
         const productDoc = await Product.findOne({
@@ -361,7 +361,7 @@ const deductStock = async (req, res, next) => {
         }
 
         // Determinar loja para evento WebSocket
-        const storeRef = req.user.isMasterAdmin ? req.storeId : req.user.store;
+        const storeRef = req.user.isMasterAdmin && req.storeId ? req.storeId : req.user.store;
 
         const result = await recipeService.deductStock(id, quantity, req.user._id);
 
@@ -515,7 +515,7 @@ const validateRecipe = async (req, res, next) => {
         }
 
         if (product) {
-            const storeRef = req.user.isMasterAdmin ? req.storeId : req.user.store;
+            const storeRef = req.user.isMasterAdmin && req.storeId ? req.storeId : req.user.store;
             const productDoc = await Product.findOne({ _id: product, store: storeRef });
             if (!productDoc) {
                 errors.push('Product not found or does not belong to this store');
@@ -542,7 +542,7 @@ const validateRecipe = async (req, res, next) => {
  */
 const getProductsWithoutRecipe = async (req, res, next) => {
     try {
-        const storeRef = req.user.isMasterAdmin ? req.storeId : req.user.store;
+        const storeRef = req.user.isMasterAdmin && req.storeId ? req.storeId : req.user.store;
 
         const products = await Product.find({ store: storeRef, isActive: true })
             .populate('category', 'name');
@@ -598,7 +598,7 @@ const getProductsWithoutRecipe = async (req, res, next) => {
  */
 const getSellableProducts = async (req, res, next) => {
     try {
-        const storeRef = req.user.isMasterAdmin ? req.storeId : req.user.store;
+        const storeRef = req.user.isMasterAdmin && req.storeId ? req.storeId : req.user.store;
 
         const recipes = await Recipe.find({ store: storeRef, isActive: true })
             .populate('product', 'name category')
@@ -633,7 +633,7 @@ const getSellableProducts = async (req, res, next) => {
  */
 const getNonSellableProducts = async (req, res, next) => {
     try {
-        const storeRef = req.user.isMasterAdmin ? req.storeId : req.user.store;
+        const storeRef = req.user.isMasterAdmin && req.storeId ? req.storeId : req.user.store;
 
         const products = await Product.find({ store: storeRef, isActive: true })
             .populate('category', 'name');
@@ -722,7 +722,7 @@ const checkProductSellability = async (req, res, next) => {
         const { productId } = req.params;
         const { variation } = req.query;
 
-        const storeRef = req.user.isMasterAdmin ? req.storeId : req.user.store;
+        const storeRef = req.user.isMasterAdmin && req.storeId ? req.storeId : req.user.store;
 
         const product = await Product.findOne({ _id: productId, store: storeRef, isActive: true });
         if (!product) {

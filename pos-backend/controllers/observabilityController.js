@@ -280,6 +280,24 @@ const generateAlerts = async (req, res, next) => {
     }
 };
 
+/**
+ * Verificar produtos sem ficha técnica e gerar alertas (TASK 10 — Fase 8.4.2)
+ */
+const checkProductsWithoutRecipe = async (req, res, next) => {
+    try {
+        const storeRef = req.user.isMasterAdmin && req.storeId ? req.storeId : req.user.store;
+
+        const result = await observabilityService.checkProductsWithoutRecipe(storeRef);
+
+        res.status(200).json({
+            success: true,
+            data: result
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     getStockHealth,
     getIngredientHealth,
@@ -290,5 +308,6 @@ module.exports = {
     dismissAlert,
     registerPurchase,
     getTimeline,
-    generateAlerts
+    generateAlerts,
+    checkProductsWithoutRecipe
 };

@@ -23,8 +23,15 @@ const createProduct = async (req, res, next) => {
             return next(error);
         }
 
-        // Determinar loja
-        const storeRef = req.user.isMasterAdmin ? req.storeId : req.user.store;
+        // Determinar loja (CREATE precisa de store, mesmo para master admin)
+        const storeRef = req.user.isMasterAdmin
+            ? (req.body.store || req.storeId || req.user.store)
+            : req.user.store;
+
+        if (!storeRef) {
+            const error = createHttpError(400, "Store ID is required to create a product. Pass storeId in query or store in body.");
+            return next(error);
+        }
 
         // Verificar se categoria existe e pertence à loja
         const category = await Category.findOne({
@@ -269,8 +276,8 @@ const updateProduct = async (req, res, next) => {
             return next(error);
         }
 
-        // Determinar loja
-        const storeRef = req.user.isMasterAdmin ? req.storeId : req.user.store;
+        // Determinar loja (master admin sem storeId = usar store do usuario)
+        const storeRef = req.user.isMasterAdmin && req.storeId ? req.storeId : req.user.store;
 
         // Atualizar campos básicos
         if (name !== undefined) product.name = name;
