@@ -2,6 +2,7 @@ import React, { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getStockPolicies } from "../../https";
 import usePolicyActions from "../../hooks/usePolicyActions";
+import { useCapabilities } from "../../hooks/useCapabilities";
 import PolicyFormModal from "./PolicyFormModal";
 import LoadingState from "./LoadingState";
 import ErrorState from "./ErrorState";
@@ -21,6 +22,9 @@ const priorityConfig = {
 };
 
 const PolicyTab = () => {
+  const { can } = useCapabilities();
+  const canAdjust = can("inventory", "adjust");
+
   const [priorityFilter, setPriorityFilter] = useState("all");
   const [activeFilter, setActiveFilter] = useState("all");
   const [search, setSearch] = useState("");
@@ -112,15 +116,17 @@ const PolicyTab = () => {
   if (policies.length === 0 && search === "" && priorityFilter === "all" && activeFilter === "all") {
     return (
       <div className="space-y-4">
-        <div className="flex justify-end">
-          <button
-            onClick={handleOpenCreate}
-            className="bg-[#1a3a1a] hover:bg-[#2a5a2a] text-[#2ed573] px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
-          >
-            <MdAdd className="text-lg" />
-            Criar Politica
-          </button>
-        </div>
+        {canAdjust && (
+          <div className="flex justify-end">
+            <button
+              onClick={handleOpenCreate}
+              className="bg-[#1a3a1a] hover:bg-[#2a5a2a] text-[#2ed573] px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+            >
+              <MdAdd className="text-lg" />
+              Criar Politica
+            </button>
+          </div>
+        )}
         <EmptyState message="Nenhuma politica de estoque cadastrada. Crie a primeira politica para comecar." />
         <PolicyFormModal
           isOpen={modalOpen}
@@ -180,13 +186,15 @@ const PolicyTab = () => {
           ))}
         </div>
 
-        <button
-          onClick={handleOpenCreate}
-          className="shrink-0 bg-[#1a3a1a] hover:bg-[#2a5a2a] text-[#2ed573] px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
-        >
-          <MdAdd className="text-lg" />
-          Criar Politica
-        </button>
+        {canAdjust && (
+          <button
+            onClick={handleOpenCreate}
+            className="shrink-0 bg-[#1a3a1a] hover:bg-[#2a5a2a] text-[#2ed573] px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+          >
+            <MdAdd className="text-lg" />
+            Criar Politica
+          </button>
+        )}
       </div>
 
       {/* Search */}
@@ -263,24 +271,30 @@ const PolicyTab = () => {
                       )}
                     </td>
                     <td className="py-3 pl-3">
-                      <div className="flex items-center gap-1">
-                        <button
-                          onClick={() => handleOpenEdit(p)}
-                          disabled={isActionsLoading}
-                          className="p-1.5 rounded text-[#ababab] hover:text-[#f5f5f5] hover:bg-[#262626] transition-colors disabled:opacity-50"
-                          title="Editar"
-                        >
-                          <MdEdit className="text-lg" />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(p)}
-                          disabled={isActionsLoading || !p.isActive}
-                          className="p-1.5 rounded text-[#ff6b6b] hover:bg-[#4a1a1a] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                          title="Desativar"
-                        >
-                          <MdDelete className="text-lg" />
-                        </button>
-                      </div>
+                      {canAdjust ? (
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={() => handleOpenEdit(p)}
+                            disabled={isActionsLoading}
+                            className="p-1.5 rounded text-[#ababab] hover:text-[#f5f5f5] hover:bg-[#262626] transition-colors disabled:opacity-50"
+                            title="Editar"
+                          >
+                            <MdEdit className="text-lg" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(p)}
+                            disabled={isActionsLoading || !p.isActive}
+                            className="p-1.5 rounded text-[#ff6b6b] hover:bg-[#4a1a1a] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            title="Desativar"
+                          >
+                            <MdDelete className="text-lg" />
+                          </button>
+                        </div>
+                      ) : (
+                        <span className="text-[#555] text-xs italic">
+                          Sem permissao
+                        </span>
+                      )}
                     </td>
                   </tr>
                 );

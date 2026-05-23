@@ -1,6 +1,7 @@
 const createHttpError = require("http-errors");
 const interStoreTransferService = require("../services/interStoreTransferService");
 const ws = require("../services/websocketService");
+const auditService = require("../services/auditService");
 
 /**
  * Criar transferência inter-store
@@ -67,6 +68,17 @@ const createInterStoreTransfer = async (req, res, next) => {
             unit: result.unit,
             location: result.destination.locationName,
             originStore: result.origin.storeName
+        });
+
+        // Audit log
+        auditService.logAction({
+            actionType: 'inter_store_transfer_executed',
+            user: req.user._id,
+            store: destinationStoreId,
+            ingredient: ingredientId,
+            entityType: 'InterStoreTransfer',
+            status: 'success',
+            summary: `Inter-store transfer by ${req.user.name}: ${result.ingredient?.name || 'unknown'} (${quantity}${unit || ''}) from ${result.origin?.storeName || 'origin'} to ${result.destination?.storeName || 'dest'}`
         });
 
         res.status(200).json({

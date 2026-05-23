@@ -167,7 +167,9 @@ const login = async (req, res, next) => {
 const getUserData = async (req, res, next) => {
     try {
 
-        const user = await User.findById(req.user._id).populate('store');
+        const user = await User.findById(req.user._id)
+            .populate('store')
+            .populate('role');
         res.status(200).json({success: true, data: user});
 
     } catch (error) {

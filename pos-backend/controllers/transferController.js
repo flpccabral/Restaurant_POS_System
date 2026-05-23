@@ -2,6 +2,7 @@ const createHttpError = require("http-errors");
 const transferService = require("../services/transferService");
 const ws = require("../services/websocketService");
 const StockLocation = require("../models/stockLocationModel");
+const auditService = require("../services/auditService");
 
 /**
  * Criar transferência de estoque
@@ -63,6 +64,18 @@ const createTransfer = async (req, res, next) => {
             unit: result.unit,
             origin: result.origin.locationName,
             destination: result.destination.locationName
+        });
+
+        // Audit log
+        auditService.logAction({
+            actionType: 'central_transfer_executed',
+            user: req.user._id,
+            store: storeRef,
+            location: destinationLocationId,
+            ingredient: ingredientId,
+            entityType: 'StockTransfer',
+            status: 'success',
+            summary: `Central transfer by ${req.user.name}: ${result.ingredient || 'unknown'} (${quantity}${unit || ''}) from ${result.origin?.locationName || 'origin'} to ${result.destination?.locationName || 'dest'}`
         });
 
         res.status(200).json({

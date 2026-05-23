@@ -118,6 +118,9 @@ app.use("/api/production", require("./routes/productionRoute"));
 app.use("/api/stock-policies", require("./routes/stockPolicyRoute"));
 app.use("/api/observability", require("./routes/observabilityRoute"));
 
+// Phase 8 — Audit Log
+app.use("/api/audit", require("./routes/auditRoute"));
+
 // Global Error Handler
 app.use(globalErrorHandler);
 

@@ -2,6 +2,7 @@ const createHttpError = require("http-errors");
 const stockHealthService = require("../services/stockHealthService");
 const replenishmentService = require("../services/replenishmentService");
 const observabilityService = require("../services/observabilityService");
+const auditService = require("../services/auditService");
 
 /**
  * Saúde do estoque por loja
@@ -120,6 +121,18 @@ const resolveAlert = async (req, res, next) => {
 
         const alert = await observabilityService.resolveAlert(id, req.user._id, notes);
 
+        // Audit log
+        auditService.logAction({
+            actionType: 'alert_resolved',
+            user: req.user._id,
+            store: alert.store || req.user.store,
+            ingredient: alert.ingredient,
+            entityType: 'OperationalAlert',
+            entityId: alert._id,
+            status: 'success',
+            summary: `Alert resolved by ${req.user.name}: ${alert.type} for ${alert.ingredient?.name || 'unknown'}`
+        });
+
         res.status(200).json({
             success: true,
             message: "Alert resolved successfully!",
@@ -145,6 +158,18 @@ const dismissAlert = async (req, res, next) => {
         const { reason } = req.body;
 
         const alert = await observabilityService.dismissAlert(id, req.user._id, reason);
+
+        // Audit log
+        auditService.logAction({
+            actionType: 'alert_dismissed',
+            user: req.user._id,
+            store: alert.store || req.user.store,
+            ingredient: alert.ingredient,
+            entityType: 'OperationalAlert',
+            entityId: alert._id,
+            status: 'success',
+            summary: `Alert dismissed by ${req.user.name}: ${alert.type} for ${alert.ingredient?.name || 'unknown'}`
+        });
 
         res.status(200).json({
             success: true,
@@ -210,6 +235,19 @@ const registerPurchase = async (req, res, next) => {
             locationId,
             message
         }, req.user._id);
+
+        // Audit log
+        auditService.logAction({
+            actionType: 'purchase_registered',
+            user: req.user._id,
+            store: storeRef,
+            ingredient: ingredientId,
+            location: locationId,
+            entityType: 'OperationalAlert',
+            entityId: alert._id,
+            status: 'success',
+            summary: `Purchase registered by ${req.user.name}: ${ingredientName || 'unknown'} (${quantity || ''}${unit || ''})`
+        });
 
         res.status(200).json({
             success: true,

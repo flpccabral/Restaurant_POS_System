@@ -1,6 +1,7 @@
 const createHttpError = require("http-errors");
 const StockPolicy = require("../models/stockPolicyModel");
 const StockLocation = require("../models/stockLocationModel");
+const auditService = require("../services/auditService");
 
 /**
  * Criar política de estoque
@@ -46,6 +47,20 @@ const createStockPolicy = async (req, res, next) => {
             unit: unit || 'g',
             priority: priority || 'medium',
             isActive: true
+        });
+
+        // Audit log
+        auditService.logAction({
+            actionType: 'stock_policy_created',
+            user: req.user._id,
+            store: storeId,
+            location: locationId,
+            ingredient: ingredientId,
+            entityType: 'StockPolicy',
+            entityId: policy._id,
+            status: 'success',
+            summary: `Stock policy created by ${req.user.name}`,
+            after: { minQuantity, reorderPoint, idealQuantity, maxQuantity, unit, priority }
         });
 
         res.status(201).json({
@@ -115,6 +130,8 @@ const updateStockPolicy = async (req, res, next) => {
 
         const { minQuantity, reorderPoint, idealQuantity, maxQuantity, unit, priority, isActive } = req.body;
 
+        const before = policy.toObject();
+
         if (minQuantity !== undefined) policy.minQuantity = minQuantity;
         if (reorderPoint !== undefined) policy.reorderPoint = reorderPoint;
         if (idealQuantity !== undefined) policy.idealQuantity = idealQuantity;
@@ -124,6 +141,27 @@ const updateStockPolicy = async (req, res, next) => {
         if (isActive !== undefined) policy.isActive = isActive;
 
         await policy.save();
+
+        // Audit log
+        auditService.logAction({
+            actionType: 'stock_policy_updated',
+            user: req.user._id,
+            store: policy.store,
+            location: policy.location,
+            ingredient: policy.ingredient,
+            entityType: 'StockPolicy',
+            entityId: policy._id,
+            status: 'success',
+            summary: `Stock policy updated by ${req.user.name}`,
+            before: { minQuantity: before.minQuantity, reorderPoint: before.reorderPoint, idealQuantity: before.idealQuantity, maxQuantity: before.maxQuantity },
+            after: { minQuantity: policy.minQuantity, reorderPoint: policy.reorderPoint, idealQuantity: policy.idealQuantity, maxQuantity: policy.maxQuantity }
+        });
+
+        res.status(200).json({
+            success: true,
+            message: "Stock policy updated successfully!",
+            data: policy
+        });
 
         res.status(200).json({
             success: true,
@@ -148,6 +186,19 @@ const deleteStockPolicy = async (req, res, next) => {
 
         policy.isActive = false;
         await policy.save();
+
+        // Audit log
+        auditService.logAction({
+            actionType: 'stock_policy_deleted',
+            user: req.user._id,
+            store: policy.store,
+            location: policy.location,
+            ingredient: policy.ingredient,
+            entityType: 'StockPolicy',
+            entityId: policy._id,
+            status: 'success',
+            summary: `Stock policy deactivated by ${req.user.name}`
+        });
 
         res.status(200).json({
             success: true,

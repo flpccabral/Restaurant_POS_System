@@ -6,6 +6,8 @@ const initialState = {
     email : "",
     phone: "",
     role: "",
+    rolePermissions: null,
+    isMasterAdmin: false,
     store: null,
     isAuth: false
 }
@@ -15,14 +17,23 @@ const userSlice = createSlice({
     initialState,
     reducers: {
         setUser: (state, action) => {
-            const { _id, name, phone, email, role, store } = action.payload;
+            const { _id, name, phone, email, role, store, isMasterAdmin } = action.payload;
             state._id = _id;
             state.name = name;
             state.phone = phone;
             state.email = email;
-            state.role = role;
             state.store = store || null;
+            state.isMasterAdmin = isMasterAdmin || false;
             state.isAuth = true;
+
+            // role can be a string (legacy 'Admin') or an Object (populated Role document)
+            if (typeof role === 'object' && role !== null) {
+                state.role = role.name || role.roleId || '';
+                state.rolePermissions = role.permissions || null;
+            } else {
+                state.role = role || '';
+                state.rolePermissions = null;
+            }
         },
 
         removeUser: (state) => {
@@ -31,6 +42,8 @@ const userSlice = createSlice({
             state.name = "";
             state.phone = "";
             state.role = "";
+            state.rolePermissions = null;
+            state.isMasterAdmin = false;
             state.store = null;
             state.isAuth = false;
         }

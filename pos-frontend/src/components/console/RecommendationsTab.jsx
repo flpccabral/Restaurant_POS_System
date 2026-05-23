@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getNetworkRecommendations } from "../../https";
 import useOperationalActions from "../../hooks/useOperationalActions";
+import { useCapabilities } from "../../hooks/useCapabilities";
 import ConfirmActionModal from "./ConfirmActionModal";
 import StatusBadge from "./StatusBadge";
 import LoadingState from "./LoadingState";
@@ -26,6 +27,8 @@ const typeConfig = {
 };
 
 const RecommendationsTab = () => {
+  const { can } = useCapabilities();
+
   const [priorityFilter, setPriorityFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
 
@@ -45,6 +48,9 @@ const RecommendationsTab = () => {
     queryFn: getNetworkRecommendations,
     staleTime: 120_000,
   });
+
+  const canTransfer = can("inventory", "transfer");
+  const canAdjust = can("inventory", "adjust");
 
   if (isLoading) return <LoadingState rows={6} />;
   if (isError)
@@ -157,6 +163,11 @@ const RecommendationsTab = () => {
     return "Executar";
   };
 
+  const canExecuteAction = (type) => {
+    if (type === "purchase_needed") return canAdjust;
+    return canTransfer;
+  };
+
   if (recommendations.length === 0) {
     return (
       <EmptyState message="Nenhuma recomendacao no momento. A rede esta com estoques saudaveis." />
@@ -213,6 +224,7 @@ const RecommendationsTab = () => {
           {filtered.map((rec, idx) => {
             const tConfig = typeConfig[rec.type] || {};
             const buttonLabel = getActionButtonLabel(rec.type);
+            const hasPermission = canExecuteAction(rec.type);
             return (
               <div
                 key={`${rec.storeId}-${rec.ingredient?.id}-${idx}`}
@@ -269,17 +281,26 @@ const RecommendationsTab = () => {
                     </div>
                   </div>
 
-                  <button
-                    onClick={() => handleOpenModal(rec)}
-                    disabled={isActionsLoading}
-                    className={`shrink-0 bg-[#1a3a1a] text-[#2ed573] px-3 py-1.5 rounded text-xs font-medium transition-colors ${
-                      isActionsLoading
-                        ? "opacity-50 cursor-not-allowed"
-                        : "hover:bg-[#2a5a2a]"
-                    }`}
-                  >
-                    {buttonLabel}
-                  </button>
+                  {hasPermission ? (
+                    <button
+                      onClick={() => handleOpenModal(rec)}
+                      disabled={isActionsLoading}
+                      className={`shrink-0 bg-[#1a3a1a] text-[#2ed573] px-3 py-1.5 rounded text-xs font-medium transition-colors ${
+                        isActionsLoading
+                          ? "opacity-50 cursor-not-allowed"
+                          : "hover:bg-[#2a5a2a]"
+                      }`}
+                    >
+                      {buttonLabel}
+                    </button>
+                  ) : (
+                    <span
+                      className="shrink-0 text-[#555] text-xs italic px-3 py-1.5"
+                      title="Sem permissao para executar esta acao"
+                    >
+                      Sem permissao
+                    </span>
+                  )}
                 </div>
               </div>
             );

@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 import { getAlerts } from "../../https";
 import useOperationalActions from "../../hooks/useOperationalActions";
+import { useCapabilities } from "../../hooks/useCapabilities";
 import ConfirmActionModal from "./ConfirmActionModal";
 import StatusBadge from "./StatusBadge";
 import LoadingState from "./LoadingState";
@@ -12,6 +13,7 @@ import EmptyState from "./EmptyState";
 const AlertsTab = () => {
   const user = useSelector((state) => state.user);
   const storeId = user.store?._id;
+  const { can } = useCapabilities();
 
   const [statusFilter, setStatusFilter] = useState("new");
   const [severityFilter, setSeverityFilter] = useState("all");
@@ -34,6 +36,8 @@ const AlertsTab = () => {
       }),
     staleTime: 60_000,
   });
+
+  const canAdjust = can("inventory", "adjust");
 
   if (!storeId) {
     return <EmptyState message="Nenhuma loja associada ao usuario." />;
@@ -169,32 +173,40 @@ const AlertsTab = () => {
 
               <div className="flex items-center gap-2 shrink-0">
                 <StatusBadge value={alert.status} />
-                <button
-                  onClick={() => handleOpenModal(alert, "resolve")}
-                  disabled={
-                    !isNewOrAcknowledged(alert) || isActionsLoading
-                  }
-                  className={`bg-[#1a3a1a] text-[#2ed573] px-3 py-1 rounded text-xs font-medium transition-colors ${
-                    !isNewOrAcknowledged(alert) || isActionsLoading
-                      ? "opacity-50 cursor-not-allowed"
-                      : "hover:bg-[#2a5a2a]"
-                  }`}
-                >
-                  Resolver
-                </button>
-                <button
-                  onClick={() => handleOpenModal(alert, "dismiss")}
-                  disabled={
-                    !isNewOrAcknowledged(alert) || isActionsLoading
-                  }
-                  className={`bg-[#2a2a2a] text-[#ababab] px-3 py-1 rounded text-xs font-medium transition-colors ${
-                    !isNewOrAcknowledged(alert) || isActionsLoading
-                      ? "opacity-50 cursor-not-allowed"
-                      : "hover:bg-[#333]"
-                  }`}
-                >
-                  Ignorar
-                </button>
+                {canAdjust ? (
+                  <>
+                    <button
+                      onClick={() => handleOpenModal(alert, "resolve")}
+                      disabled={
+                        !isNewOrAcknowledged(alert) || isActionsLoading
+                      }
+                      className={`bg-[#1a3a1a] text-[#2ed573] px-3 py-1 rounded text-xs font-medium transition-colors ${
+                        !isNewOrAcknowledged(alert) || isActionsLoading
+                          ? "opacity-50 cursor-not-allowed"
+                          : "hover:bg-[#2a5a2a]"
+                      }`}
+                    >
+                      Resolver
+                    </button>
+                    <button
+                      onClick={() => handleOpenModal(alert, "dismiss")}
+                      disabled={
+                        !isNewOrAcknowledged(alert) || isActionsLoading
+                      }
+                      className={`bg-[#2a2a2a] text-[#ababab] px-3 py-1 rounded text-xs font-medium transition-colors ${
+                        !isNewOrAcknowledged(alert) || isActionsLoading
+                          ? "opacity-50 cursor-not-allowed"
+                          : "hover:bg-[#333]"
+                      }`}
+                    >
+                      Ignorar
+                    </button>
+                  </>
+                ) : (
+                  <span className="text-[#555] text-xs italic">
+                    Sem permissao para executar esta acao
+                  </span>
+                )}
               </div>
             </div>
           ))}
