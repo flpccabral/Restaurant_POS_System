@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const productionController = require("../controllers/productionController");
-const { authenticate } = require("../middlewares/tokenVerification");
+const { isVerifiedUser } = require("../middlewares/tokenVerification");
 const { checkPermission } = require("../middlewares/checkPermission");
 
-router.use(authenticate);
+router.use(isVerifiedUser);
 
 // Criar produção interna
 router.post(

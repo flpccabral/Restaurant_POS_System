@@ -345,6 +345,19 @@ const seedDatabase = async () => {
 
         // 9. Criar Saldo de Estoque Inicial
         console.log('\n📊 Creating initial stock balances...');
+
+        // Buscar a localização padrão da loja
+        const defaultLocation = await require('../models/stockLocationModel').findOne({
+            store: store._id,
+            type: 'STORE',
+            isActive: true
+        });
+        if (!defaultLocation) {
+            console.error('❌ No default STOCK_LOCATION found for store. Run migration first.');
+            process.exit(1);
+        }
+        console.log(`   📍 Using location: ${defaultLocation.name} (${defaultLocation._id})`);
+
         const stockIngredients = [
             { name: 'Carne Bovina', minimumStock: 5000, initialBalance: 10000 },
             { name: 'Pão', minimumStock: 50, initialBalance: 100 },
@@ -366,6 +379,7 @@ const seedDatabase = async () => {
                 if (!stockBalance) {
                     stockBalance = await StockBalance.create({
                         store: store._id,
+                        location: defaultLocation._id,
                         ingredient: ingredient._id,
                         balance: stockData.initialBalance,
                         reserved: 0,

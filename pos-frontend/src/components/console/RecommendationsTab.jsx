@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getNetworkRecommendations } from "../../https";
+import useOperationalActions from "../../hooks/useOperationalActions";
+import ConfirmActionModal from "./ConfirmActionModal";
 import StatusBadge from "./StatusBadge";
 import LoadingState from "./LoadingState";
 import ErrorState from "./ErrorState";
@@ -8,11 +10,9 @@ import EmptyState from "./EmptyState";
 import { HiArrowsRightLeft } from "react-icons/hi2";
 import { MdLocalShipping, MdShoppingCart } from "react-icons/md";
 
-const DISABLED_TOOLTIP = "Ações serão habilitadas na Fase 7B";
-
 const typeConfig = {
   central_to_store: {
-    label: "Central → Loja",
+    label: "Central -> Loja",
     icon: <MdLocalShipping className="text-[#54a0ff]" />,
   },
   inter_store_transfer: {
@@ -29,6 +29,17 @@ const RecommendationsTab = () => {
   const [priorityFilter, setPriorityFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
 
+  // Modal state
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedRec, setSelectedRec] = useState(null);
+
+  const {
+    isLoading: isActionsLoading,
+    executeCentralTransfer,
+    executeInterStoreTransfer,
+    markPurchaseNeeded,
+  } = useOperationalActions();
+
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["networkRecommendations"],
     queryFn: getNetworkRecommendations,
@@ -39,7 +50,7 @@ const RecommendationsTab = () => {
   if (isError)
     return (
       <ErrorState
-        message="Falha ao carregar recomendações da rede."
+        message="Falha ao carregar recomendacoes da rede."
         onRetry={refetch}
       />
     );
@@ -53,8 +64,103 @@ const RecommendationsTab = () => {
     return matchPriority && matchType;
   });
 
+  const handleOpenModal = (rec) => {
+    setSelectedRec(rec);
+    setModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    setSelectedRec(null);
+  };
+
+  const handleConfirm = async () => {
+    if (!selectedRec) return;
+
+    try {
+      switch (selectedRec.type) {
+        case "central_to_store":
+          await executeCentralTransfer({
+            originLocationId: selectedRec.source?.locationId,
+            destinationLocationId: selectedRec.destinationLocationId,
+            ingredientId: selectedRec.ingredient?.id,
+            quantity: selectedRec.suggestedQuantity,
+            unit: selectedRec.unit,
+            reason: selectedRec.justification,
+          });
+          break;
+
+        case "inter_store_transfer":
+          await executeInterStoreTransfer({
+            originStoreId: selectedRec.source?.storeId,
+            destinationStoreId: selectedRec.storeId,
+            originLocationId: selectedRec.source?.locationId,
+            destinationLocationId: selectedRec.destinationLocationId,
+            ingredientId: selectedRec.ingredient?.id,
+            quantity: selectedRec.suggestedQuantity,
+            unit: selectedRec.unit,
+            reason: selectedRec.justification,
+          });
+          break;
+
+        case "purchase_needed":
+          await markPurchaseNeeded({
+            ingredientId: selectedRec.ingredient?.id,
+            ingredientName: selectedRec.ingredient?.name,
+            quantity: selectedRec.suggestedQuantity,
+            unit: selectedRec.unit,
+            notes: selectedRec.justification,
+          });
+          break;
+
+        default:
+          break;
+      }
+      handleCloseModal();
+    } catch {
+      // Error is handled by the hook via snackbar
+    }
+  };
+
+  const getModalDetails = () => {
+    if (!selectedRec) return null;
+    const details = {
+      ingredient: selectedRec.ingredient?.name,
+      quantity: selectedRec.suggestedQuantity,
+      unit: selectedRec.unit,
+      currentBalance: selectedRec.currentBalance,
+      justification: selectedRec.justification,
+    };
+
+    if (
+      selectedRec.type === "central_to_store" ||
+      selectedRec.type === "inter_store_transfer"
+    ) {
+      details.origin =
+        selectedRec.source?.locationName ||
+        selectedRec.source?.storeName ||
+        "N/A";
+      details.destination = selectedRec.storeName || "N/A";
+    }
+
+    if (selectedRec.type === "central_to_store") {
+      details.risks = `Central warehouse will reduce stock by ${selectedRec.suggestedQuantity}${selectedRec.unit}.`;
+    } else if (selectedRec.type === "inter_store_transfer") {
+      details.risks = selectedRec.risks?.join("; ") || "Verify store compatibility before proceeding.";
+    }
+
+    return details;
+  };
+
+  const getActionButtonLabel = (type) => {
+    if (type === "purchase_needed") return "Registrar Compra";
+    return "Executar";
+  };
+
   if (recommendations.length === 0) {
-    return <EmptyState message="Nenhuma recomendação no momento. A rede está com estoques saudáveis." />;
+    return (
+      <EmptyState message="Nenhuma recomendacao no momento. A rede esta com estoques saudaveis." />
+    );
   }
 
   return (
@@ -62,9 +168,9 @@ const RecommendationsTab = () => {
       <div className="flex flex-wrap gap-2">
         {[
           { value: "all", label: "Todas" },
-          { value: "critical", label: "Crítico" },
+          { value: "critical", label: "Critico" },
           { value: "high", label: "Alto" },
-          { value: "medium", label: "Médio" },
+          { value: "medium", label: "Medio" },
           { value: "low", label: "Baixo" },
         ].map((tab) => (
           <button
@@ -82,7 +188,7 @@ const RecommendationsTab = () => {
         <span className="text-[#555] mx-2">|</span>
         {[
           { value: "all", label: "Todos os tipos" },
-          { value: "central_to_store", label: "Central → Loja" },
+          { value: "central_to_store", label: "Central -> Loja" },
           { value: "inter_store_transfer", label: "Entre Lojas" },
           { value: "purchase_needed", label: "Compra" },
         ].map((tab) => (
@@ -101,11 +207,12 @@ const RecommendationsTab = () => {
       </div>
 
       {filtered.length === 0 ? (
-        <EmptyState message="Nenhuma recomendação com este filtro." />
+        <EmptyState message="Nenhuma recomendacao com este filtro." />
       ) : (
         <div className="space-y-3">
           {filtered.map((rec, idx) => {
             const tConfig = typeConfig[rec.type] || {};
+            const buttonLabel = getActionButtonLabel(rec.type);
             return (
               <div
                 key={`${rec.storeId}-${rec.ingredient?.id}-${idx}`}
@@ -163,11 +270,15 @@ const RecommendationsTab = () => {
                   </div>
 
                   <button
-                    disabled
-                    title={DISABLED_TOOLTIP}
-                    className="shrink-0 bg-[#1a3a1a] text-[#2ed573] px-3 py-1.5 rounded text-xs font-medium opacity-50 cursor-not-allowed"
+                    onClick={() => handleOpenModal(rec)}
+                    disabled={isActionsLoading}
+                    className={`shrink-0 bg-[#1a3a1a] text-[#2ed573] px-3 py-1.5 rounded text-xs font-medium transition-colors ${
+                      isActionsLoading
+                        ? "opacity-50 cursor-not-allowed"
+                        : "hover:bg-[#2a5a2a]"
+                    }`}
                   >
-                    Executar
+                    {buttonLabel}
                   </button>
                 </div>
               </div>
@@ -175,6 +286,15 @@ const RecommendationsTab = () => {
           })}
         </div>
       )}
+
+      <ConfirmActionModal
+        isOpen={modalOpen}
+        onClose={handleCloseModal}
+        onConfirm={handleConfirm}
+        actionType={selectedRec?.type}
+        details={getModalDetails()}
+        isLoading={isActionsLoading}
+      />
     </div>
   );
 };

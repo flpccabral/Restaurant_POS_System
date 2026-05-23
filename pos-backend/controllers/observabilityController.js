@@ -137,6 +137,32 @@ const resolveAlert = async (req, res, next) => {
 };
 
 /**
+ * Dismiss (ignorar) alerta
+ */
+const dismissAlert = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const { reason } = req.body;
+
+        const alert = await observabilityService.dismissAlert(id, req.user._id, reason);
+
+        res.status(200).json({
+            success: true,
+            message: "Alert dismissed successfully!",
+            data: alert
+        });
+    } catch (error) {
+        if (error.message === 'Alert not found') {
+            return next(createHttpError(404, error.message));
+        }
+        if (error.message.includes('already')) {
+            return next(createHttpError(400, error.message));
+        }
+        next(error);
+    }
+};
+
+/**
  * Timeline operacional
  */
 const getTimeline = async (req, res, next) => {
@@ -156,6 +182,39 @@ const getTimeline = async (req, res, next) => {
         res.status(200).json({
             success: true,
             data: timeline
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
+ * Registrar compra (apenas nota, sem criar ordem de compra real)
+ */
+const registerPurchase = async (req, res, next) => {
+    try {
+        const { ingredientId, ingredientName, quantity, unit, notes, locationId, message } = req.body;
+
+        if (!ingredientId && !ingredientName) {
+            return next(createHttpError(400, "Ingredient ID or name is required!"));
+        }
+
+        const storeRef = req.user.isMasterAdmin && req.storeId ? req.storeId : req.user.store;
+
+        const alert = await observabilityService.registerPurchase(storeRef, {
+            ingredientId,
+            ingredientName,
+            quantity,
+            unit,
+            notes,
+            locationId,
+            message
+        }, req.user._id);
+
+        res.status(200).json({
+            success: true,
+            message: "Purchase registered successfully!",
+            data: alert
         });
     } catch (error) {
         next(error);
@@ -190,6 +249,8 @@ module.exports = {
     getNetworkRecommendations,
     getAlerts,
     resolveAlert,
+    dismissAlert,
+    registerPurchase,
     getTimeline,
     generateAlerts
 };

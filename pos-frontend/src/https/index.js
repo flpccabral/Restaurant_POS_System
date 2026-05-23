@@ -37,3 +37,15 @@ export const getTimeline = (params = {}) =>
   axiosWrapper.get("/api/observability/timeline", { params });
 export const getStockPolicies = (params = {}) =>
   axiosWrapper.get("/api/stock-policies", { params });
+
+// Phase 7B — Acoes assistidas
+export const resolveAlert = (alertId, data) =>
+  axiosWrapper.post(`/api/observability/alerts/${alertId}/resolve`, data);
+export const dismissAlert = (alertId, data) =>
+  axiosWrapper.post(`/api/observability/alerts/${alertId}/dismiss`, data);
+export const executeCentralTransfer = (data) =>
+  axiosWrapper.post("/api/stock/transfer", data);
+export const executeInterStoreTransfer = (data) =>
+  axiosWrapper.post("/api/stock/transfer/inter-store", data);
+export const markPurchaseNeeded = (data) =>
+  axiosWrapper.post("/api/observability/purchase/register", data);

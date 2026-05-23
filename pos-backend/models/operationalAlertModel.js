@@ -24,7 +24,8 @@ const operationalAlertSchema = new mongoose.Schema({
             'transfer_recommended',
             'refund_without_stock_reversal',
             'sale_without_stock_deduction',
-            'product_without_recipe'
+            'product_without_recipe',
+            'purchase_registered'
         ],
         index: true
     },

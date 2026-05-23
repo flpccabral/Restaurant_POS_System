@@ -98,6 +98,20 @@ const getAlerts = async (storeId, options = {}) => {
 };
 
 /**
+ * Dismiss (ignore) um alerta.
+ */
+const dismissAlert = async (alertId, userId, reason) => {
+    const alert = await OperationalAlert.findById(alertId);
+    if (!alert) {
+        throw new Error('Alert not found');
+    }
+    if (alert.status === 'resolved' || alert.status === 'dismissed') {
+        throw new Error(`Alert is already ${alert.status}`);
+    }
+    return alert.dismiss(userId, reason);
+};
+
+/**
  * Resolve um alerta.
  */
 const resolveAlert = async (alertId, userId, notes) => {
@@ -296,9 +310,36 @@ const _mapHealthToAlert = (ingredient, store) => {
     };
 };
 
+/**
+ * Registra uma compra (apenas nota/registro, sem criar ordem de compra real).
+ */
+const registerPurchase = async (storeId, data, userId) => {
+    const alert = await OperationalAlert.create({
+        type: 'purchase_registered',
+        severity: 'info',
+        store: storeId,
+        ingredient: data.ingredientId,
+        location: data.locationId,
+        status: 'resolved',
+        message: data.message || `Purchase registered for '${data.ingredientName || 'ingredient'}' (${data.quantity || ''}${data.unit || ''})`,
+        currentValue: data.quantity,
+        metadata: {
+            purchaseNotes: data.notes,
+            quantity: data.quantity,
+            unit: data.unit,
+            registeredBy: userId
+        },
+        resolvedBy: userId,
+        resolvedAt: new Date()
+    });
+    return alert;
+};
+
 module.exports = {
     generateAlerts,
     getAlerts,
     resolveAlert,
+    dismissAlert,
+    registerPurchase,
     getOperationalTimeline
 };

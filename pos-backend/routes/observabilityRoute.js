@@ -6,6 +6,8 @@ const {
     getNetworkRecommendations,
     getAlerts,
     resolveAlert,
+    dismissAlert,
+    registerPurchase,
     getTimeline,
     generateAlerts
 } = require("../controllers/observabilityController");
@@ -32,7 +34,9 @@ router.get("/recommendations/network", checkPermission('inventory', 'read'), get
 // Alerts
 router.get("/alerts", checkPermission('inventory', 'read'), getAlerts);
 router.post("/alerts/:id/resolve", checkPermission('inventory', 'adjust'), resolveAlert);
+router.post("/alerts/:id/dismiss", checkPermission('inventory', 'adjust'), dismissAlert);
 router.post("/alerts/generate/:storeId", checkPermission('inventory', 'read'), generateAlerts);
+router.post("/purchase/register", checkPermission('inventory', 'adjust'), registerPurchase);
 
 // Timeline
 router.get("/timeline", checkPermission('inventory', 'read'), getTimeline);
