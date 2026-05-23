@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { MdDashboard, MdInventory, MdWarning, MdLightbulb, MdTimeline } from "react-icons/md";
+import { MdDashboard, MdInventory, MdWarning, MdLightbulb, MdTimeline, MdGavel } from "react-icons/md";
 import OverviewTab from "../components/console/OverviewTab";
 import StockHealthTab from "../components/console/StockHealthTab";
 import AlertsTab from "../components/console/AlertsTab";
 import RecommendationsTab from "../components/console/RecommendationsTab";
 import TimelineTab from "../components/console/TimelineTab";
+import PolicyTab from "../components/console/PolicyTab";
 
 const tabs = [
   { key: "overview", label: "Visão Geral", icon: <MdDashboard /> },
@@ -12,6 +13,7 @@ const tabs = [
   { key: "alerts", label: "Alertas", icon: <MdWarning /> },
   { key: "recommendations", label: "Recomendações", icon: <MdLightbulb /> },
   { key: "timeline", label: "Timeline", icon: <MdTimeline /> },
+  { key: "policies", label: "Políticas", icon: <MdGavel /> },
 ];
 
 const OperationalConsole = () => {
@@ -51,6 +53,7 @@ const OperationalConsole = () => {
           {activeTab === "alerts" && <AlertsTab />}
           {activeTab === "recommendations" && <RecommendationsTab />}
           {activeTab === "timeline" && <TimelineTab />}
+          {activeTab === "policies" && <PolicyTab />}
         </div>
       </div>
     </div>

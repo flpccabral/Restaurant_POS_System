@@ -38,6 +38,22 @@ export const getTimeline = (params = {}) =>
 export const getStockPolicies = (params = {}) =>
   axiosWrapper.get("/api/stock-policies", { params });
 
+// Phase 7C — Stock Policy CRUD
+export const createStockPolicy = (data) =>
+  axiosWrapper.post("/api/stock-policies", data);
+export const updateStockPolicy = (policyId, data) =>
+  axiosWrapper.put(`/api/stock-policies/${policyId}`, data);
+export const deleteStockPolicy = (policyId) =>
+  axiosWrapper.delete(`/api/stock-policies/${policyId}`);
+
+// Phase 7C — Form dropdown data
+export const getIngredients = (params = {}) =>
+  axiosWrapper.get("/api/ingredient", { params });
+export const getStores = () =>
+  axiosWrapper.get("/api/store");
+export const getLocations = (params = {}) =>
+  axiosWrapper.get("/api/stock/locations", { params });
+
 // Phase 7B — Acoes assistidas
 export const resolveAlert = (alertId, data) =>
   axiosWrapper.post(`/api/observability/alerts/${alertId}/resolve`, data);

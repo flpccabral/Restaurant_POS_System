@@ -69,9 +69,10 @@ const createInterStoreTransfer = async ({
 
     try {
         // 1. Validar stores ativas
-        const [originStore, destStore] = await Store.find({
-            _id: { $in: [originStoreId, destinationStoreId] }
-        }).session(session);
+        const [originStore, destStore] = await Promise.all([
+            Store.findById(originStoreId).session(session),
+            Store.findById(destinationStoreId).session(session)
+        ]);
 
         if (!originStore || !destStore) {
             throw new Error('Origin or destination store not found');
