@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Package,
+  FileText,
   Tags,
   Warehouse,
   Leaf,
@@ -17,6 +18,7 @@ import {
   CreditCard,
   Receipt,
   ChefHat,
+  MonitorCog,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -38,6 +40,7 @@ const navSections: NavSection[] = [
     label: "CADASTROS",
     items: [
       { label: "Produtos", href: "/products", icon: Package },
+      { label: "Fichas Tecnicas", href: "/recipes", icon: FileText },
       { label: "Categorias", href: "/categories", icon: Tags },
       { label: "Ingredientes", href: "/ingredients", icon: Leaf },
       { label: "Fornecedores", href: "/suppliers", icon: Truck },
@@ -46,6 +49,7 @@ const navSections: NavSection[] = [
   {
     label: "OPERACIONAL",
     items: [
+      { label: "Console Operacional", href: "/console", icon: MonitorCog },
       { label: "Estoque", href: "/inventory", icon: Warehouse },
       { label: "Pedidos de Compra", href: "/purchase-orders", icon: ClipboardList },
     ],

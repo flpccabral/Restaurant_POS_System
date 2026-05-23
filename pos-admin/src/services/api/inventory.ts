@@ -13,4 +13,7 @@ export const inventoryService = {
   getAlerts: () => api.get<ApiResponse<unknown[]>>("/stock/alerts"),
   getRestockAlerts: () => api.get<ApiResponse<unknown[]>>("/stock/restock-alerts"),
   getShoppingList: () => api.get<ApiResponse<unknown[]>>("/stock/shopping-list"),
+  /** Get available stock locations */
+  getLocations: (params?: { type?: string }) =>
+    api.get<ApiResponse<Array<{ _id: string; name: string; store?: string; type?: string }>>>("/stock/locations", { params }),
 };

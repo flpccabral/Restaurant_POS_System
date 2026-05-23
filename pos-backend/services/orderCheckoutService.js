@@ -15,6 +15,7 @@ const Product = require('../models/productModel');
 const StockLocation = require('../models/stockLocationModel');
 const StockBalance = require('../models/stockBalanceModel');
 const unitConversion = require('./unitConversionService');
+const OperationalAlert = require('../models/operationalAlertModel');
 
 /**
  * Resolve a localização de estoque local da loja (tipo STORE).
@@ -182,6 +183,40 @@ const processOrderStockDeduction = async ({ storeId, orderId, orderItems, userId
         throw new Error(
             `Stock deduction failed for order: ${result.errors.map(e => `${e.item}: ${e.reason}`).join('; ')}`
         );
+    }
+
+    // GERAR ALERTAS para itens sem ficha técnica (TASK 11 — Fase 8.4.2)
+    // Executado fora da transação — não deve bloquear a venda
+    const noRecipeItems = result.items.filter(i => i.stockDeductionStatus === 'no_recipe');
+    if (noRecipeItems.length > 0) {
+        try {
+            const alerts = noRecipeItems.map(item => ({
+                type: 'sale_without_stock_deduction',
+                severity: 'critical',
+                store: storeId,
+                status: 'new',
+                message: `Venda realizada sem baixa de estoque — Produto '${item.productName}' (Pedido: ${orderId}) não possui ficha técnica ativa. CMV e saldo de estoque podem estar incorretos.`,
+                currentValue: item.quantity,
+                metadata: {
+                    orderId,
+                    productId: item.productId,
+                    productName: item.productName,
+                    quantity: item.quantity,
+                    reason: 'no_active_recipe',
+                    stockDeductionStatus: item.stockDeductionStatus
+                }
+            }));
+
+            // Create alerts in parallel (outside session, non-blocking)
+            for (const alertData of alerts) {
+                OperationalAlert.findOrCreate(alertData).catch(err => {
+                    console.error(`[orderCheckoutService] Failed to create alert: ${err.message}`);
+                });
+            }
+        } catch (alertErr) {
+            // Log but do not fail the transaction
+            console.error(`[orderCheckoutService] Alert creation error: ${alertErr.message}`);
+        }
     }
 
     return result;

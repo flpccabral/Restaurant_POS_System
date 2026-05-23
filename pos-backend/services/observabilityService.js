@@ -335,11 +335,93 @@ const registerPurchase = async (storeId, data, userId) => {
     return alert;
 };
 
+/**
+ * Gera alertas para produtos ativos sem ficha técnica (TASK 10 — Fase 8.4.2).
+ * Varre todos os produtos ativos da loja e verifica se possuem Recipe.isActive=true.
+ * Cria alertas do tipo 'product_without_recipe' por produto.
+ */
+const checkProductsWithoutRecipe = async (storeId) => {
+    const Product = mongoose.model('Product');
+    const Recipe = mongoose.model('Recipe');
+
+    const products = await Product.find({ store: storeId, isActive: true })
+        .populate('category', 'name')
+        .select('name variations');
+
+    const recipes = await Recipe.find({ store: storeId, isActive: true })
+        .select('product variation')
+        .lean();
+
+    // Build lookup map: "productId:variationSku" -> recipe
+    const recipeMap = new Map();
+    for (const r of recipes) {
+        recipeMap.set(`${r.product.toString()}:${r.variation}`, r);
+    }
+
+    const missingRecipes = [];
+    for (const product of products) {
+        const vars = product.variations || [];
+        if (vars.length === 0) {
+            missingRecipes.push({ productId: product._id, productName: product.name });
+        } else {
+            for (const v of vars) {
+                if (!v.isActive) continue;
+                const key = `${product._id.toString()}:${v.sku}`;
+                if (!recipeMap.has(key)) {
+                    missingRecipes.push({
+                        productId: product._id,
+                        productName: product.name,
+                        variationName: v.name,
+                        sku: v.sku
+                    });
+                }
+            }
+        }
+    }
+
+    const generatedAlerts = [];
+    const store = await mongoose.model('Store').findById(storeId).select('name').lean();
+
+    for (const item of missingRecipes) {
+        try {
+            const alert = await OperationalAlert.findOrCreate({
+                type: 'product_without_recipe',
+                severity: 'high',
+                store: storeId,
+                status: 'new',
+                message: `Produto '${item.productName}'${item.variationName ? ` (variação: ${item.variationName})` : ''} não possui ficha técnica ativa em ${store?.name || 'loja'}. Vendas deste produto não geram baixa de estoque nem CMV.`,
+                currentValue: 1,
+                metadata: {
+                    productId: item.productId?.toString(),
+                    productName: item.productName,
+                    variationName: item.variationName,
+                    sku: item.sku,
+                    missingRecipe: true
+                }
+            });
+            generatedAlerts.push(alert);
+        } catch (err) {
+            // Skip duplicates silently
+        }
+    }
+
+    // Also check for recipe-less products and create consolidated summary
+    return {
+        storeId,
+        storeName: store?.name,
+        totalMissing: missingRecipes.length,
+        productsWithoutRecipe: missingRecipes,
+        alertsCreated: generatedAlerts.length,
+        alerts: generatedAlerts
+    };
+};
+
 module.exports = {
     generateAlerts,
     getAlerts,
     resolveAlert,
     dismissAlert,
     registerPurchase,
-    getOperationalTimeline
+    getOperationalTimeline,
+    checkProductsWithoutRecipe
 };

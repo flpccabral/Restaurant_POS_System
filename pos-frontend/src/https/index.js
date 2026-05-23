@@ -26,6 +26,10 @@ export const getOrders = () => axiosWrapper.get("/api/order");
 export const updateOrderStatus = ({ orderId, orderStatus }) =>
   axiosWrapper.put(`/api/order/${orderId}`, { orderStatus });
 
+// Fase 8.4.2 — Baixa de estoque transacional após venda
+export const processOrderStockDeduction = (orderId) =>
+  axiosWrapper.post(`/api/order/${orderId}/process-stock-deduction`);
+
 // Observability Endpoints (Phase 6/7A)
 export const getStockHealth = (storeId) =>
   axiosWrapper.get(`/api/observability/stock-health/store/${storeId}`);

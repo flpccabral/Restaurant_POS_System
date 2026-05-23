@@ -31,6 +31,7 @@ interface DataTableProps {
   onCreate?: () => void;
   onEdit?: (id: string) => void;
   onDelete?: (id: string) => void;
+  customActions?: (row: unknown) => React.ReactNode;
   emptyMessage?: string;
   className?: string;
   /** Custom search function. Receives row and search term. Overrides searchKey. */
@@ -48,6 +49,7 @@ export function DataTable({
   onCreate,
   onEdit,
   onDelete,
+  customActions,
   emptyMessage = "Nenhum resultado encontrado.",
   className,
   onSearchField,
@@ -136,7 +138,7 @@ export function DataTable({
           <TableBody>
             {filtered.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={columns.length + 1} className="text-center py-10 text-muted-foreground">
+                <TableCell colSpan={columns.length + ((onEdit || onDelete || customActions) ? 1 : 0)} className="text-center py-10 text-muted-foreground">
                   <div className="flex flex-col items-center gap-1">
                     <Search className="h-5 w-5 text-muted-foreground/50" />
                     <p>{emptyMessage}</p>
@@ -153,9 +155,14 @@ export function DataTable({
                       {col.cell ? col.cell(row) : String(r[col.key] ?? "")}
                     </TableCell>
                   ))}
-                  {(onEdit || onDelete) && (
+                  {(onEdit || onDelete || customActions) && (
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-1 opacity-0 group-hover/data-row:opacity-100 transition-opacity duration-150">
+                        {customActions && (
+                          <div className="mr-1">
+                            {customActions(row)}
+                          </div>
+                        )}
                         {onEdit && (
                           <Button
                             variant="ghost"

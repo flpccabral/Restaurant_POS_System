@@ -29,10 +29,20 @@ router.use(isVerifiedUser);
 router.use(storeIsolation);
 router.use(deviceApproval);
 
+// Static routes MUST come BEFORE parameterized /:id routes
+// to prevent Express from treating static path segments as an :id parameter
+router.get("/without-recipe", getProductsWithoutRecipe);
+router.get("/sellable", getSellableProducts);
+router.get("/non-sellable", getNonSellableProducts);
+
 // CRUD
 router.post("/", checkPermission('inventory', 'create'), createRecipe);
 router.get("/", getRecipes);
 router.get("/sku/:sku", getRecipeBySku);
+router.get("/product/:productId/sellable", checkProductSellability);
+router.post("/validate", validateRecipe);
+
+// Parametrized routes
 router.get("/:id", getRecipeById);
 router.put("/:id", checkPermission('inventory', 'update'), updateRecipe);
 router.put("/:id/toggle-status", checkPermission('inventory', 'update'), toggleRecipeStatus);
@@ -42,13 +52,6 @@ router.delete("/:id", checkPermission('inventory', 'delete'), deleteRecipe);
 router.get("/:id/cost", calculateRecipeCost);
 router.get("/:id/stock/check", checkStockAvailability);
 router.post("/:id/stock/deduct", checkPermission('inventory', 'adjust'), deductStock);
-
-// Validacao e vendabilidade
-router.post("/validate", validateRecipe);
-router.get("/without-recipe", getProductsWithoutRecipe);
-router.get("/sellable", getSellableProducts);
-router.get("/non-sellable", getNonSellableProducts);
-router.get("/product/:productId/sellable", checkProductSellability);
 router.get("/:id/stock/simulate", simulateConsumption);
 
 module.exports = router;

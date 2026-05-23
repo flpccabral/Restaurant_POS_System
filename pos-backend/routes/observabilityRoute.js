@@ -9,7 +9,8 @@ const {
     dismissAlert,
     registerPurchase,
     getTimeline,
-    generateAlerts
+    generateAlerts,
+    checkProductsWithoutRecipe
 } = require("../controllers/observabilityController");
 const { isVerifiedUser } = require("../middlewares/tokenVerification");
 const { storeIsolation } = require("../middlewares/storeIsolation");
@@ -36,6 +37,7 @@ router.get("/alerts", checkPermission('inventory', 'read'), getAlerts);
 router.post("/alerts/:id/resolve", checkPermission('inventory', 'adjust'), resolveAlert);
 router.post("/alerts/:id/dismiss", checkPermission('inventory', 'adjust'), dismissAlert);
 router.post("/alerts/generate/:storeId", checkPermission('inventory', 'read'), generateAlerts);
+router.post("/alerts/check-products-without-recipe", checkPermission('inventory', 'read'), checkProductsWithoutRecipe);
 router.post("/purchase/register", checkPermission('inventory', 'adjust'), registerPurchase);
 
 // Timeline

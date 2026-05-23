@@ -6,6 +6,7 @@ import {
   createOrderRazorpay,
   updateTable,
   verifyPaymentRazorpay,
+  processOrderStockDeduction,
 } from "../../https/index";
 import { enqueueSnackbar } from "notistack";
 import { useMutation } from "@tanstack/react-query";
@@ -166,6 +167,23 @@ const Bill = () => {
       setTimeout(() => {
         tableUpdateMutation.mutate(tableData);
       }, 1500);
+
+      // Trigger real stock deduction pipeline (Fase 8.4.2)
+      if (data._id) {
+        processOrderStockDeduction(data._id)
+          .then((res) => {
+            console.log("Stock deduction result:", res.data);
+            if (res.data?.data?.stockDeductionStatus === "no_recipes") {
+              enqueueSnackbar(
+                "Pedido criado, mas alguns produtos nao possuem ficha tecnica — estoque nao foi baixado",
+                { variant: "warning" }
+              );
+            }
+          })
+          .catch((err) => {
+            console.warn("Stock deduction non-blocking error:", err);
+          });
+      }
 
       enqueueSnackbar("Order Placed!", {
         variant: "success",

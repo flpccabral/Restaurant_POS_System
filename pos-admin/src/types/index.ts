@@ -43,8 +43,10 @@ export interface Product {
   category: string;
   price: number;
   isActive: boolean;
+  isCurrent?: boolean;
   variations?: ProductVariation[];
   store: string;
+  hasActiveRecipe?: boolean;
 }
 
 export interface ProductVariation {
@@ -180,6 +182,8 @@ export type Permission =
   | "inventory:create"
   | "inventory:update"
   | "inventory:delete"
+  | "inventory:adjust"
+  | "inventory:transfer"
   | "users:read"
   | "users:create"
   | "users:update"
@@ -195,3 +199,133 @@ export type Permission =
   | "devices:read"
   | "devices:approve"
   | "devices:delete";
+
+// ── Console / Observability Types ──────────────────────────────────────────
+
+export interface StockHealthSummary {
+  stockout: number;
+  critical: number;
+  low: number;
+  ok: number;
+  excess: number;
+  noPolicy: number;
+}
+
+export interface IngredientHealth {
+  ingredient: {
+    id: string;
+    name: string;
+    category?: string;
+  };
+  balance: number;
+  unit: string;
+  status: "stockout" | "critical" | "low" | "ok" | "excess" | "no_policy";
+  policy?: {
+    minQuantity: number;
+    reorderPoint: number;
+    maxQuantity: number;
+    idealQuantity: number;
+  };
+  consumption?: {
+    last24h?: { netConsumption: number };
+    last7d?: { netConsumption: number };
+    avgDailyConsumption?: number;
+  };
+  daysUntilStockout?: number;
+  storeId?: string;
+  locationId?: string;
+  locationName?: string;
+}
+
+export interface StockHealthData {
+  storeId: string;
+  ingredientCount: number;
+  statusSummary: StockHealthSummary;
+  ingredients: IngredientHealth[];
+  generatedAt?: string;
+}
+
+export interface OperationalAlert {
+  _id: string;
+  type: string;
+  severity: "critical" | "high" | "medium" | "low" | "info";
+  status: "new" | "acknowledged" | "resolved" | "dismissed";
+  message: string;
+  ingredient?: { id: string; name: string };
+  storeId?: string;
+  locationId?: string;
+  currentValue?: number;
+  thresholdValue?: number;
+  createdAt: string;
+  resolvedAt?: string;
+  resolvedBy?: string;
+}
+
+export interface Recommendation {
+  type: "central_to_store" | "inter_store_transfer" | "purchase_needed" | "no_action";
+  priority: "critical" | "high" | "medium" | "low";
+  ingredient?: { id: string; name: string };
+  storeId?: string;
+  storeName?: string;
+  suggestedQuantity: number;
+  unit: string;
+  currentBalance: number;
+  justification: string;
+  actionSuggested?: string;
+  source?: {
+    storeId?: string;
+    storeName?: string;
+    locationId?: string;
+    locationName?: string;
+    availableQuantity?: number;
+  };
+  destinationLocationId?: string;
+  risks?: string[];
+}
+
+export interface TimelineEvent {
+  type: string;
+  eventType: string;
+  timestamp: string;
+  ingredient?: string;
+  quantity?: number;
+  unit?: string;
+  location?: string;
+  severity?: string;
+  message?: string;
+  reason?: string;
+  outputs?: Array<{ ingredient: string; quantity: number; unit: string }>;
+  user?: string;
+  storeId?: string;
+}
+
+export interface StockPolicy {
+  _id: string;
+  store?: { _id: string; name: string };
+  location?: { _id: string; name: string };
+  ingredient?: { _id: string; name: string };
+  minQuantity: number;
+  reorderPoint: number;
+  idealQuantity: number;
+  maxQuantity: number;
+  unit: string;
+  priority: "high" | "medium" | "low";
+  isActive: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface OverviewData {
+  totalIngredients: number;
+  stockout: number;
+  critical: number;
+  low: number;
+  ok: number;
+  excess: number;
+  noPolicy: number;
+  newAlerts: number;
+  saleWithoutDeduction: number;
+  productsWithoutRecipe: number;
+  pendingRecommendations: number;
+  alerts: OperationalAlert[];
+}
