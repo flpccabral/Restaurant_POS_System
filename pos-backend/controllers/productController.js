@@ -1,6 +1,7 @@
 const createHttpError = require("http-errors");
 const Product = require("../models/productModel");
 const Category = require("../models/categoryModel");
+const Recipe = require("../models/recipeModel");
 const { generateUniqueSku } = require("../utils/slugGenerator");
 const ws = require("../services/websocketService");
 
@@ -128,13 +129,40 @@ const getProducts = async (req, res, next) => {
             .populate('attributes', 'name options')
             .sort({ name: 1 });
 
+        // Buscar receitas ativas para enriquecer produtos com status de ficha técnica
+        const storeFilter = {};
+        if (!req.user.isMasterAdmin) {
+            storeFilter.store = req.user.store;
+        } else if (req.storeId) {
+            storeFilter.store = req.storeId;
+        }
+        // Se o filtro de loja nao foi definido, extrair dos produtos
+        if (!storeFilter.store && products.length > 0) {
+            storeFilter.store = products[0].store;
+        }
+
+        let productsWithActiveRecipe = new Set();
+        if (storeFilter.store) {
+            const activeRecipes = await Recipe.find({
+                store: storeFilter.store,
+                isActive: true
+            }).select('product').lean();
+
+            for (const recipe of activeRecipes) {
+                if (recipe.product) {
+                    productsWithActiveRecipe.add(recipe.product.toString());
+                }
+            }
+        }
+
         res.status(200).json({
             success: true,
             count: products.length,
             data: products.map(p => ({
                 ...p.toObject(),
                 startingAt: p.startingAt,
-                hasVariations: p.hasVariations
+                hasVariations: p.hasVariations,
+                hasActiveRecipe: productsWithActiveRecipe.has(p._id.toString())
             }))
         });
     } catch (error) {
@@ -169,7 +197,12 @@ const getProductById = async (req, res, next) => {
             data: {
                 ...product.toObject(),
                 startingAt: product.startingAt,
-                hasVariations: product.hasVariations
+                hasVariations: product.hasVariations,
+                hasActiveRecipe: await Recipe.exists({
+                    store: product.store,
+                    product: product._id,
+                    isActive: true
+                }).then(r => !!r)
             }
         });
     } catch (error) {
