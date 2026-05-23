@@ -95,7 +95,7 @@ export default function SuppliersPage() {
         </div>
         <Button
           onClick={() => setEditing({ name: "", tradeName: "", document: "", email: "", phone: "", city: "", state: "", rating: "3", notes: "" })}
-          className="bg-orange-500 hover:bg-orange-600"
+          className="bg-brand hover:bg-brand-muted text-brand-foreground"
         >
           <Plus className="h-4 w-4 mr-2" />
           Novo Fornecedor
@@ -188,7 +188,7 @@ export default function SuppliersPage() {
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditing(null)}>Cancelar</Button>
             <Button
-              className="bg-orange-500 hover:bg-orange-600"
+              className="bg-brand hover:bg-brand-muted text-brand-foreground"
               disabled={mutation.isPending || !editing?.name}
               onClick={() => {
                 if (!editing) return;
@@ -218,7 +218,7 @@ export default function SuppliersPage() {
         onOpenChange={() => setDeleteId(null)}
         title="Excluir Fornecedor"
         description="Tem certeza que deseja excluir este fornecedor? Esta ação não pode ser desfeita."
-        onConfirm={() => deleteId && deleteMutation.mutate(deleteId)}
+        onConfirm={() => { if (deleteId) deleteMutation.mutate(deleteId); }}
         confirmLabel="Excluir"
         variant="destructive"
       />

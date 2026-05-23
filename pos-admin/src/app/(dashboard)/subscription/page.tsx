@@ -76,7 +76,7 @@ export default function SubscriptionPage() {
       <Card className="bg-zinc-900 border-zinc-800">
         <CardHeader>
           <CardTitle className="text-zinc-200 flex items-center gap-2">
-            <CreditCard className="h-5 w-5 text-orange-500" />
+            <CreditCard className="h-5 w-5 text-brand" />
             Plano Atual
           </CardTitle>
           <CardDescription>Informações da sua assinatura</CardDescription>

@@ -19,6 +19,13 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { productsService } from "@/services/api/products";
 import { categoriesService } from "@/services/api/categories";
 
@@ -93,7 +100,7 @@ export default function ProductsPage() {
           <h1 className="text-2xl font-bold text-white">Produtos</h1>
           <p className="text-zinc-400 text-sm mt-1">Gerencie o catálogo de produtos</p>
         </div>
-        <Button onClick={() => setEditing({ name: "", description: "", price: "0", category: "" })} className="bg-orange-500 hover:bg-orange-600">
+        <Button onClick={() => setEditing({ name: "", description: "", price: "0", category: "" })} className="bg-brand hover:bg-brand-muted text-brand-foreground">
           <Plus className="h-4 w-4 mr-2" />
           Novo Produto
         </Button>
@@ -151,21 +158,25 @@ export default function ProductsPage() {
             </div>
             <div>
               <Label>Categoria</Label>
-              <select
+              <Select
                 value={editing?.category || ""}
-                onChange={(e) => setEditing((p) => p ? { ...p, category: e.target.value } : null)}
-                className="w-full h-10 px-3 rounded-md bg-zinc-800 border border-zinc-700 text-white text-sm"
+                onValueChange={(value) => setEditing((p) => p ? { ...p, category: value ?? "" } : null)}
               >
-                <option value="">Sem categoria</option>
-                {(categories || []).map((c: { _id: string; name: string }) => (
-                  <option key={c._id} value={c._id}>{c.name}</option>
-                ))}
-              </select>
+                <SelectTrigger className="w-full bg-zinc-800 border-zinc-700 text-white">
+                  <SelectValue placeholder="Sem categoria" />
+                </SelectTrigger>
+                <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
+                  <SelectItem value="">Sem categoria</SelectItem>
+                  {(categories || []).map((c: { _id: string; name: string }) => (
+                    <SelectItem key={c._id} value={c._id}>{c.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditing(null)}>Cancelar</Button>
-            <Button className="bg-orange-500 hover:bg-orange-600" disabled={mutation.isPending || !editing?.name} onClick={() => { if (!editing) return; mutation.mutate({ method: editing._id ? "put" : "post", id: editing._id, data: { name: editing.name, description: editing.description, price: parseFloat(editing.price) || 0, category: editing.category || undefined } }) }}>
+            <Button className="bg-brand hover:bg-brand-muted text-brand-foreground" disabled={mutation.isPending || !editing?.name} onClick={() => { if (!editing) return; mutation.mutate({ method: editing._id ? "put" : "post", id: editing._id, data: { name: editing.name, description: editing.description, price: parseFloat(editing.price) || 0, category: editing.category || undefined } }) }}>
               {mutation.isPending ? "Salvando..." : "Salvar"}
             </Button>
           </DialogFooter>
@@ -177,7 +188,7 @@ export default function ProductsPage() {
         onOpenChange={() => setDeleteId(null)}
         title="Excluir Produto"
         description="Tem certeza que deseja excluir este produto? Esta ação não pode ser desfeita."
-        onConfirm={() => deleteId && deleteMutation.mutate(deleteId)}
+        onConfirm={() => { if (deleteId) deleteMutation.mutate(deleteId); }}
         confirmLabel="Excluir"
         variant="destructive"
       />

@@ -219,7 +219,7 @@ export default function DashboardPage() {
         <Card className="bg-zinc-900 border-zinc-800">
           <CardHeader>
             <CardTitle className="text-zinc-200 text-sm flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-orange-500" />
+              <TrendingUp className="h-4 w-4 text-brand" />
               Tendência de Faturamento
             </CardTitle>
           </CardHeader>
@@ -242,9 +242,9 @@ export default function DashboardPage() {
                   <Line
                     type="monotone"
                     dataKey="revenue"
-                    stroke="#f97316"
+                    stroke="var(--brand)"
                     strokeWidth={2}
-                    dot={{ fill: "#f97316", strokeWidth: 2 }}
+                    dot={{ fill: "var(--brand)", strokeWidth: 2 }}
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -275,7 +275,7 @@ export default function DashboardPage() {
                     }}
                     formatter={(value) => formatCurrency(Number(value))}
                   />
-                  <Bar dataKey="totalRevenue" fill="#f97316" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="totalRevenue" fill="var(--brand)" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             ) : (

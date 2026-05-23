@@ -75,7 +75,7 @@ export default function CategoriesPage() {
         </div>
         <Button
           onClick={() => setEditing({ name: "", description: "" })}
-          className="bg-orange-500 hover:bg-orange-600"
+          className="bg-brand hover:bg-brand-muted text-brand-foreground"
         >
           <Plus className="h-4 w-4 mr-2" />
           Nova Categoria
@@ -137,7 +137,7 @@ export default function CategoriesPage() {
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditing(null)}>Cancelar</Button>
             <Button
-              className="bg-orange-500 hover:bg-orange-600"
+              className="bg-brand hover:bg-brand-muted text-brand-foreground"
               disabled={mutation.isPending || !editing?.name}
               onClick={() => {
                 if (!editing) return;
@@ -159,7 +159,7 @@ export default function CategoriesPage() {
         onOpenChange={() => setDeleteId(null)}
         title="Excluir Categoria"
         description="Tem certeza que deseja excluir esta categoria? Esta ação não pode ser desfeita."
-        onConfirm={() => deleteId && deleteMutation.mutate(deleteId)}
+        onConfirm={() => { if (deleteId) deleteMutation.mutate(deleteId); }}
         confirmLabel="Excluir"
         variant="destructive"
       />

@@ -42,7 +42,7 @@ export function Sidebar() {
   return (
     <aside className="fixed left-0 top-0 z-40 h-screen w-64 bg-zinc-950 border-r border-zinc-800 overflow-y-auto">
       <div className="flex items-center gap-2 px-6 py-5 border-b border-zinc-800">
-        <ChefHat className="h-6 w-6 text-orange-500" />
+        <ChefHat className="h-6 w-6 text-brand" />
         <h1 className="text-lg font-bold text-white">POS Admin</h1>
       </div>
 
@@ -55,7 +55,7 @@ export function Sidebar() {
               href={item.href}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                 isActive
-                  ? "bg-orange-500/10 text-orange-500"
+                  ? "bg-brand-muted text-brand"
                   : "text-zinc-400 hover:bg-zinc-800 hover:text-white"
               }`}
             >

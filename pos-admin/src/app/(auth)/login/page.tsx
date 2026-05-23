@@ -36,8 +36,8 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-zinc-950 px-4">
       <Card className="w-full max-w-md bg-zinc-900 border-zinc-800">
         <CardHeader className="text-center space-y-4">
-          <div className="mx-auto w-12 h-12 rounded-full bg-orange-500/10 flex items-center justify-center">
-            <ChefHat className="h-6 w-6 text-orange-500" />
+          <div className="mx-auto w-12 h-12 rounded-full bg-brand-muted flex items-center justify-center">
+            <ChefHat className="h-6 w-6 text-brand" />
           </div>
           <div>
             <CardTitle className="text-2xl text-white">POS Admin</CardTitle>
@@ -74,7 +74,7 @@ export default function LoginPage() {
             </div>
             <Button
               type="submit"
-              className="w-full bg-orange-500 hover:bg-orange-600 text-white"
+              className="w-full bg-brand hover:bg-brand-muted text-brand-foreground"
               disabled={loading}
             >
               {loading ? "Entrando..." : "Entrar"}

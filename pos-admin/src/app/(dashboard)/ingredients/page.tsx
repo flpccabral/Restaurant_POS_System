@@ -94,7 +94,7 @@ export default function IngredientsPage() {
         </div>
         <Button
           onClick={() => setEditing({ name: "", category: "outro", baseUnit: "unidade", averageCost: "0", minimumStock: "0" })}
-          className="bg-orange-500 hover:bg-orange-600"
+          className="bg-brand hover:bg-brand-muted text-brand-foreground"
         >
           <Plus className="h-4 w-4 mr-2" />
           Novo Ingrediente
@@ -191,7 +191,7 @@ export default function IngredientsPage() {
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditing(null)}>Cancelar</Button>
             <Button
-              className="bg-orange-500 hover:bg-orange-600"
+              className="bg-brand hover:bg-brand-muted text-brand-foreground"
               disabled={mutation.isPending || !editing?.name}
               onClick={() => {
                 if (!editing) return;
@@ -219,7 +219,7 @@ export default function IngredientsPage() {
         onOpenChange={() => setDeleteId(null)}
         title="Excluir Ingrediente"
         description="Tem certeza que deseja excluir este ingrediente? Esta ação não pode ser desfeita."
-        onConfirm={() => deleteId && deleteMutation.mutate(deleteId)}
+        onConfirm={() => { if (deleteId) deleteMutation.mutate(deleteId); }}
         confirmLabel="Excluir"
         variant="destructive"
       />

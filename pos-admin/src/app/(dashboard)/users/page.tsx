@@ -96,7 +96,7 @@ export default function UsersPage() {
           <h1 className="text-2xl font-bold text-white">Usuários</h1>
           <p className="text-zinc-400 text-sm mt-1">Gerencie usuários e permissões</p>
         </div>
-        <Button onClick={() => setEditing({ name: "", email: "", phone: "", password: "", role: "" })} className="bg-orange-500 hover:bg-orange-600">
+        <Button onClick={() => setEditing({ name: "", email: "", phone: "", password: "", role: "" })} className="bg-brand hover:bg-brand-muted text-brand-foreground">
           <Plus className="h-4 w-4 mr-2" />
           Novo Usuário
         </Button>
@@ -164,7 +164,7 @@ export default function UsersPage() {
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditing(null)}>Cancelar</Button>
             <Button
-              className="bg-orange-500 hover:bg-orange-600"
+              className="bg-brand hover:bg-brand-muted text-brand-foreground"
               disabled={mutation.isPending || !editing?.name || !editing?.email}
               onClick={() => {
                 if (!editing) return;
@@ -189,7 +189,7 @@ export default function UsersPage() {
         onOpenChange={() => setDeleteId(null)}
         title="Excluir Usuário"
         description="Tem certeza que deseja excluir este usuário? Esta ação não pode ser desfeita."
-        onConfirm={() => deleteId && deleteMutation.mutate(deleteId)}
+        onConfirm={() => { if (deleteId) deleteMutation.mutate(deleteId); }}
         confirmLabel="Excluir"
         variant="destructive"
       />

@@ -129,7 +129,7 @@ export default function PurchaseOrdersPage() {
           <h1 className="text-2xl font-bold text-white">Pedidos de Compra</h1>
           <p className="text-zinc-400 text-sm mt-1">Gerencie pedidos de compra e aquisições</p>
         </div>
-        <Button onClick={() => setCreating(true)} className="bg-orange-500 hover:bg-orange-600">
+        <Button onClick={() => setCreating(true)} className="bg-brand hover:bg-brand-muted text-brand-foreground">
           <Plus className="h-4 w-4 mr-2" />
           Novo Pedido
         </Button>
@@ -179,7 +179,7 @@ export default function PurchaseOrdersPage() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setCreating(false)}>Cancelar</Button>
-            <Button className="bg-orange-500 hover:bg-orange-600" disabled={!form.supplierId} onClick={() => createMutation.mutate({ supplier: form.supplierId, expectedDate: form.expectedDate, notes: form.notes, items: [] })}>
+            <Button className="bg-brand hover:bg-brand-muted text-brand-foreground" disabled={!form.supplierId} onClick={() => createMutation.mutate({ supplier: form.supplierId, expectedDate: form.expectedDate, notes: form.notes, items: [] })}>
               Criar Pedido
             </Button>
           </DialogFooter>
@@ -191,7 +191,7 @@ export default function PurchaseOrdersPage() {
         onOpenChange={() => setDeleteId(null)}
         title="Excluir Pedido"
         description="Tem certeza que deseja excluir este pedido de compra?"
-        onConfirm={() => deleteId && deleteMutation.mutate(deleteId)}
+        onConfirm={() => { if (deleteId) deleteMutation.mutate(deleteId); }}
         confirmLabel="Excluir"
         variant="destructive"
       />

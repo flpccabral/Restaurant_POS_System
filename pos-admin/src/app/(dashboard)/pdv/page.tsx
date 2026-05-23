@@ -168,7 +168,7 @@ export default function PDVPage() {
             <CardContent><p className="text-2xl font-bold text-white">R$ {Number(summ.totalSales || 0).toFixed(2)}</p></CardContent>
           </Card>
           <Card className="bg-zinc-900 border-zinc-800">
-            <CardHeader><CardTitle className="text-zinc-200 text-sm flex items-center gap-2"><Receipt className="h-4 w-4 text-orange-500" />Qtd. Pagamentos</CardTitle></CardHeader>
+            <CardHeader><CardTitle className="text-zinc-200 text-sm flex items-center gap-2"><Receipt className="h-4 w-4 text-brand" />Qtd. Pagamentos</CardTitle></CardHeader>
             <CardContent><p className="text-2xl font-bold text-white">{Number(summ.paymentCount) || 0}</p></CardContent>
           </Card>
           <Card className="bg-zinc-900 border-zinc-800">

@@ -139,7 +139,7 @@ export default function DevicesPage() {
         onOpenChange={() => setDeleteId(null)}
         title="Revogar Dispositivo"
         description="Tem certeza que deseja revogar este dispositivo? Ele perderá o acesso ao sistema."
-        onConfirm={() => deleteId && deleteMutation.mutate(deleteId)}
+        onConfirm={() => { if (deleteId) deleteMutation.mutate(deleteId); }}
         confirmLabel="Revogar"
         variant="destructive"
       />

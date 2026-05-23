@@ -17,7 +17,7 @@ import { kdsService } from "@/services/api/kds";
 const statusConfig: Record<string, { label: string; color: string; bg: string }> = {
   pending: { label: "Pendente", color: "text-amber-400", bg: "bg-amber-500/10 border-amber-500/20" },
   accepted: { label: "Aceito", color: "text-blue-400", bg: "bg-blue-500/10 border-blue-500/20" },
-  preparing: { label: "Preparando", color: "text-orange-400", bg: "bg-orange-500/10 border-orange-500/20" },
+  preparing: { label: "Preparando", color: "text-brand", bg: "bg-brand-muted border-brand/20" },
   ready: { label: "Pronto", color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/20" },
   served: { label: "Entregue", color: "text-zinc-400", bg: "bg-zinc-500/10 border-zinc-500/20" },
   cancelled: { label: "Cancelado", color: "text-red-400", bg: "bg-red-500/10 border-red-500/20" },
@@ -107,7 +107,7 @@ export default function KDSPage() {
         </Card>
         <Card className="bg-zinc-900 border-zinc-800">
           <CardHeader><CardTitle className="text-zinc-200 text-sm">Preparando</CardTitle></CardHeader>
-          <CardContent><p className="text-2xl font-bold text-orange-500">{activeTickets.filter((t) => t.status === "preparing").length}</p></CardContent>
+          <CardContent><p className="text-2xl font-bold text-brand">{activeTickets.filter((t) => t.status === "preparing").length}</p></CardContent>
         </Card>
         <Card className="bg-zinc-900 border-zinc-800">
           <CardHeader><CardTitle className="text-zinc-200 text-sm">Prontos</CardTitle></CardHeader>
@@ -123,7 +123,7 @@ export default function KDSPage() {
       {activeTickets.length > 0 && (
         <div>
           <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-            <ChefHat className="h-5 w-5 text-orange-500" />
+            <ChefHat className="h-5 w-5 text-brand" />
             Pedidos Ativos
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -173,7 +173,7 @@ export default function KDSPage() {
                         </Button>
                       )}
                       {status === "ready" && (
-                        <Button size="sm" className="flex-1 bg-orange-600 hover:bg-orange-700" onClick={() => servedMutation.mutate(ticket._id as string)}>
+                        <Button size="sm" className="flex-1 bg-brand hover:bg-brand-muted text-brand-foreground" onClick={() => servedMutation.mutate(ticket._id as string)}>
                           <CheckCircle className="h-3.5 w-3.5 mr-1" /> Entregue
                         </Button>
                       )}

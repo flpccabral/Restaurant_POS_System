@@ -9,7 +9,7 @@ interface KpiCardProps {
   color?: string;
 }
 
-export function KpiCard({ title, value, icon: Icon, trend, color = "text-orange-500" }: KpiCardProps) {
+export function KpiCard({ title, value, icon: Icon, trend, color = "text-brand" }: KpiCardProps) {
   return (
     <Card className="bg-zinc-900 border-zinc-800">
       <CardContent className="p-6">

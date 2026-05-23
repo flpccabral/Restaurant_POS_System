@@ -88,7 +88,7 @@ export default function RolesPage() {
           <h1 className="text-2xl font-bold text-white">Perfis de Acesso</h1>
           <p className="text-zinc-400 text-sm mt-1">Gerencie perfis e controle de acesso</p>
         </div>
-        <Button onClick={() => setEditing({ name: "", description: "", permissions: {} })} className="bg-orange-500 hover:bg-orange-600">
+        <Button onClick={() => setEditing({ name: "", description: "", permissions: {} })} className="bg-brand hover:bg-brand-muted text-brand-foreground">
           <Plus className="h-4 w-4 mr-2" />
           Novo Perfil
         </Button>
@@ -155,7 +155,7 @@ export default function RolesPage() {
                                 return { ...p, permissions: perms };
                               });
                             }}
-                            className="accent-orange-500"
+                            className="accent-brand"
                           />
                           {act}
                         </label>
@@ -168,7 +168,7 @@ export default function RolesPage() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditing(null)}>Cancelar</Button>
-            <Button className="bg-orange-500 hover:bg-orange-600" disabled={mutation.isPending || !editing?.name} onClick={() => { if (!editing) return; mutation.mutate({ method: editing._id ? "put" : "post", id: editing._id, data: { name: editing.name, description: editing.description, permissions: editing.permissions } }) }}>
+            <Button className="bg-brand hover:bg-brand-muted text-brand-foreground" disabled={mutation.isPending || !editing?.name} onClick={() => { if (!editing) return; mutation.mutate({ method: editing._id ? "put" : "post", id: editing._id, data: { name: editing.name, description: editing.description, permissions: editing.permissions } }) }}>
               {mutation.isPending ? "Salvando..." : "Salvar"}
             </Button>
           </DialogFooter>
@@ -180,7 +180,7 @@ export default function RolesPage() {
         onOpenChange={() => setDeleteId(null)}
         title="Excluir Perfil"
         description="Tem certeza que deseja excluir este perfil? Usuários vinculados perderão as permissões."
-        onConfirm={() => deleteId && deleteMutation.mutate(deleteId)}
+        onConfirm={() => { if (deleteId) deleteMutation.mutate(deleteId); }}
         confirmLabel="Excluir"
         variant="destructive"
       />

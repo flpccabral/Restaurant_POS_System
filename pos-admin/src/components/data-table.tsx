@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,7 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Plus, Search, Pencil, Trash2 } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Column {
@@ -35,6 +35,8 @@ interface DataTableProps {
   className?: string;
   /** Custom search function. Receives row and search term. Overrides searchKey. */
   onSearchField?: (row: unknown, term: string) => boolean;
+  /** Number of rows per page. Default 20. Set to 0 to disable pagination. */
+  pageSize?: number;
 }
 
 export function DataTable({
@@ -49,16 +51,41 @@ export function DataTable({
   emptyMessage = "Nenhum resultado encontrado.",
   className,
   onSearchField,
+  pageSize = 20,
 }: DataTableProps) {
   const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   const items = Array.isArray(data) ? data : [];
 
-  const filtered = search && (onSearchField || searchKey)
-    ? items.filter((row) => {
-        if (onSearchField) return onSearchField(row, search);
-        return String((row as Record<string, unknown>)[searchKey!]).toLowerCase().includes(search.toLowerCase());
-      })
-    : items;
+  const filtered = useMemo(() => {
+    if (!search || (!onSearchField && !searchKey)) return items;
+    return items.filter((row) => {
+      if (onSearchField) return onSearchField(row, search);
+      return String((row as Record<string, unknown>)[searchKey!])
+        .toLowerCase()
+        .includes(search.toLowerCase());
+    });
+  }, [items, search, searchKey, onSearchField]);
+
+  const totalPages = pageSize > 0 ? Math.max(1, Math.ceil(filtered.length / pageSize)) : 1;
+
+  // Reset to page 1 when search results change
+  useEffect(() => {
+    // Only reset when search is active and current page exceeds new total
+    if (currentPage > totalPages) {
+      setCurrentPage(1);
+    }
+  }, [totalPages, currentPage]);
+
+  const safePage = Math.min(currentPage, totalPages);
+
+  const paginatedData = useMemo(() => {
+    if (pageSize <= 0) return filtered;
+    const start = (safePage - 1) * pageSize;
+    return filtered.slice(start, start + pageSize);
+  }, [filtered, safePage, pageSize]);
+
+  const displayData = pageSize > 0 ? paginatedData : filtered;
 
   if (loading) {
     return (
@@ -85,7 +112,7 @@ export function DataTable({
           </div>
         )}
         {onCreate && (
-          <Button onClick={onCreate} className="bg-orange-500 hover:bg-orange-600 text-white ml-auto">
+          <Button onClick={onCreate} className="bg-brand hover:bg-brand-muted text-brand-foreground ml-auto">
             <Plus className="mr-2 h-4 w-4" />
             Adicionar
           </Button>
@@ -114,7 +141,7 @@ export function DataTable({
                 </TableCell>
               </TableRow>
             ) : (
-              filtered.map((row, idx) => {
+              displayData.map((row, idx) => {
                 const r = row as Record<string, unknown>;
                 return (
                 <TableRow key={String(r._id ?? idx)} className="border-zinc-800">
@@ -156,6 +183,41 @@ export function DataTable({
           </TableBody>
         </Table>
       </div>
+
+      {/* Pagination */}
+      {pageSize > 0 && filtered.length > pageSize && (
+        <div className="flex items-center justify-between text-sm">
+          <p className="text-zinc-400">
+            {filtered.length} registro{filtered.length !== 1 ? "s" : ""}
+            {search && ` (filtrados de ${items.length})`}
+          </p>
+          <div className="flex items-center gap-3">
+            <p className="text-zinc-400">
+              Página {safePage} de {totalPages}
+            </p>
+            <div className="flex items-center gap-1">
+              <Button
+                variant="outline"
+                size="xs"
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={safePage <= 1}
+                className="border-zinc-700 text-zinc-300"
+              >
+                <ChevronLeft className="h-3.5 w-3.5" />
+              </Button>
+              <Button
+                variant="outline"
+                size="xs"
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                disabled={safePage >= totalPages}
+                className="border-zinc-700 text-zinc-300"
+              >
+                <ChevronRight className="h-3.5 w-3.5" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
