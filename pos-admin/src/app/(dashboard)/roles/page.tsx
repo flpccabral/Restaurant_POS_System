@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
+import { ErrorState } from "@/components/shared/ErrorState";
 import { DataTable } from "@/components/data-table";
 import { StatusBadge } from "@/components/status-badge";
 import { ConfirmDialog } from "@/components/confirm-dialog";
@@ -30,7 +31,7 @@ export default function RolesPage() {
     _id?: string; name: string; description: string; permissions: Record<string, string[]>;
   } | null>(null);
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["roles"],
     queryFn: () => rolesService.getAll().then((r) => r.data.data),
   });
@@ -93,6 +94,13 @@ export default function RolesPage() {
         </Button>
       </div>
 
+      {isError ? (
+        <ErrorState
+          message="Falha ao carregar perfis de acesso"
+          description="Verifique se o servidor backend está rodando e tente novamente."
+          onRetry={refetch}
+        />
+      ) : (
       <DataTable
         columns={columns}
         data={data || []}
@@ -106,6 +114,7 @@ export default function RolesPage() {
         }}
         onDelete={(id) => setDeleteId(id)}
       />
+      )}
 
       <Dialog open={!!editing} onOpenChange={() => setEditing(null)}>
         <DialogContent className="bg-zinc-900 border-zinc-800 text-white max-h-[80vh] overflow-y-auto">

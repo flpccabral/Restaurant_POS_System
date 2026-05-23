@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
+import { ErrorState } from "@/components/shared/ErrorState";
 import { DataTable } from "@/components/data-table";
 import { StatusBadge } from "@/components/status-badge";
 import { ConfirmDialog } from "@/components/confirm-dialog";
@@ -25,7 +26,7 @@ export default function CategoriesPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [editing, setEditing] = useState<{ _id?: string; name: string; description: string } | null>(null);
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["categories"],
     queryFn: () => categoriesService.getAll().then((r) => r.data.data),
   });
@@ -81,6 +82,13 @@ export default function CategoriesPage() {
         </Button>
       </div>
 
+      {isError ? (
+        <ErrorState
+          message="Falha ao carregar categorias"
+          description="Verifique se o servidor backend está rodando e tente novamente."
+          onRetry={refetch}
+        />
+      ) : (
       <DataTable
         columns={columns}
         data={data || []}
@@ -94,6 +102,7 @@ export default function CategoriesPage() {
         }}
         onDelete={(id) => setDeleteId(id)}
       />
+      )}
 
       <Dialog open={!!editing} onOpenChange={() => setEditing(null)}>
         <DialogContent className="bg-zinc-900 border-zinc-800 text-white">
