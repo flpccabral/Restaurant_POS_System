@@ -93,12 +93,12 @@ export default function UsersPage() {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Usuários</h1>
-          <p className="text-zinc-400 text-sm mt-1">Gerencie usuários e permissões</p>
+          <h1 className="text-2xl font-bold text-foreground tracking-tight">Usuarios</h1>
+          <p className="text-muted-foreground text-sm mt-0.5">Gerencie usuarios e permissoes</p>
         </div>
-        <Button onClick={() => setEditing({ name: "", email: "", phone: "", password: "", role: "" })} className="bg-brand hover:bg-brand-muted text-brand-foreground">
+        <Button onClick={() => setEditing({ name: "", email: "", phone: "", password: "", role: "" })}>
           <Plus className="h-4 w-4 mr-2" />
-          Novo Usuário
+          Novo Usuario
         </Button>
       </div>
 
@@ -127,33 +127,33 @@ export default function UsersPage() {
       />
 
       <Dialog open={!!editing} onOpenChange={() => setEditing(null)}>
-        <DialogContent className="bg-zinc-900 border-zinc-800 text-white">
+        <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>{editing?._id ? "Editar Usuário" : "Novo Usuário"}</DialogTitle>
-            <DialogDescription className="text-zinc-400">Preencha os dados do usuário</DialogDescription>
+            <DialogTitle>{editing?._id ? "Editar Usuario" : "Novo Usuario"}</DialogTitle>
+            <DialogDescription>Preencha os dados do usuario</DialogDescription>
           </DialogHeader>
-          <div className="grid grid-cols-2 gap-4 py-4">
-            <div className="col-span-2">
+          <div className="grid grid-cols-2 gap-5 py-2">
+            <div className="col-span-2 space-y-2">
               <Label>Nome</Label>
-              <Input value={editing?.name || ""} onChange={(e) => setEditing((p) => p ? { ...p, name: e.target.value } : null)} className="bg-zinc-800 border-zinc-700 text-white" />
+              <Input value={editing?.name || ""} onChange={(e) => setEditing((p) => p ? { ...p, name: e.target.value } : null)} placeholder="Nome completo" />
             </div>
-            <div>
+            <div className="space-y-2">
               <Label>E-mail</Label>
-              <Input type="email" value={editing?.email || ""} onChange={(e) => setEditing((p) => p ? { ...p, email: e.target.value } : null)} className="bg-zinc-800 border-zinc-700 text-white" />
+              <Input type="email" value={editing?.email || ""} onChange={(e) => setEditing((p) => p ? { ...p, email: e.target.value } : null)} placeholder="usuario@exemplo.com" />
             </div>
-            <div>
+            <div className="space-y-2">
               <Label>Telefone</Label>
-              <Input value={editing?.phone || ""} onChange={(e) => setEditing((p) => p ? { ...p, phone: e.target.value } : null)} className="bg-zinc-800 border-zinc-700 text-white" />
+              <Input value={editing?.phone || ""} onChange={(e) => setEditing((p) => p ? { ...p, phone: e.target.value } : null)} placeholder="(11) 99999-9999" />
             </div>
-            <div>
+            <div className="space-y-2">
               <Label>Senha {editing?._id ? "(vazio = manter)" : ""}</Label>
-              <Input type="password" value={editing?.password || ""} onChange={(e) => setEditing((p) => p ? { ...p, password: e.target.value } : null)} className="bg-zinc-800 border-zinc-700 text-white" />
+              <Input type="password" value={editing?.password || ""} onChange={(e) => setEditing((p) => p ? { ...p, password: e.target.value } : null)} placeholder="••••••••" />
             </div>
-            <div>
+            <div className="space-y-2">
               <Label>Perfil</Label>
               <Select value={editing?.role || ""} onValueChange={(v) => setEditing((p) => p ? { ...p, role: v || "" } : null)}>
-                <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white"><SelectValue placeholder="Selecione" /></SelectTrigger>
-                <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
+                <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                <SelectContent>
                   {(roles || []).map((r: { _id: string; name: string }) => (
                     <SelectItem key={r._id} value={r._id}>{r.name}</SelectItem>
                   ))}
@@ -162,9 +162,8 @@ export default function UsersPage() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditing(null)}>Cancelar</Button>
+            <Button variant="outline" onClick={() => setEditing(null)} disabled={mutation.isPending}>Cancelar</Button>
             <Button
-              className="bg-brand hover:bg-brand-muted text-brand-foreground"
               disabled={mutation.isPending || !editing?.name || !editing?.email}
               onClick={() => {
                 if (!editing) return;

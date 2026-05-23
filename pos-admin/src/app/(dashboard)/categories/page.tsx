@@ -70,13 +70,10 @@ export default function CategoriesPage() {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Categorias</h1>
-          <p className="text-zinc-400 text-sm mt-1">Gerencie as categorias do catálogo</p>
+          <h1 className="text-2xl font-bold text-foreground tracking-tight">Categorias</h1>
+          <p className="text-muted-foreground text-sm mt-0.5">Gerencie as categorias do catalogo</p>
         </div>
-        <Button
-          onClick={() => setEditing({ name: "", description: "" })}
-          className="bg-brand hover:bg-brand-muted text-brand-foreground"
-        >
+        <Button onClick={() => setEditing({ name: "", description: "" })}>
           <Plus className="h-4 w-4 mr-2" />
           Nova Categoria
         </Button>
@@ -105,39 +102,34 @@ export default function CategoriesPage() {
       )}
 
       <Dialog open={!!editing} onOpenChange={() => setEditing(null)}>
-        <DialogContent className="bg-zinc-900 border-zinc-800 text-white">
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>{editing?._id ? "Editar Categoria" : "Nova Categoria"}</DialogTitle>
-            <DialogDescription className="text-zinc-400">
-              Preencha os dados da categoria
-            </DialogDescription>
+            <DialogDescription>Preencha os dados da categoria</DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div>
+          <div className="space-y-5 py-2">
+            <div className="space-y-2">
               <Label htmlFor="cat-name">Nome</Label>
               <Input
                 id="cat-name"
                 value={editing?.name || ""}
                 onChange={(e) => setEditing((prev) => prev ? { ...prev, name: e.target.value } : null)}
-                className="bg-zinc-800 border-zinc-700 text-white"
                 placeholder="Ex: Bebidas, Sobremesas..."
               />
             </div>
-            <div>
-              <Label htmlFor="cat-desc">Descrição</Label>
+            <div className="space-y-2">
+              <Label htmlFor="cat-desc">Descricao</Label>
               <Input
                 id="cat-desc"
                 value={editing?.description || ""}
                 onChange={(e) => setEditing((prev) => prev ? { ...prev, description: e.target.value } : null)}
-                className="bg-zinc-800 border-zinc-700 text-white"
-                placeholder="Descrição opcional"
+                placeholder="Descricao opcional"
               />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditing(null)}>Cancelar</Button>
+            <Button variant="outline" onClick={() => setEditing(null)} disabled={mutation.isPending}>Cancelar</Button>
             <Button
-              className="bg-brand hover:bg-brand-muted text-brand-foreground"
               disabled={mutation.isPending || !editing?.name}
               onClick={() => {
                 if (!editing) return;

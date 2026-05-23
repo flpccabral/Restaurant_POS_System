@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChefHat } from "lucide-react";
+import { ChefHat, Loader2 } from "lucide-react";
 import { authService } from "@/services/api/auth";
 import { toast } from "sonner";
 
@@ -26,62 +26,94 @@ export default function LoginPage() {
       router.push("/");
       router.refresh();
     } catch {
-      toast.error("Email ou senha inválidos");
+      toast.error("Email ou senha invalidos");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-zinc-950 px-4">
-      <Card className="w-full max-w-md bg-zinc-900 border-zinc-800">
-        <CardHeader className="text-center space-y-4">
-          <div className="mx-auto w-12 h-12 rounded-full bg-brand-muted flex items-center justify-center">
-            <ChefHat className="h-6 w-6 text-brand" />
-          </div>
-          <div>
-            <CardTitle className="text-2xl text-white">POS Admin</CardTitle>
-            <CardDescription className="text-zinc-400">
-              Acesse o painel administrativo
-            </CardDescription>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-zinc-300">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="admin@restaurant.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500"
-                required
-              />
+    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background">
+      {/* Decorative background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-80 h-80 rounded-full bg-brand-muted blur-3xl opacity-30" />
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 rounded-full bg-brand-muted blur-3xl opacity-20" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-brand-muted blur-3xl opacity-[0.08]" />
+      </div>
+
+      <div className="relative w-full max-w-md px-4">
+        <Card className="border border-border/50 shadow-2xl shadow-black/20 backdrop-blur-sm">
+          <CardHeader className="text-center space-y-5 pb-6">
+            {/* Brand icon */}
+            <div className="mx-auto w-14 h-14 rounded-2xl bg-brand-muted flex items-center justify-center">
+              <ChefHat className="h-7 w-7 text-brand" />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="password" className="text-zinc-300">Senha</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500"
-                required
-              />
+            <div className="space-y-1.5">
+              <CardTitle className="text-2xl font-bold tracking-tight">POS Admin</CardTitle>
+              <CardDescription className="text-sm">
+                Acesse o painel administrativo do sistema
+              </CardDescription>
             </div>
-            <Button
-              type="submit"
-              className="w-full bg-brand hover:bg-brand-muted text-brand-foreground"
-              disabled={loading}
-            >
-              {loading ? "Entrando..." : "Entrar"}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="admin@restaurant.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="h-10"
+                  required
+                  autoFocus
+                />
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password">Senha</Label>
+                  <button
+                    type="button"
+                    className="text-xs text-muted-foreground hover:text-brand transition-colors"
+                    onClick={() => toast.info("Entre em contato com o suporte para redefinir sua senha.")}
+                  >
+                    Esqueceu a senha?
+                  </button>
+                </div>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="h-10"
+                  required
+                />
+              </div>
+              <Button
+                type="submit"
+                className="w-full h-10"
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Entrando...
+                  </>
+                ) : (
+                  "Entrar"
+                )}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+
+        {/* Footer */}
+        <p className="text-center text-xs text-muted-foreground/60 mt-6">
+          Gastronomic Operational Intelligence Platform
+        </p>
+      </div>
     </div>
   );
 }

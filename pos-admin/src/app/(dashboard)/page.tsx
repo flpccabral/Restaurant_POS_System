@@ -8,6 +8,9 @@ import {
   AlertTriangle,
   Package,
   TrendingUp,
+  Building2,
+  Receipt,
+  PiggyBank,
 } from "lucide-react";
 import { KpiCard } from "@/components/kpi-card";
 import { StatusBadge } from "@/components/status-badge";
@@ -49,11 +52,20 @@ import {
 
 const periods = [
   { label: "Hoje", value: "today" },
-  { label: "Últimos 7 dias", value: "7days" },
-  { label: "Últimos 30 dias", value: "30days" },
+  { label: "Ultimos 7 dias", value: "7days" },
+  { label: "Ultimos 30 dias", value: "30days" },
   { label: "Esta semana", value: "this_week" },
-  { label: "Este mês", value: "this_month" },
+  { label: "Este mes", value: "this_month" },
 ];
+
+const chartTooltipStyle = {
+  backgroundColor: "var(--popover)",
+  border: "1px solid var(--border)",
+  borderRadius: "var(--radius)",
+  color: "var(--popover-foreground)",
+  fontSize: "13px",
+  boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+} as const;
 
 export default function DashboardPage() {
   const [period, setPeriod] = useState("today");
@@ -90,19 +102,19 @@ export default function DashboardPage() {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+      {/* Page Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">Dashboard</h1>
-          <p className="text-zinc-400 text-sm mt-1">
-            Visão geral do desempenho do restaurante
+          <h1 className="text-2xl font-bold text-foreground tracking-tight">Dashboard</h1>
+          <p className="text-muted-foreground text-sm mt-0.5">
+            Visao geral do desempenho operacional
           </p>
         </div>
         <Select value={period} onValueChange={(v) => v && setPeriod(v)}>
-          <SelectTrigger className="w-48 bg-zinc-800 border-zinc-700 text-white">
+          <SelectTrigger className="w-44">
             <SelectValue />
           </SelectTrigger>
-          <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
+          <SelectContent>
             {periods.map((p) => (
               <SelectItem key={p.value} value={p.value}>
                 {p.label}
@@ -112,11 +124,11 @@ export default function DashboardPage() {
         </Select>
       </div>
 
-      {/* KPIs */}
+      {/* KPI Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {kpisLoading ? (
           Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-28 bg-zinc-900 border border-zinc-800" />
+            <Skeleton key={i} className="h-[132px] rounded-xl" />
           ))
         ) : (
           <>
@@ -125,7 +137,7 @@ export default function DashboardPage() {
               value={formatCurrency(kpis?.revenue?.gross || 0)}
               icon={DollarSign}
               trend={{
-                value: `Líquido: ${formatCurrency(kpis?.revenue?.net || 0)}`,
+                value: `Liquido: ${formatCurrency(kpis?.revenue?.net || 0)}`,
                 positive: (kpis?.revenue?.net || 0) > 0,
               }}
             />
@@ -134,7 +146,7 @@ export default function DashboardPage() {
               value={kpis?.orders?.count || 0}
               icon={ShoppingCart}
               trend={{
-                value: `Ticket médio: ${formatCurrency(kpis?.orders?.avgTicket || 0)}`,
+                value: `Ticket medio: ${formatCurrency(kpis?.orders?.avgTicket || 0)}`,
                 positive: true,
               }}
             />
@@ -142,54 +154,68 @@ export default function DashboardPage() {
               title="Produtos Ativos"
               value={kpis?.operational.activeProducts || 0}
               icon={Package}
-              color="text-blue-500"
+              color="text-info"
             />
             <KpiCard
               title="Alertas de Estoque"
               value={kpis?.operational.activeAlerts || 0}
               icon={AlertTriangle}
-              color={(kpis?.operational.activeAlerts || 0) > 0 ? "text-red-500" : "text-emerald-500"}
+              color={(kpis?.operational.activeAlerts || 0) > 0 ? "text-critical" : "text-success"}
             />
           </>
         )}
       </div>
 
-      {/* Secondary row */}
+      {/* Secondary Metric Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="bg-zinc-900 border-zinc-800">
+        <Card>
           <CardHeader>
-            <CardTitle className="text-zinc-200 text-sm">Valor em Estoque</CardTitle>
-            <CardDescription>Valor total do inventário</CardDescription>
+            <CardTitle className="flex items-center gap-2 text-sm">
+              <Building2 className="h-4 w-4 text-brand" />
+              Valor em Estoque
+            </CardTitle>
+            <CardDescription>Valor total do inventario</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold text-white">
+            <p className="text-2xl font-bold text-foreground tracking-tight">
               {inventory ? formatCurrency(inventory.totalValue || 0) : "—"}
             </p>
-            <div className="flex gap-4 mt-3 text-xs text-zinc-400">
-              <span>{inventory?.outOfStock || 0} sem estoque</span>
-              <span>{inventory?.belowMinimum || 0} abaixo do mínimo</span>
+            <div className="flex gap-4 mt-3">
+              <span className="text-xs text-muted-foreground">
+                <span className="text-critical font-medium">{inventory?.outOfStock || 0}</span> sem estoque
+              </span>
+              <span className="text-xs text-muted-foreground">
+                <span className="text-warning font-medium">{inventory?.belowMinimum || 0}</span> abaixo do minimo
+              </span>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-zinc-900 border-zinc-800">
+        <Card>
           <CardHeader>
-            <CardTitle className="text-zinc-200 text-sm">CMV (Custo Merc. Vendida)</CardTitle>
+            <CardTitle className="flex items-center gap-2 text-sm">
+              <PiggyBank className="h-4 w-4 text-brand" />
+              CMV (Custo Merc. Vendida)
+            </CardTitle>
             <CardDescription>Custo total das mercadorias vendidas</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold text-white">
+            <p className="text-2xl font-bold text-foreground tracking-tight">
               {cmv ? formatCurrency(cmv.cmv?.total || 0) : "—"}
             </p>
-            <div className="flex gap-4 mt-3 text-xs text-zinc-400">
-              <span>CMV: {cmv?.cmv?.percent || 0}%</span>
-              <span>Margem: {cmv?.margin?.gross || 0}%</span>
+            <div className="flex gap-4 mt-3">
+              <span className="text-xs text-muted-foreground">
+                CMV: <span className="text-foreground/70 font-medium">{cmv?.cmv?.percent || 0}%</span>
+              </span>
+              <span className="text-xs text-muted-foreground">
+                Margem: <span className="text-success font-medium">{cmv?.margin?.gross || 0}%</span>
+              </span>
             </div>
             {cmv?.classification && (
-              <span className={`inline-block mt-2 text-xs px-2 py-0.5 rounded-full ${
-                cmv.classification.color === "green" ? "bg-emerald-500/10 text-emerald-400" :
-                cmv.classification.color === "yellow" ? "bg-yellow-500/10 text-yellow-400" :
-                "bg-red-500/10 text-red-400"
+              <span className={`inline-block mt-2 text-xs px-2 py-0.5 rounded-full font-medium ${
+                cmv.classification.color === "green" ? "bg-success/10 text-success" :
+                cmv.classification.color === "yellow" ? "bg-warning/10 text-warning" :
+                "bg-critical/10 text-critical"
               }`}>
                 {cmv.classification.level.replace("_", " ").toUpperCase()}
               </span>
@@ -197,154 +223,162 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-zinc-900 border-zinc-800">
+        <Card>
           <CardHeader>
-            <CardTitle className="text-zinc-200 text-sm">Impostos</CardTitle>
+            <CardTitle className="flex items-center gap-2 text-sm">
+              <Receipt className="h-4 w-4 text-brand" />
+              Impostos
+            </CardTitle>
             <CardDescription>Total de impostos arrecadados</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold text-white">
+            <p className="text-2xl font-bold text-foreground tracking-tight">
               {kpis ? formatCurrency(kpis.revenue?.tax || 0) : "—"}
             </p>
-            <div className="flex gap-4 mt-3 text-xs text-zinc-400">
-              <span>Líquido: {kpis ? formatCurrency(kpis.revenue?.net || 0) : "—"}</span>
+            <div className="flex gap-4 mt-3">
+              <span className="text-xs text-muted-foreground">
+                Liquido: <span className="text-foreground/70 font-medium">
+                  {kpis ? formatCurrency(kpis.revenue?.net || 0) : "—"}
+                </span>
+              </span>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Charts */}
+      {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Revenue Trend */}
-        <Card className="bg-zinc-900 border-zinc-800">
+        <Card>
           <CardHeader>
-            <CardTitle className="text-zinc-200 text-sm flex items-center gap-2">
+            <CardTitle className="text-sm flex items-center gap-2">
               <TrendingUp className="h-4 w-4 text-brand" />
-              Tendência de Faturamento
+              Tendencia de Faturamento
             </CardTitle>
           </CardHeader>
           <CardContent>
             {salesReport?.sales && salesReport.sales.length > 0 ? (
-              <ResponsiveContainer width="100%" height={250}>
+              <ResponsiveContainer width="100%" height={260}>
                 <LineChart data={salesReport.sales}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#3f3f46" />
-                  <XAxis dataKey="date" stroke="#71717a" fontSize={12} />
-                  <YAxis stroke="#71717a" fontSize={12} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                  <XAxis dataKey="date" stroke="var(--muted-foreground)" fontSize={12} tickLine={false} axisLine={false} />
+                  <YAxis stroke="var(--muted-foreground)" fontSize={12} tickLine={false} axisLine={false} />
                   <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#18181b",
-                      border: "1px solid #3f3f46",
-                      borderRadius: "8px",
-                      color: "#f4f4f5",
-                    }}
+                    contentStyle={chartTooltipStyle}
                     formatter={(value) => formatCurrency(Number(value))}
+                    labelStyle={{ color: "var(--muted-foreground)" }}
                   />
                   <Line
                     type="monotone"
                     dataKey="revenue"
                     stroke="var(--brand)"
-                    strokeWidth={2}
-                    dot={{ fill: "var(--brand)", strokeWidth: 2 }}
+                    strokeWidth={2.5}
+                    dot={{ fill: "var(--brand)", strokeWidth: 2, r: 3 }}
+                    activeDot={{ fill: "var(--brand)", strokeWidth: 2, r: 5 }}
                   />
                 </LineChart>
               </ResponsiveContainer>
             ) : (
-              <p className="text-zinc-500 text-sm py-8 text-center">Sem dados de vendas neste período</p>
+              <div className="flex items-center justify-center h-[260px] text-sm text-muted-foreground">
+                Sem dados de vendas neste periodo
+              </div>
             )}
           </CardContent>
         </Card>
 
-        {/* Top Products */}
-        <Card className="bg-zinc-900 border-zinc-800">
+        {/* Top Products Chart */}
+        <Card>
           <CardHeader>
-            <CardTitle className="text-zinc-200 text-sm">Produtos Mais Vendidos</CardTitle>
+            <CardTitle className="text-sm">Produtos Mais Vendidos</CardTitle>
           </CardHeader>
           <CardContent>
             {topProducts?.products && topProducts.products.length > 0 ? (
-              <ResponsiveContainer width="100%" height={250}>
-                <BarChart data={topProducts.products}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#3f3f46" />
-                  <XAxis dataKey="productName" stroke="#71717a" fontSize={12} />
-                  <YAxis stroke="#71717a" fontSize={12} />
+              <ResponsiveContainer width="100%" height={260}>
+                <BarChart data={topProducts.products} barCategoryGap="20%">
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                  <XAxis dataKey="productName" stroke="var(--muted-foreground)" fontSize={12} tickLine={false} axisLine={false} />
+                  <YAxis stroke="var(--muted-foreground)" fontSize={12} tickLine={false} axisLine={false} />
                   <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#18181b",
-                      border: "1px solid #3f3f46",
-                      borderRadius: "8px",
-                      color: "#f4f4f5",
-                    }}
+                    contentStyle={chartTooltipStyle}
                     formatter={(value) => formatCurrency(Number(value))}
+                    labelStyle={{ color: "var(--muted-foreground)" }}
                   />
-                  <Bar dataKey="totalRevenue" fill="var(--brand)" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="totalRevenue" fill="var(--brand)" radius={[6, 6, 0, 0]} maxBarSize={48} />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
-              <p className="text-zinc-500 text-sm py-8 text-center">Sem dados de produtos neste período</p>
+              <div className="flex items-center justify-center h-[260px] text-sm text-muted-foreground">
+                Sem dados de produtos neste periodo
+              </div>
             )}
           </CardContent>
         </Card>
       </div>
 
-      {/* Recent / Low Stock */}
+      {/* Tables Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Top Products Table */}
-        <Card className="bg-zinc-900 border-zinc-800">
+        <Card>
           <CardHeader>
-            <CardTitle className="text-zinc-200 text-sm">Produtos Mais Vendidos</CardTitle>
+            <CardTitle className="text-sm">Produtos Mais Vendidos</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-0">
             {topProducts?.products ? (
               <Table>
                 <TableHeader>
-                  <TableRow className="border-zinc-800">
-                    <TableHead className="text-zinc-400">Produto</TableHead>
-                    <TableHead className="text-zinc-400 text-right">Qtd</TableHead>
-                    <TableHead className="text-zinc-400 text-right">Faturamento</TableHead>
+                  <TableRow>
+                    <TableHead>Produto</TableHead>
+                    <TableHead className="text-right">Qtd</TableHead>
+                    <TableHead className="text-right">Faturamento</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {topProducts.products.map((p: { productName: string; totalQuantity: number; totalRevenue: number }, i: number) => (
-                    <TableRow key={i} className="border-zinc-800">
-                      <TableCell className="text-zinc-300 font-medium">{p.productName}</TableCell>
-                      <TableCell className="text-zinc-300 text-right">{p.totalQuantity}</TableCell>
-                      <TableCell className="text-zinc-300 text-right">{formatCurrency(p.totalRevenue)}</TableCell>
+                    <TableRow key={i}>
+                      <TableCell className="font-medium text-foreground/90">{p.productName}</TableCell>
+                      <TableCell className="text-right text-foreground/70">{p.totalQuantity}</TableCell>
+                      <TableCell className="text-right text-foreground/90 font-medium">{formatCurrency(p.totalRevenue)}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
             ) : (
-              <Skeleton className="h-32 w-full bg-zinc-800" />
+              <div className="px-4">
+                <Skeleton className="h-32 w-full" />
+              </div>
             )}
           </CardContent>
         </Card>
 
         {/* Inventory Summary */}
-        <Card className="bg-zinc-900 border-zinc-800">
+        <Card>
           <CardHeader>
-            <CardTitle className="text-zinc-200 text-sm">Estoque por Categoria</CardTitle>
+            <CardTitle className="text-sm">Estoque por Categoria</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-0">
             {inventory?.categoryBreakdown ? (
               <Table>
                 <TableHeader>
-                  <TableRow className="border-zinc-800">
-                    <TableHead className="text-zinc-400">Categoria</TableHead>
-                    <TableHead className="text-zinc-400 text-right">Itens</TableHead>
-                    <TableHead className="text-zinc-400 text-right">Valor</TableHead>
+                  <TableRow>
+                    <TableHead>Categoria</TableHead>
+                    <TableHead className="text-right">Itens</TableHead>
+                    <TableHead className="text-right">Valor</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {Object.entries(inventory.categoryBreakdown as Record<string, { count: number; value: number }>).map(([category, data]) => (
-                    <TableRow key={category} className="border-zinc-800">
-                      <TableCell className="text-zinc-300 font-medium">{category}</TableCell>
-                      <TableCell className="text-zinc-300 text-right">{data.count}</TableCell>
-                      <TableCell className="text-zinc-300 text-right">{formatCurrency(data.value)}</TableCell>
+                    <TableRow key={category}>
+                      <TableCell className="font-medium text-foreground/90">{category}</TableCell>
+                      <TableCell className="text-right text-foreground/70">{data.count}</TableCell>
+                      <TableCell className="text-right text-foreground/90 font-medium">{formatCurrency(data.value)}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
             ) : (
-              <Skeleton className="h-32 w-full bg-zinc-800" />
+              <div className="px-4">
+                <Skeleton className="h-32 w-full" />
+              </div>
             )}
           </CardContent>
         </Card>

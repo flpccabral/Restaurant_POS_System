@@ -91,7 +91,7 @@ export function DataTable({
     return (
       <div className="space-y-3">
         {Array.from({ length: 5 }).map((_, i) => (
-          <Skeleton key={i} className="h-10 w-full bg-zinc-800" />
+          <Skeleton key={i} className="h-10 w-full" />
         ))}
       </div>
     );
@@ -102,75 +102,79 @@ export function DataTable({
       <div className="flex items-center justify-between gap-4">
         {searchKey && (
           <div className="relative w-72">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder={searchPlaceholder}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-9 bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500"
+              className="pl-9"
             />
           </div>
         )}
         {onCreate && (
-          <Button onClick={onCreate} className="bg-brand hover:bg-brand-muted text-brand-foreground ml-auto">
+          <Button onClick={onCreate} className="ml-auto">
             <Plus className="mr-2 h-4 w-4" />
             Adicionar
           </Button>
         )}
       </div>
 
-      <div className="rounded-md border border-zinc-800 overflow-hidden">
+      <div className="rounded-lg border border-border overflow-hidden">
         <Table>
-          <TableHeader className="bg-zinc-900">
-            <TableRow className="border-zinc-800">
+          <TableHeader>
+            <TableRow>
               {columns.map((col) => (
-                <TableHead key={col.key} className="text-zinc-400 font-medium">
+                <TableHead key={col.key}>
                   {col.header}
                 </TableHead>
               ))}
               {(onEdit || onDelete) && (
-                <TableHead className="text-zinc-400 font-medium w-24">Ações</TableHead>
+                <TableHead className="w-20 text-right">Acoes</TableHead>
               )}
             </TableRow>
           </TableHeader>
           <TableBody>
             {filtered.length === 0 ? (
-              <TableRow className="border-zinc-800">
-                <TableCell colSpan={columns.length + 1} className="text-center py-8 text-zinc-500">
-                  {emptyMessage}
+              <TableRow>
+                <TableCell colSpan={columns.length + 1} className="text-center py-10 text-muted-foreground">
+                  <div className="flex flex-col items-center gap-1">
+                    <Search className="h-5 w-5 text-muted-foreground/50" />
+                    <p>{emptyMessage}</p>
+                  </div>
                 </TableCell>
               </TableRow>
             ) : (
               displayData.map((row, idx) => {
                 const r = row as Record<string, unknown>;
                 return (
-                <TableRow key={String(r._id ?? idx)} className="border-zinc-800">
+                <TableRow key={String(r._id ?? idx)} className="group/data-row">
                   {columns.map((col) => (
-                    <TableCell key={col.key} className={cn("text-zinc-300", col.className)}>
+                    <TableCell key={col.key} className={cn("text-foreground/80", col.className)}>
                       {col.cell ? col.cell(row) : String(r[col.key] ?? "")}
                     </TableCell>
                   ))}
                   {(onEdit || onDelete) && (
                     <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-2">
+                      <div className="flex items-center justify-end gap-1 opacity-0 group-hover/data-row:opacity-100 transition-opacity duration-150">
                         {onEdit && (
                           <Button
                             variant="ghost"
-                            size="sm"
+                            size="icon-sm"
                             onClick={() => onEdit(String(r._id))}
-                            className="h-8 w-8 p-0 text-zinc-400 hover:text-white"
                           >
                             <Pencil className="h-3.5 w-3.5" />
+                            <span className="sr-only">Editar</span>
                           </Button>
                         )}
                         {onDelete && (
                           <Button
                             variant="ghost"
-                            size="sm"
+                            size="icon-sm"
                             onClick={() => onDelete(String(r._id))}
-                            className="h-8 w-8 p-0 text-zinc-400 hover:text-red-400"
+                            className="text-muted-foreground hover:text-critical hover:bg-critical/10"
                           >
                             <Trash2 className="h-3.5 w-3.5" />
+                            <span className="sr-only">Excluir</span>
                           </Button>
                         )}
                       </div>
@@ -187,32 +191,32 @@ export function DataTable({
       {/* Pagination */}
       {pageSize > 0 && filtered.length > pageSize && (
         <div className="flex items-center justify-between text-sm">
-          <p className="text-zinc-400">
+          <p className="text-muted-foreground">
             {filtered.length} registro{filtered.length !== 1 ? "s" : ""}
             {search && ` (filtrados de ${items.length})`}
           </p>
           <div className="flex items-center gap-3">
-            <p className="text-zinc-400">
-              Página {safePage} de {totalPages}
+            <p className="text-muted-foreground">
+              Pagina {safePage} de {totalPages}
             </p>
             <div className="flex items-center gap-1">
               <Button
                 variant="outline"
-                size="xs"
+                size="icon-xs"
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={safePage <= 1}
-                className="border-zinc-700 text-zinc-300"
               >
                 <ChevronLeft className="h-3.5 w-3.5" />
+                <span className="sr-only">Pagina anterior</span>
               </Button>
               <Button
                 variant="outline"
-                size="xs"
+                size="icon-xs"
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                 disabled={safePage >= totalPages}
-                className="border-zinc-700 text-zinc-300"
               >
                 <ChevronRight className="h-3.5 w-3.5" />
+                <span className="sr-only">Proxima pagina</span>
               </Button>
             </div>
           </div>

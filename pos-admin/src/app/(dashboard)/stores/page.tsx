@@ -83,10 +83,10 @@ export default function StoresPage() {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Lojas</h1>
-          <p className="text-zinc-400 text-sm mt-1">Gerencie lojas e configurações</p>
+          <h1 className="text-2xl font-bold text-foreground tracking-tight">Lojas</h1>
+          <p className="text-muted-foreground text-sm mt-0.5">Gerencie lojas e configuracoes</p>
         </div>
-        <Button onClick={() => setEditing({ name: "", cnpj: "", email: "", phone: "", city: "", state: "", taxRate: "0" })} className="bg-brand hover:bg-brand-muted text-brand-foreground">
+        <Button onClick={() => setEditing({ name: "", cnpj: "", email: "", phone: "", city: "", state: "", taxRate: "0" })}>
           <Plus className="h-4 w-4 mr-2" />
           Nova Loja
         </Button>
@@ -128,44 +128,44 @@ export default function StoresPage() {
       )}
 
       <Dialog open={!!editing} onOpenChange={() => setEditing(null)}>
-        <DialogContent className="bg-zinc-900 border-zinc-800 text-white">
+        <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>{editing?._id ? "Editar Loja" : "Nova Loja"}</DialogTitle>
-            <DialogDescription className="text-zinc-400">Preencha os dados da loja</DialogDescription>
+            <DialogDescription>Preencha os dados da loja</DialogDescription>
           </DialogHeader>
-          <div className="grid grid-cols-2 gap-4 py-4">
-            <div className="col-span-2">
+          <div className="grid grid-cols-2 gap-5 py-2">
+            <div className="col-span-2 space-y-2">
               <Label>Nome</Label>
-              <Input value={editing?.name || ""} onChange={(e) => setEditing((p) => p ? { ...p, name: e.target.value } : null)} className="bg-zinc-800 border-zinc-700 text-white" />
+              <Input value={editing?.name || ""} onChange={(e) => setEditing((p) => p ? { ...p, name: e.target.value } : null)} placeholder="Nome da loja" />
             </div>
-            <div>
+            <div className="space-y-2">
               <Label>CNPJ</Label>
-              <Input value={editing?.cnpj || ""} onChange={(e) => setEditing((p) => p ? { ...p, cnpj: e.target.value } : null)} className="bg-zinc-800 border-zinc-700 text-white" />
+              <Input value={editing?.cnpj || ""} onChange={(e) => setEditing((p) => p ? { ...p, cnpj: e.target.value } : null)} placeholder="00.000.000/0000-00" />
             </div>
-            <div>
+            <div className="space-y-2">
               <Label>E-mail</Label>
-              <Input type="email" value={editing?.email || ""} onChange={(e) => setEditing((p) => p ? { ...p, email: e.target.value } : null)} className="bg-zinc-800 border-zinc-700 text-white" />
+              <Input type="email" value={editing?.email || ""} onChange={(e) => setEditing((p) => p ? { ...p, email: e.target.value } : null)} placeholder="loja@exemplo.com" />
             </div>
-            <div>
+            <div className="space-y-2">
               <Label>Telefone</Label>
-              <Input value={editing?.phone || ""} onChange={(e) => setEditing((p) => p ? { ...p, phone: e.target.value } : null)} className="bg-zinc-800 border-zinc-700 text-white" />
+              <Input value={editing?.phone || ""} onChange={(e) => setEditing((p) => p ? { ...p, phone: e.target.value } : null)} placeholder="(11) 99999-9999" />
             </div>
-            <div>
+            <div className="space-y-2">
               <Label>Taxa de Imposto (%)</Label>
-              <Input type="number" value={editing?.taxRate || "0"} onChange={(e) => setEditing((p) => p ? { ...p, taxRate: e.target.value } : null)} className="bg-zinc-800 border-zinc-700 text-white" />
+              <Input type="number" step="0.01" value={editing?.taxRate || "0"} onChange={(e) => setEditing((p) => p ? { ...p, taxRate: e.target.value } : null)} />
             </div>
-            <div>
+            <div className="space-y-2">
               <Label>Cidade</Label>
-              <Input value={editing?.city || ""} onChange={(e) => setEditing((p) => p ? { ...p, city: e.target.value } : null)} className="bg-zinc-800 border-zinc-700 text-white" />
+              <Input value={editing?.city || ""} onChange={(e) => setEditing((p) => p ? { ...p, city: e.target.value } : null)} placeholder="Sao Paulo" />
             </div>
-            <div>
+            <div className="space-y-2">
               <Label>Estado</Label>
-              <Input value={editing?.state || ""} onChange={(e) => setEditing((p) => p ? { ...p, state: e.target.value } : null)} className="bg-zinc-800 border-zinc-700 text-white" />
+              <Input value={editing?.state || ""} onChange={(e) => setEditing((p) => p ? { ...p, state: e.target.value } : null)} placeholder="SP" />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditing(null)}>Cancelar</Button>
-            <Button className="bg-brand hover:bg-brand-muted text-brand-foreground" disabled={mutation.isPending || !editing?.name} onClick={() => { if (!editing) return; mutation.mutate({ method: editing._id ? "put" : "post", id: editing._id, data: { name: editing.name, cnpj: editing.cnpj, email: editing.email, phone: editing.phone, address: { city: editing.city, state: editing.state }, settings: { taxRate: parseFloat(editing.taxRate) || 0 } } }) }}>
+            <Button variant="outline" onClick={() => setEditing(null)} disabled={mutation.isPending}>Cancelar</Button>
+            <Button disabled={mutation.isPending || !editing?.name} onClick={() => { if (!editing) return; mutation.mutate({ method: editing._id ? "put" : "post", id: editing._id, data: { name: editing.name, cnpj: editing.cnpj, email: editing.email, phone: editing.phone, address: { city: editing.city, state: editing.state }, settings: { taxRate: parseFloat(editing.taxRate) || 0 } } }) }}>
               {mutation.isPending ? "Salvando..." : "Salvar"}
             </Button>
           </DialogFooter>

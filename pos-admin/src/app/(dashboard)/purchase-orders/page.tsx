@@ -126,10 +126,10 @@ export default function PurchaseOrdersPage() {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Pedidos de Compra</h1>
-          <p className="text-zinc-400 text-sm mt-1">Gerencie pedidos de compra e aquisições</p>
+          <h1 className="text-2xl font-bold text-foreground tracking-tight">Pedidos de Compra</h1>
+          <p className="text-muted-foreground text-sm mt-0.5">Gerencie pedidos de compra e aquisicoes</p>
         </div>
-        <Button onClick={() => setCreating(true)} className="bg-brand hover:bg-brand-muted text-brand-foreground">
+        <Button onClick={() => setCreating(true)}>
           <Plus className="h-4 w-4 mr-2" />
           Novo Pedido
         </Button>
@@ -156,31 +156,29 @@ export default function PurchaseOrdersPage() {
       />
 
       <Dialog open={creating} onOpenChange={setCreating}>
-        <DialogContent className="bg-zinc-900 border-zinc-800 text-white">
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Novo Pedido de Compra</DialogTitle>
-            <DialogDescription className="text-zinc-400">
-              Preencha os dados do pedido
-            </DialogDescription>
+            <DialogDescription>Preencha os dados do pedido</DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div>
+          <div className="space-y-5 py-2">
+            <div className="space-y-2">
               <Label>Fornecedor (ID)</Label>
-              <Input value={form.supplierId} onChange={(e) => setForm((p) => ({ ...p, supplierId: e.target.value }))} className="bg-zinc-800 border-zinc-700 text-white" placeholder="ID do fornecedor" />
+              <Input value={form.supplierId} onChange={(e) => setForm((p) => ({ ...p, supplierId: e.target.value }))} placeholder="ID do fornecedor" />
             </div>
-            <div>
-              <Label>Previsão de Entrega</Label>
-              <Input type="date" value={form.expectedDate} onChange={(e) => setForm((p) => ({ ...p, expectedDate: e.target.value }))} className="bg-zinc-800 border-zinc-700 text-white" />
+            <div className="space-y-2">
+              <Label>Previsao de Entrega</Label>
+              <Input type="date" value={form.expectedDate} onChange={(e) => setForm((p) => ({ ...p, expectedDate: e.target.value }))} />
             </div>
-            <div>
-              <Label>Observações</Label>
-              <Input value={form.notes} onChange={(e) => setForm((p) => ({ ...p, notes: e.target.value }))} className="bg-zinc-800 border-zinc-700 text-white" />
+            <div className="space-y-2">
+              <Label>Observacoes</Label>
+              <Input value={form.notes} onChange={(e) => setForm((p) => ({ ...p, notes: e.target.value }))} placeholder="Observacoes opcionais" />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setCreating(false)}>Cancelar</Button>
-            <Button className="bg-brand hover:bg-brand-muted text-brand-foreground" disabled={!form.supplierId} onClick={() => createMutation.mutate({ supplier: form.supplierId, expectedDate: form.expectedDate, notes: form.notes, items: [] })}>
-              Criar Pedido
+            <Button variant="outline" onClick={() => setCreating(false)} disabled={createMutation.isPending}>Cancelar</Button>
+            <Button disabled={!form.supplierId || createMutation.isPending} onClick={() => createMutation.mutate({ supplier: form.supplierId, expectedDate: form.expectedDate, notes: form.notes, items: [] })}>
+              {createMutation.isPending ? "Criando..." : "Criar Pedido"}
             </Button>
           </DialogFooter>
         </DialogContent>

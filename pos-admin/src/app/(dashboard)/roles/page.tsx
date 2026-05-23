@@ -85,10 +85,10 @@ export default function RolesPage() {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Perfis de Acesso</h1>
-          <p className="text-zinc-400 text-sm mt-1">Gerencie perfis e controle de acesso</p>
+          <h1 className="text-2xl font-bold text-foreground tracking-tight">Perfis de Acesso</h1>
+          <p className="text-muted-foreground text-sm mt-0.5">Gerencie perfis e controle de acesso</p>
         </div>
-        <Button onClick={() => setEditing({ name: "", description: "", permissions: {} })} className="bg-brand hover:bg-brand-muted text-brand-foreground">
+        <Button onClick={() => setEditing({ name: "", description: "", permissions: {} })}>
           <Plus className="h-4 w-4 mr-2" />
           Novo Perfil
         </Button>
@@ -117,31 +117,31 @@ export default function RolesPage() {
       )}
 
       <Dialog open={!!editing} onOpenChange={() => setEditing(null)}>
-        <DialogContent className="bg-zinc-900 border-zinc-800 text-white max-h-[80vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editing?._id ? "Editar Perfil" : "Novo Perfil"}</DialogTitle>
-            <DialogDescription className="text-zinc-400">Preencha os dados e permissões do perfil</DialogDescription>
+            <DialogDescription>Preencha os dados e permissoes do perfil</DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
+          <div className="space-y-5 py-2">
+            <div className="grid grid-cols-2 gap-5">
+              <div className="space-y-2">
                 <Label>Nome</Label>
-                <Input value={editing?.name || ""} onChange={(e) => setEditing((p) => p ? { ...p, name: e.target.value } : null)} className="bg-zinc-800 border-zinc-700 text-white" />
+                <Input value={editing?.name || ""} onChange={(e) => setEditing((p) => p ? { ...p, name: e.target.value } : null)} placeholder="Nome do perfil" />
               </div>
-              <div>
-                <Label>Descrição</Label>
-                <Input value={editing?.description || ""} onChange={(e) => setEditing((p) => p ? { ...p, description: e.target.value } : null)} className="bg-zinc-800 border-zinc-700 text-white" />
+              <div className="space-y-2">
+                <Label>Descricao</Label>
+                <Input value={editing?.description || ""} onChange={(e) => setEditing((p) => p ? { ...p, description: e.target.value } : null)} placeholder="Descricao do perfil" />
               </div>
             </div>
             <div>
-              <Label className="text-sm text-zinc-300">Permissões</Label>
+              <Label className="text-sm">Permissoes</Label>
               <div className="grid grid-cols-2 gap-2 mt-2">
                 {modules.map((mod) => (
-                  <div key={mod} className="flex items-center gap-2 bg-zinc-800 rounded-md px-3 py-2">
-                    <span className="text-sm text-zinc-300 capitalize w-24">{mod}</span>
+                  <div key={mod} className="flex items-center gap-2 bg-muted rounded-md px-3 py-2">
+                    <span className="text-sm text-foreground/80 capitalize w-24">{mod}</span>
                     <div className="flex gap-2">
                       {actions.map((act) => (
-                        <label key={act} className="flex items-center gap-1 text-xs text-zinc-400 cursor-pointer">
+                        <label key={act} className="flex items-center gap-1 text-xs text-muted-foreground cursor-pointer">
                           <input
                             type="checkbox"
                             checked={(editing?.permissions[mod] || []).includes(act)}
@@ -167,8 +167,8 @@ export default function RolesPage() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditing(null)}>Cancelar</Button>
-            <Button className="bg-brand hover:bg-brand-muted text-brand-foreground" disabled={mutation.isPending || !editing?.name} onClick={() => { if (!editing) return; mutation.mutate({ method: editing._id ? "put" : "post", id: editing._id, data: { name: editing.name, description: editing.description, permissions: editing.permissions } }) }}>
+            <Button variant="outline" onClick={() => setEditing(null)} disabled={mutation.isPending}>Cancelar</Button>
+            <Button disabled={mutation.isPending || !editing?.name} onClick={() => { if (!editing) return; mutation.mutate({ method: editing._id ? "put" : "post", id: editing._id, data: { name: editing.name, description: editing.description, permissions: editing.permissions } }) }}>
               {mutation.isPending ? "Salvando..." : "Salvar"}
             </Button>
           </DialogFooter>

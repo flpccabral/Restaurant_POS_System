@@ -89,12 +89,11 @@ export default function IngredientsPage() {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Ingredientes</h1>
-          <p className="text-zinc-400 text-sm mt-1">Gerencie ingredientes e unidades de medida</p>
+          <h1 className="text-2xl font-bold text-foreground tracking-tight">Ingredientes</h1>
+          <p className="text-muted-foreground text-sm mt-0.5">Gerencie ingredientes e unidades de medida</p>
         </div>
         <Button
           onClick={() => setEditing({ name: "", category: "outro", baseUnit: "unidade", averageCost: "0", minimumStock: "0" })}
-          className="bg-brand hover:bg-brand-muted text-brand-foreground"
         >
           <Plus className="h-4 w-4 mr-2" />
           Novo Ingrediente
@@ -133,65 +132,61 @@ export default function IngredientsPage() {
       )}
 
       <Dialog open={!!editing} onOpenChange={() => setEditing(null)}>
-        <DialogContent className="bg-zinc-900 border-zinc-800 text-white">
+        <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>{editing?._id ? "Editar Ingrediente" : "Novo Ingrediente"}</DialogTitle>
-            <DialogDescription className="text-zinc-400">
-              Preencha os dados do ingrediente
-            </DialogDescription>
+            <DialogDescription>Preencha os dados do ingrediente</DialogDescription>
           </DialogHeader>
-          <div className="grid grid-cols-2 gap-4 py-4">
-            <div className="col-span-2">
+          <div className="grid grid-cols-2 gap-5 py-2">
+            <div className="col-span-2 space-y-2">
               <Label>Nome</Label>
               <Input
                 value={editing?.name || ""}
                 onChange={(e) => setEditing((p) => p ? { ...p, name: e.target.value } : null)}
-                className="bg-zinc-800 border-zinc-700 text-white"
                 placeholder="Ex: Farinha de trigo, Picanha..."
               />
             </div>
-            <div>
+            <div className="space-y-2">
               <Label>Categoria</Label>
               <Select value={editing?.category || ""} onValueChange={(v) => setEditing((p) => p ? { ...p, category: v || "outro" } : null)}>
-                <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white"><SelectValue /></SelectTrigger>
-                <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
                   {categories.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
-            <div>
+            <div className="space-y-2">
               <Label>Unidade</Label>
               <Select value={editing?.baseUnit || ""} onValueChange={(v) => setEditing((p) => p ? { ...p, baseUnit: v || "unidade" } : null)}>
-                <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white"><SelectValue /></SelectTrigger>
-                <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
                   {units.map((u) => <SelectItem key={u} value={u}>{u}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
-            <div>
-              <Label>Custo Médio (R$)</Label>
+            <div className="space-y-2">
+              <Label>Custo Medio (R$)</Label>
               <Input
                 type="number"
                 step="0.01"
                 value={editing?.averageCost || "0"}
                 onChange={(e) => setEditing((p) => p ? { ...p, averageCost: e.target.value } : null)}
-                className="bg-zinc-800 border-zinc-700 text-white"
+                placeholder="0,00"
               />
             </div>
-            <div>
-              <Label>Estoque Mínimo</Label>
+            <div className="space-y-2">
+              <Label>Estoque Minimo</Label>
               <Input
                 type="number"
                 value={editing?.minimumStock || "0"}
                 onChange={(e) => setEditing((p) => p ? { ...p, minimumStock: e.target.value } : null)}
-                className="bg-zinc-800 border-zinc-700 text-white"
+                placeholder="0"
               />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditing(null)}>Cancelar</Button>
+            <Button variant="outline" onClick={() => setEditing(null)} disabled={mutation.isPending}>Cancelar</Button>
             <Button
-              className="bg-brand hover:bg-brand-muted text-brand-foreground"
               disabled={mutation.isPending || !editing?.name}
               onClick={() => {
                 if (!editing) return;

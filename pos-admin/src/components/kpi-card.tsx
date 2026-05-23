@@ -1,5 +1,6 @@
-import { LucideIcon } from "lucide-react";
+import { LucideIcon, TrendingUp, TrendingDown } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 interface KpiCardProps {
   title: string;
@@ -11,20 +12,35 @@ interface KpiCardProps {
 
 export function KpiCard({ title, value, icon: Icon, trend, color = "text-brand" }: KpiCardProps) {
   return (
-    <Card className="bg-zinc-900 border-zinc-800">
-      <CardContent className="p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm text-zinc-400">{title}</p>
-            <p className="text-2xl font-bold text-white mt-1">{value}</p>
+    <Card className="group/card">
+      <CardContent className="p-5">
+        <div className="flex items-start justify-between">
+          <div className="space-y-2">
+            <p className="text-sm text-muted-foreground font-medium">{title}</p>
+            <p className="text-2xl font-bold text-foreground tracking-tight">{value}</p>
             {trend && (
-              <p className={`text-xs mt-1 ${trend.positive ? "text-emerald-400" : "text-red-400"}`}>
-                {trend.positive ? "↑" : "↓"} {trend.value} vs last period
-              </p>
+              <div
+                className={cn(
+                  "inline-flex items-center gap-1 text-xs font-medium rounded-full px-2 py-0.5",
+                  trend.positive
+                    ? "text-success bg-success/10"
+                    : "text-critical bg-critical/10"
+                )}
+              >
+                {trend.positive ? (
+                  <TrendingUp className="h-3 w-3" />
+                ) : (
+                  <TrendingDown className="h-3 w-3" />
+                )}
+                {trend.value}
+              </div>
             )}
           </div>
-          <div className={`p-3 rounded-lg bg-zinc-800 ${color}`}>
-            <Icon className="h-5 w-5" />
+          <div className={cn(
+            "flex items-center justify-center w-11 h-11 rounded-xl shrink-0",
+            "bg-brand-muted"
+          )}>
+            <Icon className={cn("h-5 w-5", color)} />
           </div>
         </div>
       </CardContent>

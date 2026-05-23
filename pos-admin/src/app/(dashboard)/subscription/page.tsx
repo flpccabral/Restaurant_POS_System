@@ -22,11 +22,11 @@ import {
 import { subscriptionService } from "@/services/api/subscription";
 
 const statusConfig: Record<string, { label: string; color: string }> = {
-  active: { label: "Ativo", color: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" },
-  trialing: { label: "Teste", color: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
-  past_due: { label: "Pendente", color: "bg-amber-500/10 text-amber-400 border-amber-500/20" },
-  cancelled: { label: "Cancelado", color: "bg-red-500/10 text-red-400 border-red-500/20" },
-  expired: { label: "Expirado", color: "bg-zinc-500/10 text-zinc-400 border-zinc-500/20" },
+  active: { label: "Ativo", color: "bg-success/10 text-success border-success/20" },
+  trialing: { label: "Teste", color: "bg-info/10 text-info border-info/20" },
+  past_due: { label: "Pendente", color: "bg-warning/10 text-warning border-warning/20" },
+  cancelled: { label: "Cancelado", color: "bg-critical/10 text-critical border-critical/20" },
+  expired: { label: "Expirado", color: "bg-muted text-muted-foreground border-border" },
 };
 
 export default function SubscriptionPage() {
@@ -68,34 +68,34 @@ export default function SubscriptionPage() {
   return (
     <div className="p-6 space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white">Assinatura</h1>
-        <p className="text-zinc-400 text-sm mt-1">Visualize detalhes do plano e histórico de pagamento</p>
+        <h1 className="text-2xl font-bold text-foreground tracking-tight">Assinatura</h1>
+        <p className="text-muted-foreground text-sm mt-0.5">Visualize detalhes do plano e historico de pagamento</p>
       </div>
 
       {/* Status Card */}
-      <Card className="bg-zinc-900 border-zinc-800">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-zinc-200 flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2 text-sm">
             <CreditCard className="h-5 w-5 text-brand" />
             Plano Atual
           </CardTitle>
-          <CardDescription>Informações da sua assinatura</CardDescription>
+          <CardDescription>Informacoes da sua assinatura</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xl font-bold text-white">{plan?.name || "Plano não identificado"}</p>
-              <p className="text-sm text-zinc-400 mt-1">{plan?.description || ""}</p>
+              <p className="text-xl font-bold text-foreground">{plan?.name || "Plano nao identificado"}</p>
+              <p className="text-sm text-muted-foreground mt-1">{plan?.description || ""}</p>
             </div>
             <Badge className={cfg.color}>{cfg.label}</Badge>
           </div>
 
           {(sub?.price as number) != null && (
             <div className="flex items-center gap-4 text-sm">
-              <span className="text-zinc-400">Valor:</span>
-              <span className="text-white font-medium">
+              <span className="text-muted-foreground">Valor:</span>
+              <span className="text-foreground font-medium">
                 R$ {(Number(sub?.price) / 100).toFixed(2)}
-                {(sub?.billingCycle as string) === "yearly" ? "/ano" : (sub?.billingCycle as string) === "quarterly" ? "/trimestre" : "/mês"}
+                {(sub?.billingCycle as string) === "yearly" ? "/ano" : (sub?.billingCycle as string) === "quarterly" ? "/trimestre" : "/mes"}
               </span>
             </div>
           )}
@@ -103,29 +103,29 @@ export default function SubscriptionPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
             {periodStart && (
               <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-zinc-500" />
-                <span className="text-zinc-400">Início:</span>
-                <span className="text-white">{new Date(periodStart).toLocaleDateString("pt-BR")}</span>
+                <Clock className="h-4 w-4 text-muted-foreground" />
+                <span className="text-muted-foreground">Inicio:</span>
+                <span className="text-foreground">{new Date(periodStart).toLocaleDateString("pt-BR")}</span>
               </div>
             )}
             {periodEnd && (
               <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-zinc-500" />
-                <span className="text-zinc-400">Renovação:</span>
-                <span className="text-white">{new Date(periodEnd).toLocaleDateString("pt-BR")}</span>
+                <Clock className="h-4 w-4 text-muted-foreground" />
+                <span className="text-muted-foreground">Renovacao:</span>
+                <span className="text-foreground">{new Date(periodEnd).toLocaleDateString("pt-BR")}</span>
               </div>
             )}
           </div>
 
           {/* Usage Limits */}
           {sub?.usage != null && (
-            <div className="pt-4 border-t border-zinc-800">
-              <p className="text-sm text-zinc-400 mb-2">Limites de Uso</p>
+            <div className="pt-4 border-t border-border">
+              <p className="text-sm text-muted-foreground mb-2">Limites de Uso</p>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {Object.entries((sub.usage as Record<string, number>) || {}).map(([key, value]) => (
-                  <div key={key} className="bg-zinc-800 rounded-md p-3">
-                    <p className="text-xs text-zinc-500 capitalize">{key}</p>
-                    <p className="text-lg font-bold text-white">{Number(value)}</p>
+                  <div key={key} className="bg-muted rounded-lg p-3">
+                    <p className="text-xs text-muted-foreground capitalize">{key}</p>
+                    <p className="text-lg font-bold text-foreground">{Number(value)}</p>
                   </div>
                 ))}
               </div>
@@ -133,18 +133,18 @@ export default function SubscriptionPage() {
           )}
 
           {/* Plan Selection */}
-          <div className="flex items-center gap-4 pt-4 border-t border-zinc-800">
+          <div className="flex items-center gap-4 pt-4 border-t border-border">
             <Select onValueChange={(v) => { if (v && typeof v === "string") updateMutation.mutate({ plan: v }) }}>
-              <SelectTrigger className="w-48 bg-zinc-800 border-zinc-700 text-white">
+              <SelectTrigger className="w-48">
                 <SelectValue placeholder="Trocar plano" />
               </SelectTrigger>
-              <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
+              <SelectContent>
                 {((plans || []) as Array<{ _id: string; name: string }>).map((p) => (
                   <SelectItem key={p._id} value={p._id}>{p.name}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            <span className="text-xs text-zinc-500">
+            <span className="text-xs text-muted-foreground">
               {updateMutation.isPending ? "Atualizando..." : "Selecione um novo plano"}
             </span>
           </div>
@@ -154,24 +154,24 @@ export default function SubscriptionPage() {
       {/* Plan Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {(["basic", "pro", "enterprise"] as const).map((tier) => (
-          <Card key={tier} className="bg-zinc-900 border-zinc-800">
+          <Card key={tier}>
             <CardHeader>
-              <CardTitle className="text-zinc-200 capitalize">{tier}</CardTitle>
-              <CardDescription>Plano {tier === "basic" ? "básico" : tier === "pro" ? "profissional" : "empresarial"}</CardDescription>
+              <CardTitle className="capitalize">{tier}</CardTitle>
+              <CardDescription>Plano {tier === "basic" ? "basico" : tier === "pro" ? "profissional" : "empresarial"}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-2 text-sm">
-                <div className="flex items-center gap-2 text-zinc-400">
-                  <CheckCircle className="h-4 w-4 text-emerald-500" />
-                  {tier === "basic" ? "1 loja" : tier === "pro" ? "Até 5 lojas" : "Lojas ilimitadas"}
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <CheckCircle className="h-4 w-4 text-success shrink-0" />
+                  {tier === "basic" ? "1 loja" : tier === "pro" ? "Ate 5 lojas" : "Lojas ilimitadas"}
                 </div>
-                <div className="flex items-center gap-2 text-zinc-400">
-                  <CheckCircle className="h-4 w-4 text-emerald-500" />
-                  {tier === "basic" ? "3 usuários" : tier === "pro" ? "15 usuários" : "Usuários ilimitados"}
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <CheckCircle className="h-4 w-4 text-success shrink-0" />
+                  {tier === "basic" ? "3 usuarios" : tier === "pro" ? "15 usuarios" : "Usuarios ilimitados"}
                 </div>
-                <div className="flex items-center gap-2 text-zinc-400">
-                  <CheckCircle className="h-4 w-4 text-emerald-500" />
-                  {tier === "enterprise" ? "Suporte prioritário" : "Suporte por e-mail"}
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <CheckCircle className="h-4 w-4 text-success shrink-0" />
+                  {tier === "enterprise" ? "Suporte prioritario" : "Suporte por e-mail"}
                 </div>
               </div>
             </CardContent>

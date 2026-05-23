@@ -66,11 +66,11 @@ export default function InventoryPage() {
       inventoryService.stockOut(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["stock-balance"] });
-      toast.success("Saída de estoque registrada");
+      toast.success("Saida de estoque registrada");
       setStockOutOpen(false);
       setStockForm({ ingredientId: "", quantity: "", reason: "" });
     },
-    onError: () => toast.error("Erro ao registrar saída"),
+    onError: () => toast.error("Erro ao registrar saida"),
   });
 
   const columns = [
@@ -93,16 +93,16 @@ export default function InventoryPage() {
     { key: "reserved", header: "Reservado" },
     {
       key: "available",
-      header: "Disponível",
+      header: "Disponivel",
       cell: (row: unknown) => {
         const d = row as Record<string, unknown>;
         return `${d.available ?? (Number(d.balance) - Number(d.reserved))}`;
       },
     },
-    { key: "minimumStock", header: "Mínimo" },
+    { key: "minimumStock", header: "Minimo" },
     {
       key: "lastPurchasePrice",
-      header: "Últ. Preço",
+      header: "Ult. Preco",
       cell: (row: unknown) => {
         const p = (row as Record<string, unknown>).lastPurchasePrice;
         return p ? `R$ ${Number(p).toFixed(2)}` : "—";
@@ -128,38 +128,48 @@ export default function InventoryPage() {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Estoque</h1>
-          <p className="text-zinc-400 text-sm mt-1">Gerencie níveis de estoque, entradas e saídas</p>
+          <h1 className="text-2xl font-bold text-foreground tracking-tight">Estoque</h1>
+          <p className="text-muted-foreground text-sm mt-0.5">Gerencie niveis de estoque, entradas e saidas</p>
         </div>
         <div className="flex gap-2">
-          <Button onClick={() => setStockInOpen(true)} className="bg-emerald-600 hover:bg-emerald-700">
+          <Button onClick={() => setStockInOpen(true)} className="bg-success hover:bg-success/90 text-success-foreground">
             <ArrowDownCircle className="h-4 w-4 mr-2" />
             Entrada
           </Button>
           <Button onClick={() => setStockOutOpen(true)} variant="destructive">
             <ArrowUpCircle className="h-4 w-4 mr-2" />
-            Saída
+            Saida
           </Button>
         </div>
       </div>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="bg-zinc-900 border-zinc-800">
-          <CardHeader><CardTitle className="text-zinc-200 text-sm">Valor em Estoque</CardTitle></CardHeader>
-          <CardContent><p className="text-2xl font-bold text-white">R$ {Number(totalValue).toFixed(2)}</p></CardContent>
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm">Valor em Estoque</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold text-foreground tracking-tight">R$ {Number(totalValue).toFixed(2)}</p>
+          </CardContent>
         </Card>
-        <Card className="bg-zinc-900 border-zinc-800">
-          <CardHeader><CardTitle className="text-zinc-200 text-sm">Itens Cadastrados</CardTitle></CardHeader>
-          <CardContent><p className="text-2xl font-bold text-white">{stockItems.length}</p></CardContent>
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm">Itens Cadastrados</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold text-foreground tracking-tight">{stockItems.length}</p>
+          </CardContent>
         </Card>
-        <Card className="bg-zinc-900 border-zinc-800">
-          <CardHeader>
-            <CardTitle className="text-zinc-200 text-sm flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4 text-amber-500" /> Alertas
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4 text-warning" /> Alertas
             </CardTitle>
           </CardHeader>
-          <CardContent><p className="text-2xl font-bold text-amber-500">{alertCount}</p></CardContent>
+          <CardContent>
+            <p className="text-2xl font-bold text-warning tracking-tight">{alertCount}</p>
+          </CardContent>
         </Card>
       </div>
 
@@ -178,29 +188,29 @@ export default function InventoryPage() {
 
       {/* Stock In Dialog */}
       <Dialog open={stockInOpen} onOpenChange={setStockInOpen}>
-        <DialogContent className="bg-zinc-900 border-zinc-800 text-white">
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Entrada de Estoque</DialogTitle>
-            <DialogDescription className="text-zinc-400">Registrar entrada de mercadoria</DialogDescription>
+            <DialogDescription>Registrar entrada de mercadoria</DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div>
+          <div className="space-y-5 py-2">
+            <div className="space-y-2">
               <Label>Ingrediente (ID)</Label>
-              <Input value={stockForm.ingredientId} onChange={(e) => setStockForm((p) => ({ ...p, ingredientId: e.target.value }))} className="bg-zinc-800 border-zinc-700 text-white" placeholder="ID do ingrediente" />
+              <Input value={stockForm.ingredientId} onChange={(e) => setStockForm((p) => ({ ...p, ingredientId: e.target.value }))} placeholder="ID do ingrediente" />
             </div>
-            <div>
+            <div className="space-y-2">
               <Label>Quantidade</Label>
-              <Input type="number" value={stockForm.quantity} onChange={(e) => setStockForm((p) => ({ ...p, quantity: e.target.value }))} className="bg-zinc-800 border-zinc-700 text-white" />
+              <Input type="number" value={stockForm.quantity} onChange={(e) => setStockForm((p) => ({ ...p, quantity: e.target.value }))} placeholder="0" />
             </div>
-            <div>
-              <Label>Observação</Label>
-              <Input value={stockForm.reason} onChange={(e) => setStockForm((p) => ({ ...p, reason: e.target.value }))} className="bg-zinc-800 border-zinc-700 text-white" placeholder="Motivo da entrada" />
+            <div className="space-y-2">
+              <Label>Observacao</Label>
+              <Input value={stockForm.reason} onChange={(e) => setStockForm((p) => ({ ...p, reason: e.target.value }))} placeholder="Motivo da entrada" />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setStockInOpen(false)}>Cancelar</Button>
-            <Button className="bg-emerald-600 hover:bg-emerald-700" disabled={!stockForm.ingredientId || !stockForm.quantity} onClick={() => stockInMutation.mutate({ ingredientId: stockForm.ingredientId, quantity: parseFloat(stockForm.quantity), notes: stockForm.reason })}>
-              Registrar Entrada
+            <Button variant="outline" onClick={() => setStockInOpen(false)} disabled={stockInMutation.isPending}>Cancelar</Button>
+            <Button className="bg-success hover:bg-success/90 text-success-foreground" disabled={!stockForm.ingredientId || !stockForm.quantity || stockInMutation.isPending} onClick={() => stockInMutation.mutate({ ingredientId: stockForm.ingredientId, quantity: parseFloat(stockForm.quantity), notes: stockForm.reason })}>
+              {stockInMutation.isPending ? "Registrando..." : "Registrar Entrada"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -208,37 +218,37 @@ export default function InventoryPage() {
 
       {/* Stock Out Dialog */}
       <Dialog open={stockOutOpen} onOpenChange={setStockOutOpen}>
-        <DialogContent className="bg-zinc-900 border-zinc-800 text-white">
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Saída de Estoque</DialogTitle>
-            <DialogDescription className="text-zinc-400">Registrar saída de mercadoria</DialogDescription>
+            <DialogTitle>Saida de Estoque</DialogTitle>
+            <DialogDescription>Registrar saida de mercadoria</DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div>
+          <div className="space-y-5 py-2">
+            <div className="space-y-2">
               <Label>Ingrediente (ID)</Label>
-              <Input value={stockForm.ingredientId} onChange={(e) => setStockForm((p) => ({ ...p, ingredientId: e.target.value }))} className="bg-zinc-800 border-zinc-700 text-white" placeholder="ID do ingrediente" />
+              <Input value={stockForm.ingredientId} onChange={(e) => setStockForm((p) => ({ ...p, ingredientId: e.target.value }))} placeholder="ID do ingrediente" />
             </div>
-            <div>
+            <div className="space-y-2">
               <Label>Quantidade</Label>
-              <Input type="number" value={stockForm.quantity} onChange={(e) => setStockForm((p) => ({ ...p, quantity: e.target.value }))} className="bg-zinc-800 border-zinc-700 text-white" />
+              <Input type="number" value={stockForm.quantity} onChange={(e) => setStockForm((p) => ({ ...p, quantity: e.target.value }))} placeholder="0" />
             </div>
-            <div>
+            <div className="space-y-2">
               <Label>Motivo</Label>
               <Select value={stockForm.reason || ""} onValueChange={(v) => setStockForm((p) => ({ ...p, reason: v || "" }))}>
-                <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white"><SelectValue placeholder="Selecione" /></SelectTrigger>
-                <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
-                  <SelectItem value="uso">Uso em produção</SelectItem>
-                  <SelectItem value="desperdicio">Desperdício</SelectItem>
-                  <SelectItem value="devolucao">Devolução</SelectItem>
+                <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="uso">Uso em producao</SelectItem>
+                  <SelectItem value="desperdicio">Desperdicio</SelectItem>
+                  <SelectItem value="devolucao">Devolucao</SelectItem>
                   <SelectItem value="outro">Outro</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setStockOutOpen(false)}>Cancelar</Button>
-            <Button variant="destructive" disabled={!stockForm.ingredientId || !stockForm.quantity || !stockForm.reason} onClick={() => stockOutMutation.mutate({ ingredientId: stockForm.ingredientId, quantity: parseFloat(stockForm.quantity), reason: stockForm.reason })}>
-              Registrar Saída
+            <Button variant="outline" onClick={() => setStockOutOpen(false)} disabled={stockOutMutation.isPending}>Cancelar</Button>
+            <Button variant="destructive" disabled={!stockForm.ingredientId || !stockForm.quantity || !stockForm.reason || stockOutMutation.isPending} onClick={() => stockOutMutation.mutate({ ingredientId: stockForm.ingredientId, quantity: parseFloat(stockForm.quantity), reason: stockForm.reason })}>
+              {stockOutMutation.isPending ? "Registrando..." : "Registrar Saida"}
             </Button>
           </DialogFooter>
         </DialogContent>

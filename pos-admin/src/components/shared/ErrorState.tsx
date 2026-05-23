@@ -26,16 +26,18 @@ export function ErrorState({
 }: ErrorStateProps) {
   return (
     <div className="flex items-center justify-center min-h-[300px]">
-      <Card className="bg-zinc-900 border-zinc-800 w-full max-w-md">
+      <Card className="w-full max-w-md">
         <CardHeader>
-          <div className="flex items-center gap-2">
-            <AlertTriangle className="h-5 w-5 text-red-400" />
-            <CardTitle className="text-zinc-200 text-lg">{message}</CardTitle>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-critical/10 shrink-0">
+              <AlertTriangle className="h-5 w-5 text-critical" />
+            </div>
+            <CardTitle className="text-lg">{message}</CardTitle>
           </div>
         </CardHeader>
         {description && (
           <CardContent>
-            <p className="text-sm text-zinc-400">{description}</p>
+            <p className="text-sm text-muted-foreground">{description}</p>
           </CardContent>
         )}
         {onRetry && (
@@ -43,7 +45,6 @@ export function ErrorState({
             <Button
               variant="outline"
               onClick={onRetry}
-              className="border-zinc-700 text-zinc-300 hover:text-white"
             >
               <RefreshCw className="h-4 w-4 mr-2" />
               Tentar novamente

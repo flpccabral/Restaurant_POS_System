@@ -97,10 +97,10 @@ export default function ProductsPage() {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Produtos</h1>
-          <p className="text-zinc-400 text-sm mt-1">Gerencie o catálogo de produtos</p>
+          <h1 className="text-2xl font-bold text-foreground tracking-tight">Produtos</h1>
+          <p className="text-muted-foreground text-sm mt-0.5">Gerencie o catalogo de produtos</p>
         </div>
-        <Button onClick={() => setEditing({ name: "", description: "", price: "0", category: "" })} className="bg-brand hover:bg-brand-muted text-brand-foreground">
+        <Button onClick={() => setEditing({ name: "", description: "", price: "0", category: "" })}>
           <Plus className="h-4 w-4 mr-2" />
           Novo Produto
         </Button>
@@ -138,34 +138,34 @@ export default function ProductsPage() {
       )}
 
       <Dialog open={!!editing} onOpenChange={() => setEditing(null)}>
-        <DialogContent className="bg-zinc-900 border-zinc-800 text-white">
+        <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>{editing?._id ? "Editar Produto" : "Novo Produto"}</DialogTitle>
-            <DialogDescription className="text-zinc-400">Preencha os dados do produto</DialogDescription>
+            <DialogDescription>Preencha os dados do produto</DialogDescription>
           </DialogHeader>
-          <div className="grid grid-cols-2 gap-4 py-4">
-            <div className="col-span-2">
+          <div className="grid grid-cols-2 gap-5 py-2">
+            <div className="col-span-2 space-y-2">
               <Label>Nome</Label>
-              <Input value={editing?.name || ""} onChange={(e) => setEditing((p) => p ? { ...p, name: e.target.value } : null)} className="bg-zinc-800 border-zinc-700 text-white" />
+              <Input value={editing?.name || ""} onChange={(e) => setEditing((p) => p ? { ...p, name: e.target.value } : null)} placeholder="Nome do produto" />
             </div>
-            <div className="col-span-2">
-              <Label>Descrição</Label>
-              <Input value={editing?.description || ""} onChange={(e) => setEditing((p) => p ? { ...p, description: e.target.value } : null)} className="bg-zinc-800 border-zinc-700 text-white" />
+            <div className="col-span-2 space-y-2">
+              <Label>Descricao</Label>
+              <Input value={editing?.description || ""} onChange={(e) => setEditing((p) => p ? { ...p, description: e.target.value } : null)} placeholder="Descricao opcional do produto" />
             </div>
-            <div>
-              <Label>Preço (R$)</Label>
-              <Input type="number" step="0.01" value={editing?.price || "0"} onChange={(e) => setEditing((p) => p ? { ...p, price: e.target.value } : null)} className="bg-zinc-800 border-zinc-700 text-white" />
+            <div className="space-y-2">
+              <Label>Preco (R$)</Label>
+              <Input type="number" step="0.01" value={editing?.price || "0"} onChange={(e) => setEditing((p) => p ? { ...p, price: e.target.value } : null)} placeholder="0,00" />
             </div>
-            <div>
+            <div className="space-y-2">
               <Label>Categoria</Label>
               <Select
                 value={editing?.category || ""}
                 onValueChange={(value) => setEditing((p) => p ? { ...p, category: value ?? "" } : null)}
               >
-                <SelectTrigger className="w-full bg-zinc-800 border-zinc-700 text-white">
+                <SelectTrigger>
                   <SelectValue placeholder="Sem categoria" />
                 </SelectTrigger>
-                <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
+                <SelectContent>
                   <SelectItem value="">Sem categoria</SelectItem>
                   {(categories || []).map((c: { _id: string; name: string }) => (
                     <SelectItem key={c._id} value={c._id}>{c.name}</SelectItem>
@@ -175,8 +175,8 @@ export default function ProductsPage() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditing(null)}>Cancelar</Button>
-            <Button className="bg-brand hover:bg-brand-muted text-brand-foreground" disabled={mutation.isPending || !editing?.name} onClick={() => { if (!editing) return; mutation.mutate({ method: editing._id ? "put" : "post", id: editing._id, data: { name: editing.name, description: editing.description, price: parseFloat(editing.price) || 0, category: editing.category || undefined } }) }}>
+            <Button variant="outline" onClick={() => setEditing(null)} disabled={mutation.isPending}>Cancelar</Button>
+            <Button disabled={mutation.isPending || !editing?.name} onClick={() => { if (!editing) return; mutation.mutate({ method: editing._id ? "put" : "post", id: editing._id, data: { name: editing.name, description: editing.description, price: parseFloat(editing.price) || 0, category: editing.category || undefined } }) }}>
               {mutation.isPending ? "Salvando..." : "Salvar"}
             </Button>
           </DialogFooter>

@@ -24,25 +24,29 @@ export function Header() {
   };
 
   return (
-    <header className="fixed top-0 left-64 right-0 z-30 h-14 bg-zinc-950/80 backdrop-blur border-b border-zinc-800 flex items-center justify-between px-6">
-      <div className="text-sm text-zinc-400">
-        Sistema POS &mdash; Painel Administrativo
+    <header className="fixed top-0 left-64 right-0 z-30 h-14 bg-background/80 backdrop-blur-md border-b border-border flex items-center justify-between px-6">
+      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <span className="hidden md:inline">Sistema POS</span>
+        <span className="hidden md:inline text-muted-foreground/50">&mdash;</span>
+        <span>Painel Administrativo</span>
       </div>
 
       <DropdownMenu>
-        <DropdownMenuTrigger className="flex items-center gap-2 px-3 py-2 rounded-lg text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors outline-none">
-          <User className="h-4 w-4" />
-          <span className="text-sm">Admin</span>
+        <DropdownMenuTrigger className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors outline-none">
+          <div className="flex items-center justify-center w-7 h-7 rounded-full bg-brand-muted">
+            <User className="h-3.5 w-3.5 text-brand" />
+          </div>
+          <span className="text-sm font-medium">Admin</span>
           <ChevronDown className="h-3 w-3" />
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-48 bg-zinc-900 border-zinc-800 text-zinc-300">
+        <DropdownMenuContent align="end" className="w-48">
           <DropdownMenuItem className="text-sm cursor-pointer">
             <User className="mr-2 h-4 w-4" />
             Perfil
           </DropdownMenuItem>
-          <DropdownMenuSeparator className="bg-zinc-800" />
+          <DropdownMenuSeparator />
           <DropdownMenuItem
-            className="text-red-400 cursor-pointer"
+            className="text-critical cursor-pointer"
             onClick={handleLogout}
           >
             <LogOut className="mr-2 h-4 w-4" />

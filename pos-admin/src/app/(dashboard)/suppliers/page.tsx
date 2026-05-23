@@ -90,12 +90,11 @@ export default function SuppliersPage() {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Fornecedores</h1>
-          <p className="text-zinc-400 text-sm mt-1">Gerencie fornecedores e contatos</p>
+          <h1 className="text-2xl font-bold text-foreground tracking-tight">Fornecedores</h1>
+          <p className="text-muted-foreground text-sm mt-0.5">Gerencie fornecedores e contatos</p>
         </div>
         <Button
           onClick={() => setEditing({ name: "", tradeName: "", document: "", email: "", phone: "", city: "", state: "", rating: "3", notes: "" })}
-          className="bg-brand hover:bg-brand-muted text-brand-foreground"
         >
           <Plus className="h-4 w-4 mr-2" />
           Novo Fornecedor
@@ -140,55 +139,52 @@ export default function SuppliersPage() {
       )}
 
       <Dialog open={!!editing} onOpenChange={() => setEditing(null)}>
-        <DialogContent className="bg-zinc-900 border-zinc-800 text-white max-h-[80vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editing?._id ? "Editar Fornecedor" : "Novo Fornecedor"}</DialogTitle>
-            <DialogDescription className="text-zinc-400">
-              Preencha os dados do fornecedor
-            </DialogDescription>
+            <DialogDescription>Preencha os dados do fornecedor</DialogDescription>
           </DialogHeader>
-          <div className="grid grid-cols-2 gap-4 py-4">
-            <div className="col-span-2">
-              <Label>Nome / Razão Social</Label>
-              <Input value={editing?.name || ""} onChange={(e) => setEditing((p) => p ? { ...p, name: e.target.value } : null)} className="bg-zinc-800 border-zinc-700 text-white" />
+          <div className="grid grid-cols-2 gap-5 py-2">
+            <div className="col-span-2 space-y-2">
+              <Label>Nome / Razao Social</Label>
+              <Input value={editing?.name || ""} onChange={(e) => setEditing((p) => p ? { ...p, name: e.target.value } : null)} placeholder="Nome do fornecedor" />
             </div>
-            <div>
+            <div className="space-y-2">
               <Label>Nome Fantasia</Label>
-              <Input value={editing?.tradeName || ""} onChange={(e) => setEditing((p) => p ? { ...p, tradeName: e.target.value } : null)} className="bg-zinc-800 border-zinc-700 text-white" />
+              <Input value={editing?.tradeName || ""} onChange={(e) => setEditing((p) => p ? { ...p, tradeName: e.target.value } : null)} placeholder="Nome fantasia" />
             </div>
-            <div>
+            <div className="space-y-2">
               <Label>CNPJ/CPF</Label>
-              <Input value={editing?.document || ""} onChange={(e) => setEditing((p) => p ? { ...p, document: e.target.value } : null)} className="bg-zinc-800 border-zinc-700 text-white" />
+              <Input value={editing?.document || ""} onChange={(e) => setEditing((p) => p ? { ...p, document: e.target.value } : null)} placeholder="00.000.000/0000-00" />
             </div>
-            <div>
+            <div className="space-y-2">
               <Label>E-mail</Label>
-              <Input type="email" value={editing?.email || ""} onChange={(e) => setEditing((p) => p ? { ...p, email: e.target.value } : null)} className="bg-zinc-800 border-zinc-700 text-white" />
+              <Input type="email" value={editing?.email || ""} onChange={(e) => setEditing((p) => p ? { ...p, email: e.target.value } : null)} placeholder="fornecedor@exemplo.com" />
             </div>
-            <div>
+            <div className="space-y-2">
               <Label>Telefone</Label>
-              <Input value={editing?.phone || ""} onChange={(e) => setEditing((p) => p ? { ...p, phone: e.target.value } : null)} className="bg-zinc-800 border-zinc-700 text-white" />
+              <Input value={editing?.phone || ""} onChange={(e) => setEditing((p) => p ? { ...p, phone: e.target.value } : null)} placeholder="(11) 99999-9999" />
             </div>
-            <div>
+            <div className="space-y-2">
               <Label>Cidade</Label>
-              <Input value={editing?.city || ""} onChange={(e) => setEditing((p) => p ? { ...p, city: e.target.value } : null)} className="bg-zinc-800 border-zinc-700 text-white" />
+              <Input value={editing?.city || ""} onChange={(e) => setEditing((p) => p ? { ...p, city: e.target.value } : null)} placeholder="Sao Paulo" />
             </div>
-            <div>
+            <div className="space-y-2">
               <Label>Estado</Label>
-              <Input value={editing?.state || ""} onChange={(e) => setEditing((p) => p ? { ...p, state: e.target.value } : null)} className="bg-zinc-800 border-zinc-700 text-white" />
+              <Input value={editing?.state || ""} onChange={(e) => setEditing((p) => p ? { ...p, state: e.target.value } : null)} placeholder="SP" />
             </div>
-            <div>
-              <Label>Avaliação (1-5)</Label>
-              <Input type="number" min={1} max={5} value={editing?.rating || "3"} onChange={(e) => setEditing((p) => p ? { ...p, rating: e.target.value } : null)} className="bg-zinc-800 border-zinc-700 text-white" />
+            <div className="space-y-2">
+              <Label>Avaliacao (1-5)</Label>
+              <Input type="number" min={1} max={5} value={editing?.rating || "3"} onChange={(e) => setEditing((p) => p ? { ...p, rating: e.target.value } : null)} />
             </div>
-            <div className="col-span-2">
-              <Label>Observações</Label>
-              <Input value={editing?.notes || ""} onChange={(e) => setEditing((p) => p ? { ...p, notes: e.target.value } : null)} className="bg-zinc-800 border-zinc-700 text-white" />
+            <div className="col-span-2 space-y-2">
+              <Label>Observacoes</Label>
+              <Input value={editing?.notes || ""} onChange={(e) => setEditing((p) => p ? { ...p, notes: e.target.value } : null)} placeholder="Observacoes opcionais" />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditing(null)}>Cancelar</Button>
+            <Button variant="outline" onClick={() => setEditing(null)} disabled={mutation.isPending}>Cancelar</Button>
             <Button
-              className="bg-brand hover:bg-brand-muted text-brand-foreground"
               disabled={mutation.isPending || !editing?.name}
               onClick={() => {
                 if (!editing) return;

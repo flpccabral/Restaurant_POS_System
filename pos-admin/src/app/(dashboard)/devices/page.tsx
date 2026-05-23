@@ -95,23 +95,23 @@ export default function DevicesPage() {
   return (
     <div className="p-6 space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white">Dispositivos</h1>
-        <p className="text-zinc-400 text-sm mt-1">Gerencie dispositivos e terminais PDV</p>
+        <h1 className="text-2xl font-bold text-foreground tracking-tight">Dispositivos</h1>
+        <p className="text-muted-foreground text-sm mt-0.5">Gerencie dispositivos e terminais PDV</p>
       </div>
 
       {/* Summary */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
-          <p className="text-sm text-zinc-400">Total</p>
-          <p className="text-2xl font-bold text-white">{total}</p>
+        <div className="bg-card border border-border rounded-xl p-5">
+          <p className="text-sm text-muted-foreground">Total</p>
+          <p className="text-2xl font-bold text-foreground mt-1">{total}</p>
         </div>
-        <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
-          <p className="text-sm text-zinc-400">Aprovados</p>
-          <p className="text-2xl font-bold text-emerald-500">{approved}</p>
+        <div className="bg-card border border-border rounded-xl p-5">
+          <p className="text-sm text-muted-foreground">Aprovados</p>
+          <p className="text-2xl font-bold text-success mt-1">{approved}</p>
         </div>
-        <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
-          <p className="text-sm text-zinc-400">Pendentes</p>
-          <p className="text-2xl font-bold text-amber-500">{pending}</p>
+        <div className="bg-card border border-border rounded-xl p-5">
+          <p className="text-sm text-muted-foreground">Pendentes</p>
+          <p className="text-2xl font-bold text-warning mt-1">{pending}</p>
         </div>
       </div>
 

@@ -10,7 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle, Loader2 } from "lucide-react";
+import { AlertTriangle, Loader2, Trash2 } from "lucide-react";
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -52,18 +52,22 @@ export function ConfirmDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-zinc-900 border-zinc-800 text-white">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             {variant === "destructive" && (
-              <AlertTriangle className="h-5 w-5 text-red-400" />
+              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-critical/10 shrink-0">
+                <AlertTriangle className="h-5 w-5 text-critical" />
+              </div>
             )}
-            <DialogTitle>{title}</DialogTitle>
+            <div>
+              <DialogTitle>{title}</DialogTitle>
+              <DialogDescription>{description}</DialogDescription>
+            </div>
           </div>
-          <DialogDescription className="text-zinc-400">{description}</DialogDescription>
         </DialogHeader>
         {error && (
-          <div className="rounded-md bg-red-500/10 border border-red-500/20 px-3 py-2 text-sm text-red-400">
+          <div className="rounded-lg bg-critical/10 border border-critical/20 px-3 py-2 text-sm text-critical">
             {error}
           </div>
         )}
@@ -72,18 +76,13 @@ export function ConfirmDialog({
             variant="outline"
             onClick={() => onOpenChange(false)}
             disabled={loading}
-            className="border-zinc-700 text-zinc-300"
           >
             {cancelLabel}
           </Button>
           <Button
             onClick={handleConfirm}
             disabled={loading}
-            className={
-              variant === "destructive"
-                ? "bg-red-600 hover:bg-red-700 text-white"
-                : "bg-brand hover:bg-brand-muted text-brand-foreground"
-            }
+            variant={variant === "destructive" ? "destructive" : "default"}
           >
             {loading ? (
               <>
@@ -91,7 +90,10 @@ export function ConfirmDialog({
                 {confirmLabel}
               </>
             ) : (
-              confirmLabel
+              <>
+                {variant === "destructive" && <Trash2 className="h-4 w-4 mr-2" />}
+                {confirmLabel}
+              </>
             )}
           </Button>
         </DialogFooter>
