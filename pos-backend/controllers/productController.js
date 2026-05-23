@@ -10,7 +10,7 @@ const ws = require("../services/websocketService");
  */
 const createProduct = async (req, res, next) => {
     try {
-        const { name, description, categoryId, variations, attributes, image, tags } = req.body;
+        const { name, description, categoryId, price, variations, attributes, image, tags } = req.body;
 
         // Validação de campos obrigatórios
         if (!name) {
@@ -54,7 +54,7 @@ const createProduct = async (req, res, next) => {
             tags: tags || []
         });
 
-        // Adicionar variações se fornecidas
+        // Adicionar variações se fornecidas, ou criar variação padrão
         if (variations && Array.isArray(variations) && variations.length > 0) {
             const existingSkus = [];
 
@@ -74,6 +74,18 @@ const createProduct = async (req, res, next) => {
                     isActive: variation.isActive !== false
                 });
             }
+        }
+
+        // Se nenhuma variação foi adicionada, criar variação "Padrão" automaticamente
+        if (product.variations.length === 0) {
+            const defaultPrice = price !== undefined ? price : 0;
+            const sku = generateUniqueSku(name, 'Padrao', []);
+            product.variations.push({
+                name: 'Padrão',
+                price: defaultPrice,
+                sku,
+                isActive: true
+            });
         }
 
         // Adicionar atributos se fornecidos
@@ -261,7 +273,7 @@ const getProductBySku = async (req, res, next) => {
 const updateProduct = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const { name, description, categoryId, image, tags, isCurrent, isActive } = req.body;
+        const { name, description, categoryId, price, image, tags, isCurrent, isActive } = req.body;
 
         const product = await Product.findById(id);
 
@@ -286,6 +298,17 @@ const updateProduct = async (req, res, next) => {
         if (tags !== undefined) product.tags = tags;
         if (isCurrent !== undefined) product.isCurrent = isCurrent;
         if (isActive !== undefined) product.isActive = isActive;
+
+        // Se produto não tem variações e um preço foi enviado, criar variação padrão
+        if (product.variations.length === 0 && price !== undefined) {
+            const sku = generateUniqueSku(product.name, 'Padrao', []);
+            product.variations.push({
+                name: 'Padrão',
+                price: price,
+                sku,
+                isActive: true
+            });
+        }
 
         // Atualizar categoria se fornecida
         if (categoryId) {
