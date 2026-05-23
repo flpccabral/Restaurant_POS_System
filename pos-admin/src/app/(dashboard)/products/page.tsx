@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import Link from "next/link";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Plus } from "lucide-react";
+import { Plus, FileText, AlertTriangle } from "lucide-react";
 import { ErrorState } from "@/components/shared/ErrorState";
+import { FilterPills } from "@/components/shared/FilterPills";
 import { DataTable } from "@/components/data-table";
 import { StatusBadge } from "@/components/status-badge";
 import { ConfirmDialog } from "@/components/confirm-dialog";
@@ -26,6 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import type { Product } from "@/types";
 import { productsService } from "@/services/api/products";
 import { categoriesService } from "@/services/api/categories";
 
@@ -35,6 +38,8 @@ export default function ProductsPage() {
   const [editing, setEditing] = useState<{
     _id?: string; name: string; description: string; price: string; category: string;
   } | null>(null);
+  const [recipeFilter, setRecipeFilter] = useState<string | null>(null);
+  const [saveWarning, setSaveWarning] = useState<string | null>(null);
 
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["products"],
@@ -46,14 +51,36 @@ export default function ProductsPage() {
     queryFn: () => categoriesService.getAll().then((r) => r.data.data).catch(() => []),
   });
 
+  const filteredData = useMemo(() => {
+    if (!data) return [];
+    if (!recipeFilter) return data;
+    if (recipeFilter === "without_recipe") {
+      return data.filter((p: Product) => p.hasActiveRecipe === false);
+    }
+    if (recipeFilter === "with_recipe") {
+      return data.filter((p: Product) => p.hasActiveRecipe === true);
+    }
+    return data;
+  }, [data, recipeFilter]);
+
   const mutation = useMutation({
     mutationFn: (vars: { method: "post" | "put"; id?: string; data: Record<string, unknown> }) => {
       if (vars.method === "post") return productsService.create(vars.data);
       return productsService.update(vars.id!, vars.data);
     },
-    onSuccess: () => {
+    onSuccess: (_, vars) => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
       toast.success("Produto salvo com sucesso");
+
+      // Check if saved product has no recipe — show warning (TASK 4)
+      const isActive = vars.data.isActive !== false;
+      if (!vars.data.hasActiveRecipe && isActive) {
+        toast.warning(
+          "Produto salvo, mas ainda não possui ficha técnica ativa. Cadastre uma receita para garantir baixa de estoque e CMV corretos.",
+          { duration: 6000 }
+        );
+      }
+
       setEditing(null);
     },
     onError: () => toast.error("Erro ao salvar produto"),
@@ -81,8 +108,20 @@ export default function ProductsPage() {
     },
     {
       key: "price",
-      header: "Preço",
+      header: "Preco",
       cell: (row: unknown) => `R$ ${Number((row as Record<string, unknown>).price).toFixed(2)}`,
+    },
+    {
+      key: "hasActiveRecipe",
+      header: "Ficha Tecnica",
+      cell: (row: unknown) => {
+        const has = (row as Record<string, unknown>).hasActiveRecipe as boolean;
+        return has ? (
+          <StatusBadge status="ok" label="Com receita" />
+        ) : (
+          <StatusBadge status="critical" label="Sem receita" icon={AlertTriangle} />
+        );
+      },
     },
     {
       key: "isActive",
@@ -106,16 +145,27 @@ export default function ProductsPage() {
         </Button>
       </div>
 
+      {/* Filter pills for recipe status (TASK 3) */}
+      <FilterPills
+        options={[
+          { value: "without_recipe", label: "Sem receita" },
+          { value: "with_recipe", label: "Com receita" },
+        ]}
+        selected={recipeFilter}
+        onChange={setRecipeFilter}
+        allLabel="Todos"
+      />
+
       {isError ? (
         <ErrorState
           message="Falha ao carregar produtos"
-          description="Verifique se o servidor backend está rodando e tente novamente."
+          description="Verifique se o servidor backend esta rodando e tente novamente."
           onRetry={refetch}
         />
       ) : (
       <DataTable
         columns={columns}
-        data={data || []}
+        data={filteredData}
         loading={isLoading}
         searchKey="name"
         searchPlaceholder="Pesquisar produtos..."
@@ -134,6 +184,22 @@ export default function ProductsPage() {
           }
         }}
         onDelete={(id) => setDeleteId(id)}
+        customActions={(row: unknown) => {
+          const r = row as Record<string, unknown>;
+          const hasRecipe = r.hasActiveRecipe as boolean;
+          if (!hasRecipe) {
+            return (
+              <Link
+                href={`/recipes/new?productId=${r._id}`}
+                className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-md bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 transition-colors"
+              >
+                <FileText className="h-3 w-3" />
+                Criar receita
+              </Link>
+            );
+          }
+          return null;
+        }}
       />
       )}
 
@@ -176,7 +242,7 @@ export default function ProductsPage() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditing(null)} disabled={mutation.isPending}>Cancelar</Button>
-            <Button disabled={mutation.isPending || !editing?.name} onClick={() => { if (!editing) return; mutation.mutate({ method: editing._id ? "put" : "post", id: editing._id, data: { name: editing.name, description: editing.description, price: parseFloat(editing.price) || 0, category: editing.category || undefined } }) }}>
+            <Button disabled={mutation.isPending || !editing?.name} onClick={() => { if (!editing) return; mutation.mutate({ method: editing._id ? "put" : "post", id: editing._id, data: { name: editing.name, description: editing.description, price: parseFloat(editing.price) || 0, categoryId: editing.category || undefined } }) }}>
               {mutation.isPending ? "Salvando..." : "Salvar"}
             </Button>
           </DialogFooter>
@@ -187,7 +253,7 @@ export default function ProductsPage() {
         open={!!deleteId}
         onOpenChange={() => setDeleteId(null)}
         title="Excluir Produto"
-        description="Tem certeza que deseja excluir este produto? Esta ação não pode ser desfeita."
+        description="Tem certeza que deseja excluir este produto? Esta acao nao pode ser desfeita."
         onConfirm={() => { if (deleteId) deleteMutation.mutate(deleteId); }}
         confirmLabel="Excluir"
         variant="destructive"
