@@ -909,6 +909,8 @@ async function run() {
     // ========== TIMELINE WITH PRODUCTION BATCH ==========
     logSection('Timeline with production batch');
 
+    await ProductionBatch.deleteOne({ batchId: 'PHASE6-TEST-BATCH-001' });
+
     // Create a production batch for hamburgueria
     const batch = await ProductionBatch.create({
         store: hamburgueriaStore._id,

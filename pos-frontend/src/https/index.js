@@ -25,3 +25,15 @@ export const addOrder = (data) => axiosWrapper.post("/api/order/", data);
 export const getOrders = () => axiosWrapper.get("/api/order");
 export const updateOrderStatus = ({ orderId, orderStatus }) =>
   axiosWrapper.put(`/api/order/${orderId}`, { orderStatus });
+
+// Observability Endpoints (Phase 6/7A)
+export const getStockHealth = (storeId) =>
+  axiosWrapper.get(`/api/observability/stock-health/store/${storeId}`);
+export const getNetworkRecommendations = () =>
+  axiosWrapper.get("/api/observability/recommendations/network");
+export const getAlerts = (params = {}) =>
+  axiosWrapper.get("/api/observability/alerts", { params });
+export const getTimeline = (params = {}) =>
+  axiosWrapper.get("/api/observability/timeline", { params });
+export const getStockPolicies = (params = {}) =>
+  axiosWrapper.get("/api/stock-policies", { params });

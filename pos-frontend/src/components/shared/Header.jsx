@@ -10,6 +10,7 @@ import { logout } from "../../https";
 import { removeUser } from "../../redux/slices/userSlice";
 import { useNavigate } from "react-router-dom";
 import { MdDashboard } from "react-icons/md";
+import { MdOutlineMonitor } from "react-icons/md";
 
 const Header = () => {
   const userData = useSelector((state) => state.user);
@@ -59,6 +60,9 @@ const Header = () => {
             <MdDashboard className="text-[#f5f5f5] text-2xl" />
           </div>
         )}
+        <div onClick={() => navigate("/console")} className="bg-[#1f1f1f] rounded-[15px] p-3 cursor-pointer" title="Console Operacional">
+          <MdOutlineMonitor className="text-[#f5f5f5] text-2xl" />
+        </div>
         <div className="bg-[#1f1f1f] rounded-[15px] p-3 cursor-pointer">
           <FaBell className="text-[#f5f5f5] text-2xl" />
         </div>
