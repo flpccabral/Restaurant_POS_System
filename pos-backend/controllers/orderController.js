@@ -3,6 +3,7 @@ const Order = require("../models/orderModel");
 const { default: mongoose } = require("mongoose");
 const ws = require("../services/websocketService");
 const orderCheckoutService = require("../services/orderCheckoutService");
+const OperationalAlert = require("../models/operationalAlertModel");
 
 /**
  * MULTI-TENANCY FIX: Helper to build store-scoped filter
@@ -156,7 +157,7 @@ const processOrderStockDeduction = async (req, res, next) => {
                 session
             });
 
-            // Atualizar itens do pedido
+            // Atualizar itens do pedido — Fase 9.1D: persistência completa per-item
             for (const itemResult of stockDeductionResult.items) {
                 const item = order.items.id(itemResult.itemId);
                 if (item) {
@@ -170,6 +171,13 @@ const processOrderStockDeduction = async (req, res, next) => {
                     if (itemResult.movements && itemResult.movements.length > 0) {
                         item.stockMovements = itemResult.movements;
                     }
+                    // Fase 9.1D — metadados operacionais
+                    if (itemResult.stockImpactRule) item.stockImpactRule = itemResult.stockImpactRule;
+                    if (itemResult.sellableType) item.sellableType = itemResult.sellableType;
+                    if (itemResult.variation) item.variation = itemResult.variation;
+                    if (itemResult.sku) item.sku = itemResult.sku;
+                    if (itemResult.pricePerQuantity) item.pricePerQuantity = itemResult.pricePerQuantity;
+                    if (itemResult.stockDeductionReason) item.stockDeductionReason = itemResult.stockDeductionReason;
                 }
             }
 
@@ -190,6 +198,35 @@ const processOrderStockDeduction = async (req, res, next) => {
         } catch (deductionError) {
             await session.abortTransaction();
             stockDeductionError = deductionError.message;
+
+            // TASK 7: Salvar status de falha FORA da transação
+            try {
+                order.stockDeductionStatus = 'failed';
+                order.stockDeductionError = stockDeductionError;
+                await order.save();
+            } catch (saveErr) {
+                console.error(`[orderController] Failed to save failed status for order ${id}: ${saveErr.message}`);
+            }
+
+            // TASK 8: Gerar alerta operacional fora da transação
+            try {
+                await OperationalAlert.create({
+                    type: 'sale_without_stock_deduction',
+                    severity: 'critical',
+                    store: storeRef,
+                    status: 'new',
+                    message: `Falha na baixa de estoque do pedido ${id}: ${stockDeductionError}`,
+                    currentValue: 1,
+                    metadata: {
+                        orderId: id,
+                        reason: 'transaction_abort',
+                        error: stockDeductionError,
+                        storeId: storeRef?.toString()
+                    }
+                });
+            } catch (alertErr) {
+                console.error(`[orderController] Failed to create alert for order ${id}: ${alertErr.message}`);
+            }
         } finally {
             session.endSession();
         }
@@ -200,8 +237,8 @@ const processOrderStockDeduction = async (req, res, next) => {
                 ? `Stock deduction failed: ${stockDeductionError}`
                 : "Stock deduction processed!",
             data: {
-                stockDeductionStatus: order.stockDeductionStatus,
-                totalCOGS: order.totalCOGS,
+                stockDeductionStatus: order.stockDeductionStatus || 'failed',
+                totalCOGS: order.totalCOGS || 0,
                 stockDeductionError,
                 items: stockDeductionResult?.items || []
             }

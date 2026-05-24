@@ -7,6 +7,17 @@
  * Ponto único de orquestração para criação de pedido com baixa de estoque.
  * NÃO é chamado diretamente do controller de criação de pedido — é chamado
  * no momento do pagamento (processPayment) quando o pedido está sendo finalizado.
+ *
+ * ================================================================
+ * POLITICA DE BAIXA: ALL-OR-NOTHING TRANSACIONAL (Fase 9.1C)
+ * ================================================================
+ * - A baixa de estoque é atômica por pedido (MongoDB transaction)
+ * - Se qualquer item aplicável falhar com hard error, toda a transação é abortada
+ * - Soft errors (no_recipe, incomplete_config, unknown rule) NÃO abortam a transação
+ * - Hard errors (saldo insuficiente, StockBalance ausente, location ausente) ABORTAM tudo
+ * - Quando a transação aborta, o status do pedido é salvo como 'failed' fora da transação
+ * - Um alerta crítico é gerado para cada falha de baixa
+ * ================================================================
  */
 
 const mongoose = require('mongoose');
@@ -42,26 +53,38 @@ const resolveStoreLocation = async (storeId) => {
  * @returns {Promise<object|null>}
  */
 const findRecipeForItem = async (storeId, productId, variationSku = null) => {
-    const filter = {
+    // 1. Tentar por sku (campo único por loja — mais confiável)
+    if (variationSku) {
+        const recipeBySku = await Recipe.findOne({
+            store: storeId,
+            product: productId,
+            sku: variationSku,
+            isActive: true
+        }).populate('ingredients.ingredient', 'name baseUnit averageCost conversionToBase');
+
+        if (recipeBySku) return recipeBySku;
+    }
+
+    // 2. Fallback: busca por variation (SKU enviado pelo PDV)
+    if (variationSku) {
+        const recipeByVariation = await Recipe.findOne({
+            store: storeId,
+            product: productId,
+            variation: variationSku,
+            isActive: true
+        }).populate('ingredients.ingredient', 'name baseUnit averageCost conversionToBase');
+
+        if (recipeByVariation) return recipeByVariation;
+    }
+
+    // 3. Fallback final: busca apenas por produto (para variações não encontradas)
+    const recipeFallback = await Recipe.findOne({
         store: storeId,
         product: productId,
         isActive: true
-    };
+    }).populate('ingredients.ingredient', 'name baseUnit averageCost conversionToBase');
 
-    if (variationSku) {
-        filter.variation = variationSku;
-    }
-
-    let recipe = await Recipe.findOne(filter)
-        .populate('ingredients.ingredient', 'name baseUnit averageCost conversionToBase');
-
-    // Se não encontrou com variation, tenta sem
-    if (!recipe && variationSku) {
-        recipe = await Recipe.findOne({ store: storeId, product: productId, isActive: true })
-            .populate('ingredients.ingredient', 'name baseUnit averageCost conversionToBase');
-    }
-
-    return recipe;
+    return recipeFallback;
 };
 
 /**
@@ -117,9 +140,10 @@ const processOrderStockDeduction = async ({ storeId, orderId, orderItems, userId
 
             if (!product) {
                 itemResult.stockDeductionStatus = 'error';
+                itemResult.stockDeductionReason = `Product not found: ${item.name}`;
                 result.errors.push({
                     item: item.name,
-                    reason: `Product not found: ${item.name}`
+                    reason: itemResult.stockDeductionReason
                 });
                 result.items.push(itemResult);
                 continue;
@@ -128,6 +152,12 @@ const processOrderStockDeduction = async ({ storeId, orderId, orderItems, userId
             const rule = product.stockImpactRule || 'recipe_composition';
             itemResult.stockImpactRule = rule;
 
+            // Fase 9.1D — enriquecer itemResult com metadados do produto
+            itemResult.sellableType = product.sellableType || null;
+            itemResult.sku = product.sku || null;
+            itemResult.variation = item.variation || null;
+            itemResult.pricePerQuantity = item.pricePerQuantity || item.price || null;
+
             switch (rule) {
                 case 'recipe_composition': {
                     // Comportamento atual: encontrar Recipe, simular, baixar
@@ -135,9 +165,10 @@ const processOrderStockDeduction = async ({ storeId, orderId, orderItems, userId
 
                     if (!recipe) {
                         itemResult.stockDeductionStatus = 'no_recipe';
+                        itemResult.stockDeductionReason = `No active recipe found for product ${item.name}${item.variation ? ` (variation: ${item.variation})` : ''}`;
                         result.errors.push({
                             item: item.name,
-                            reason: `No active recipe found for product ${item.name}${item.variation ? ` (variation: ${item.variation})` : ''}`
+                            reason: itemResult.stockDeductionReason
                         });
                         result.items.push(itemResult);
                         continue;
@@ -151,6 +182,7 @@ const processOrderStockDeduction = async ({ storeId, orderId, orderItems, userId
 
                     if (!simulation.allIngredientsAvailable) {
                         itemResult.stockDeductionStatus = 'insufficient_stock';
+                        itemResult.stockDeductionReason = `Insufficient stock: ${simulation.wouldFail.map(f => `${f.ingredientName} (need ${f.required}, have ${f.available})`).join('; ')}`;
                         result.errors.push({
                             item: item.name,
                             reason: 'Insufficient stock',
@@ -178,6 +210,7 @@ const processOrderStockDeduction = async ({ storeId, orderId, orderItems, userId
                     itemResult.movements = deductionResult.movements;
 
                     result.totalCOGS += deductionResult.totalCost;
+                    result.items.push(itemResult);
                     break;
                 }
 
@@ -185,9 +218,10 @@ const processOrderStockDeduction = async ({ storeId, orderId, orderItems, userId
                     // Baixa direta de um item de estoque específico
                     if (!product.directStockItem) {
                         itemResult.stockDeductionStatus = 'error';
+                        itemResult.stockDeductionReason = `Product ${item.name} has stock_item_direct rule but no directStockItem configured`;
                         result.errors.push({
                             item: item.name,
-                            reason: `Product ${item.name} has stock_item_direct rule but no directStockItem configured`
+                            reason: itemResult.stockDeductionReason
                         });
                         result.items.push(itemResult);
                         continue;
@@ -202,9 +236,10 @@ const processOrderStockDeduction = async ({ storeId, orderId, orderItems, userId
 
                     if (!directIngredient) {
                         itemResult.stockDeductionStatus = 'error';
+                        itemResult.stockDeductionReason = `Direct stock ingredient not found for product ${item.name}`;
                         result.errors.push({
                             item: item.name,
-                            reason: `Direct stock ingredient not found for product ${item.name}`
+                            reason: itemResult.stockDeductionReason
                         });
                         result.items.push(itemResult);
                         continue;
@@ -222,9 +257,10 @@ const processOrderStockDeduction = async ({ storeId, orderId, orderItems, userId
 
                     if (!stockBalance) {
                         itemResult.stockDeductionStatus = 'error';
+                        itemResult.stockDeductionReason = `Stock balance not found for ingredient ${directIngredient.name}`;
                         result.errors.push({
                             item: item.name,
-                            reason: `Stock balance not found for ingredient ${directIngredient.name}`
+                            reason: itemResult.stockDeductionReason
                         });
                         result.items.push(itemResult);
                         continue;
@@ -232,9 +268,10 @@ const processOrderStockDeduction = async ({ storeId, orderId, orderItems, userId
 
                     if (stockBalance.balance < totalQty) {
                         itemResult.stockDeductionStatus = 'insufficient_stock';
+                        itemResult.stockDeductionReason = `Insufficient stock for ${directIngredient.name}: available ${stockBalance.balance}, required ${totalQty} ${deductionUnit}`;
                         result.errors.push({
                             item: item.name,
-                            reason: `Insufficient stock for ${directIngredient.name}: available ${stockBalance.balance}, required ${totalQty} ${deductionUnit}`
+                            reason: itemResult.stockDeductionReason
                         });
                         result.items.push(itemResult);
                         continue;
@@ -291,6 +328,8 @@ const processOrderStockDeduction = async ({ storeId, orderId, orderItems, userId
 
                     itemResult.stockDeductionStatus = 'deducted';
                     itemResult.movements.push(movement[0]._id);
+
+                    result.items.push(itemResult);
                     break;
                 }
 
@@ -305,9 +344,10 @@ const processOrderStockDeduction = async ({ storeId, orderId, orderItems, userId
                 case 'combo_components': {
                     // Combo não implementado — gerar alerta
                     itemResult.stockDeductionStatus = 'incomplete_config';
+                    itemResult.stockDeductionReason = `Product ${item.name} has combo_components rule which is not implemented yet`;
                     result.errors.push({
                         item: item.name,
-                        reason: `Product ${item.name} has combo_components rule which is not implemented yet`
+                        reason: itemResult.stockDeductionReason
                     });
                     result.items.push(itemResult);
                     continue;
@@ -315,15 +355,17 @@ const processOrderStockDeduction = async ({ storeId, orderId, orderItems, userId
 
                 default: {
                     itemResult.stockDeductionStatus = 'error';
+                    itemResult.stockDeductionReason = `Unknown stockImpactRule '${rule}' for product ${item.name}`;
                     result.errors.push({
                         item: item.name,
-                        reason: `Unknown stockImpactRule '${rule}' for product ${item.name}`
+                        reason: itemResult.stockDeductionReason
                     });
                     result.items.push(itemResult);
                 }
             }
         } catch (error) {
             itemResult.stockDeductionStatus = 'error';
+            itemResult.stockDeductionReason = error.message;
             result.errors.push({
                 item: item.name,
                 reason: error.message
