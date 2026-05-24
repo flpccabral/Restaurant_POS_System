@@ -229,7 +229,11 @@ export default function ProductsPage() {
                 onValueChange={(value) => setEditing((p) => p ? { ...p, category: value ?? "" } : null)}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Sem categoria" />
+                  {editing?.category && (categories || []).find(c => c._id === editing.category) ? (
+                    <span>{(categories || []).find(c => c._id === editing.category)!.name}</span>
+                  ) : (
+                    <SelectValue placeholder="Sem categoria" />
+                  )}
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="">Sem categoria</SelectItem>
