@@ -299,7 +299,11 @@ export function PolicyFormModal({
                 disabled={isLoading || isEdit}
               >
                 <SelectTrigger id="storeId" className={errors.storeId ? "border-destructive" : ""}>
-                  <SelectValue placeholder="Selecione uma loja" />
+                  {form.storeId ? (
+                    <span>{(stores as Array<{ _id: string; name: string }> | undefined)?.find((s) => s._id === form.storeId)?.name || "—"}</span>
+                  ) : (
+                    <SelectValue placeholder="Selecione uma loja" />
+                  )}
                 </SelectTrigger>
                 <SelectContent>
                   {stores.map(
@@ -340,7 +344,11 @@ export function PolicyFormModal({
                   id="locationId"
                   className={errors.locationId ? "border-destructive" : ""}
                 >
-                  <SelectValue placeholder="Selecione" />
+                  {form.locationId ? (
+                    <span>{(filteredLocations as Array<{ _id: string; name: string }> | undefined)?.find((l) => l._id === form.locationId)?.name || "—"}</span>
+                  ) : (
+                    <SelectValue placeholder="Selecione" />
+                  )}
                 </SelectTrigger>
                 <SelectContent>
                   {filteredLocations.map(
@@ -369,7 +377,11 @@ export function PolicyFormModal({
                   id="ingredientId"
                   className={errors.ingredientId ? "border-destructive" : ""}
                 >
-                  <SelectValue placeholder="Selecione" />
+                  {form.ingredientId ? (
+                    <span>{(ingredients as Array<{ _id: string; name: string }> | undefined)?.find((i) => i._id === form.ingredientId)?.name || "—"}</span>
+                  ) : (
+                    <SelectValue placeholder="Selecione" />
+                  )}
                 </SelectTrigger>
                 <SelectContent>
                   {ingredients.map(

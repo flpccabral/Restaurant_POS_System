@@ -152,7 +152,13 @@ export default function UsersPage() {
             <div className="space-y-2">
               <Label>Perfil</Label>
               <Select value={editing?.role || ""} onValueChange={(v) => setEditing((p) => p ? { ...p, role: v || "" } : null)}>
-                <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                <SelectTrigger>
+                  {editing?.role ? (
+                    <span>{(roles || []).find((r: { _id: string; name: string }) => r._id === editing.role)?.name || editing.role}</span>
+                  ) : (
+                    <SelectValue placeholder="Selecione" />
+                  )}
+                </SelectTrigger>
                 <SelectContent>
                   {(roles || []).map((r: { _id: string; name: string }) => (
                     <SelectItem key={r._id} value={r._id}>{r.name}</SelectItem>
