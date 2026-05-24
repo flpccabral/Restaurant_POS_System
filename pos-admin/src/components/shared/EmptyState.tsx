@@ -15,11 +15,13 @@ interface EmptyStateProps {
   actionLabel?: string;
   /** Optional CTA click handler */
   onAction?: () => void;
+  /** Optional children rendered inside CardContent (below description, above CTA) */
+  children?: React.ReactNode;
 }
 
 /**
  * EmptyState — displays a centered empty state card with icon, title,
- * optional description, and optional CTA button.
+ * optional description, optional children, and optional CTA button.
  *
  * @example
  * ```tsx
@@ -37,6 +39,7 @@ export function EmptyState({
   icon: Icon = Inbox,
   actionLabel,
   onAction,
+  children,
 }: EmptyStateProps) {
   return (
     <div className="flex items-center justify-center min-h-[300px]">
@@ -49,9 +52,12 @@ export function EmptyState({
             <CardTitle className="text-zinc-200 text-lg">{title}</CardTitle>
           </div>
         </CardHeader>
-        {description && (
-          <CardContent>
-            <p className="text-sm text-zinc-400 text-center">{description}</p>
+        {(description || children) && (
+          <CardContent className="space-y-4">
+            {description && (
+              <p className="text-sm text-zinc-400 text-center">{description}</p>
+            )}
+            {children}
           </CardContent>
         )}
         {actionLabel && onAction && (

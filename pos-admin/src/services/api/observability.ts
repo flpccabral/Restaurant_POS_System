@@ -33,7 +33,7 @@ export const observabilityService = {
   // ── Alerts ──────────────────────────────────────────────────────────────
 
   /** Get operational alerts with optional filters */
-  getAlerts: (params?: { status?: string; severity?: string; type?: string; limit?: number }) =>
+  getAlerts: (params?: { storeId?: string; status?: string; severity?: string; type?: string; limit?: number }) =>
     api.get<ApiResponse<{ alerts: OperationalAlert[] }>>("/observability/alerts", { params }).then((r) => r.data),
 
   /** Resolve an alert */

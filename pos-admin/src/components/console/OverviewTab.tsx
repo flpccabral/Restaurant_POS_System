@@ -6,11 +6,8 @@ import {
   AlertTriangle,
   TrendingDown,
   CheckCircle,
-  ShoppingCart,
-  FileWarning,
-  Lightbulb,
 } from "lucide-react";
-import { useCapabilities } from "@/hooks/useCapabilities";
+import { useStoreContext } from "@/contexts/StoreContext";
 import { observabilityService } from "@/services/api/observability";
 import { KpiCard } from "@/components/kpi-card";
 import { StatusBadge } from "@/components/status-badge";
@@ -19,7 +16,7 @@ import { EmptyState } from "@/components/shared/EmptyState";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export function OverviewTab() {
-  const { storeId } = useCapabilities();
+  const { storeId } = useStoreContext();
 
   const {
     data: stockHealth,
@@ -40,7 +37,7 @@ export function OverviewTab() {
     refetch: refetchAlerts,
   } = useQuery({
     queryKey: ["alerts", storeId],
-    queryFn: () => observabilityService.getAlerts({ limit: 5 }),
+    queryFn: () => observabilityService.getAlerts({ storeId: storeId || undefined, limit: 5 }),
     staleTime: 60_000,
   });
 

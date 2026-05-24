@@ -10,7 +10,8 @@ const {
     registerPurchase,
     getTimeline,
     generateAlerts,
-    checkProductsWithoutRecipe
+    checkProductsWithoutRecipe,
+    getOverview
 } = require("../controllers/observabilityController");
 const { isVerifiedUser } = require("../middlewares/tokenVerification");
 const { storeIsolation } = require("../middlewares/storeIsolation");
@@ -23,6 +24,9 @@ const router = express.Router();
 router.use(isVerifiedUser);
 router.use(storeIsolation);
 router.use(deviceApproval);
+
+// Overview (consolidado para Console)
+router.get("/overview", checkPermission('inventory', 'read'), getOverview);
 
 // Stock health
 router.get("/stock-health/store/:storeId", checkPermission('inventory', 'read'), getStockHealth);

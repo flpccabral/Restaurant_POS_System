@@ -260,6 +260,64 @@ const registerPurchase = async (req, res, next) => {
 };
 
 /**
+ * Overview consolidado para o Console Operacional (Fase 8.5)
+ * Agrega dados de saúde do estoque, alertas recentes e recomendações pendentes.
+ */
+const getOverview = async (req, res, next) => {
+    try {
+        const { storeId } = req.query;
+
+        const storeRef = req.user.isMasterAdmin && req.storeId ? req.storeId : req.user.store;
+        const targetStoreId = req.user.isMasterAdmin ? (storeId || storeRef) : storeRef;
+
+        // Busca saúde do estoque em paralelo com alertas e recomendações
+        const [stockHealthResult, alertsResult, recommendationsResult] = await Promise.allSettled([
+            stockHealthService.getStoreStockHealth(targetStoreId),
+            observabilityService.getAlerts(targetStoreId, { limit: 10 }),
+            replenishmentService.generateNetworkRecommendations()
+        ]);
+
+        // Status summary do stock health
+        const statusSummary = stockHealthResult.status === 'fulfilled' && stockHealthResult.value
+            ? stockHealthResult.value.statusSummary || {}
+            : {};
+
+        // Alertas
+        const alerts = alertsResult.status === 'fulfilled' && alertsResult.value
+            ? alertsResult.value.alerts || []
+            : [];
+
+        // Recomendações pendentes
+        let pendingRecommendations = 0;
+        if (recommendationsResult.status === 'fulfilled' && recommendationsResult.value) {
+            pendingRecommendations = recommendationsResult.value.totalRecommendations || 0;
+        }
+
+        const overview = {
+            totalIngredients: stockHealthResult.status === 'fulfilled' ? (stockHealthResult.value.ingredientCount || 0) : 0,
+            stockout: statusSummary.stockout || 0,
+            critical: statusSummary.critical || 0,
+            low: statusSummary.low || 0,
+            ok: statusSummary.ok || 0,
+            excess: statusSummary.excess || 0,
+            noPolicy: statusSummary.noPolicy || 0,
+            newAlerts: alerts.filter(a => a.status === 'new').length,
+            saleWithoutDeduction: alerts.filter(a => a.type === 'sale_without_stock_deduction').length,
+            productsWithoutRecipe: alerts.filter(a => a.type === 'product_without_recipe').length,
+            pendingRecommendations,
+            alerts: alerts.slice(0, 10)
+        };
+
+        res.status(200).json({
+            success: true,
+            data: overview
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
  * Gerar alertas para uma loja
  */
 const generateAlerts = async (req, res, next) => {
@@ -309,5 +367,6 @@ module.exports = {
     registerPurchase,
     getTimeline,
     generateAlerts,
-    checkProductsWithoutRecipe
+    checkProductsWithoutRecipe,
+    getOverview
 };

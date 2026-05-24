@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useCapabilities } from "@/hooks/useCapabilities";
+import { useStoreContext } from "@/contexts/StoreContext";
 import { observabilityService } from "@/services/api/observability";
 import { StatusBadge } from "@/components/status-badge";
 import { FilterPills } from "@/components/shared/FilterPills";
@@ -40,12 +40,12 @@ const typeFilters = [
 ];
 
 export function TimelineTab() {
-  const { storeId } = useCapabilities();
+  const { storeId } = useStoreContext();
   const [typeFilter, setTypeFilter] = useState<string | null>(null);
 
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["timeline", storeId],
-    queryFn: () => observabilityService.getTimeline({ limit: 100 }),
+    queryFn: () => observabilityService.getTimeline({ storeId: storeId || undefined, limit: 100 }),
     enabled: !!storeId,
     staleTime: 60_000,
   });

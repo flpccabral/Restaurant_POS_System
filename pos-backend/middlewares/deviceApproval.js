@@ -159,31 +159,23 @@ const registerDevice = async (req, res, next) => {
             device.nickname = nickname.trim();
             device.deviceInfo = { ...device.deviceInfo, ...deviceInfo };
             device.lastActiveAt = new Date();
-
-            // Se for Master Admin, auto-aprovar
-            if (user.isMasterAdmin) {
-                device.isApproved = true;
-                device.approvedBy = user._id;
-                device.approvedAt = new Date();
-            }
+            device.isApproved = true;
 
             await device.save();
         } else {
-            // Criar novo dispositivo
+            // Criar novo dispositivo (auto-aprovado para todos os usuarios)
             device = await Device.create({
                 user: user._id,
                 store: user.store,
                 fingerprint,
                 nickname: nickname.trim(),
                 deviceInfo,
-                isApproved: user.isMasterAdmin || false,  // Auto-aprovar Master Admin
+                isApproved: true,
                 isCurrent: true,
                 lastActiveAt: new Date(),
                 firstSeenAt: new Date(),
-                ...(user.isMasterAdmin ? {
-                    approvedBy: user._id,
-                    approvedAt: new Date()
-                } : {})
+                approvedBy: user._id,
+                approvedAt: new Date()
             });
         }
 
@@ -324,24 +316,23 @@ const registerDeviceOnLogin = async (req, res, next) => {
             // Atualizar dispositivo existente
             device.lastActiveAt = new Date();
             device.isCurrent = true;
+            device.isApproved = true;
             device.deviceInfo = { ...device.deviceInfo, ...deviceInfo };
             await device.save();
         } else {
-            // Criar novo dispositivo (sem nickname ainda)
+            // Criar novo dispositivo (auto-aprovado para todos os usuarios)
             device = await Device.create({
                 user: user._id,
                 store: user.store,
                 fingerprint,
-                nickname: 'Auto-' + deviceInfo.browser || 'Unknown',
+                nickname: 'Auto-' + (deviceInfo.browser || 'Unknown'),
                 deviceInfo,
-                isApproved: user.isMasterAdmin || false,
+                isApproved: true,
                 isCurrent: true,
                 lastActiveAt: new Date(),
                 firstSeenAt: new Date(),
-                ...(user.isMasterAdmin ? {
-                    approvedBy: user._id,
-                    approvedAt: new Date()
-                } : {})
+                approvedBy: user._id,
+                approvedAt: new Date()
             });
         }
 

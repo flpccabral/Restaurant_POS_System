@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useCapabilities } from "@/hooks/useCapabilities";
+import { useStoreContext } from "@/contexts/StoreContext";
 import { observabilityService } from "@/services/api/observability";
 import { StatusBadge } from "@/components/status-badge";
 import { FilterPills } from "@/components/shared/FilterPills";
@@ -31,7 +31,7 @@ const statusFilters = [
 ];
 
 export function StockHealthTab() {
-  const { storeId } = useCapabilities();
+  const { storeId } = useStoreContext();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
 

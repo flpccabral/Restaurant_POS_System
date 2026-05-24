@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useCapabilities } from "@/hooks/useCapabilities";
+import { useStoreContext } from "@/contexts/StoreContext";
 import { useOperationalActions } from "@/hooks/useOperationalActions";
 import { observabilityService } from "@/services/api/observability";
 import { StatusBadge } from "@/components/status-badge";
@@ -29,7 +30,8 @@ const severityFilters = [
 ];
 
 export function AlertsTab() {
-  const { storeId, can } = useCapabilities();
+  const { can } = useCapabilities();
+  const { storeId } = useStoreContext();
   const { isLoading: isActionsLoading, resolveAlert, dismissAlert } = useOperationalActions();
 
   const [statusFilter, setStatusFilter] = useState<string | null>("new");
@@ -45,6 +47,7 @@ export function AlertsTab() {
     queryFn: () =>
       observabilityService.getAlerts({
         ...(statusFilter && statusFilter !== "all" ? { status: statusFilter } : {}),
+        storeId: storeId || undefined,
         ...(severityFilter && severityFilter !== "all" ? { severity: severityFilter } : {}),
         limit: 50,
       }),

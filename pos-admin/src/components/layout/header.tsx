@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { authService } from "@/services/api/auth";
 import { useRouter } from "next/navigation";
+import { StoreContextSelector } from "@/components/console/StoreContextSelector";
 
 export function Header() {
   const router = useRouter();
@@ -29,6 +30,10 @@ export function Header() {
         <span className="hidden md:inline">Sistema POS</span>
         <span className="hidden md:inline text-muted-foreground/50">&mdash;</span>
         <span>Painel Administrativo</span>
+        {/* Store context selector — visible for master admin, informative for regular users */}
+        <div className="ml-4 pl-4 border-l border-border">
+          <StoreContextSelector />
+        </div>
       </div>
 
       <DropdownMenu>

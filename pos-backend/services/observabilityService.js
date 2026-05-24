@@ -100,8 +100,22 @@ const getAlerts = async (storeId, options = {}) => {
 /**
  * Dismiss (ignore) um alerta.
  */
-const dismissAlert = async (alertId, userId, reason) => {
-    const alert = await OperationalAlert.findById(alertId);
+/**
+ * Find an alert by either ObjectId (_id) or UUID (alertId).
+ */
+const findAlertByIdentifier = async (identifier) => {
+    // MongoDB ObjectId tem 24 caracteres hex
+    const isObjectId = mongoose.Types.ObjectId.isValid(identifier);
+    if (isObjectId) {
+        const alert = await OperationalAlert.findById(identifier);
+        if (alert) return alert;
+    }
+    // Fallback: busca por UUID
+    return OperationalAlert.findOne({ alertId: identifier });
+};
+
+const dismissAlert = async (alertUuid, userId, reason) => {
+    const alert = await findAlertByIdentifier(alertUuid);
     if (!alert) {
         throw new Error('Alert not found');
     }
@@ -114,8 +128,8 @@ const dismissAlert = async (alertId, userId, reason) => {
 /**
  * Resolve um alerta.
  */
-const resolveAlert = async (alertId, userId, notes) => {
-    const alert = await OperationalAlert.findById(alertId);
+const resolveAlert = async (alertUuid, userId, notes) => {
+    const alert = await findAlertByIdentifier(alertUuid);
     if (!alert) {
         throw new Error('Alert not found');
     }

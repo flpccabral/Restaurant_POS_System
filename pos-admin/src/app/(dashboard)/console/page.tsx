@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useCapabilities } from "@/hooks/useCapabilities";
+import { useStoreContext } from "@/contexts/StoreContext";
 import { Tabs, TabsList, TabsTab, TabsPanel } from "@/components/ui/tabs";
 import { OverviewTab } from "@/components/console/OverviewTab";
 import { StockHealthTab } from "@/components/console/StockHealthTab";
@@ -9,6 +10,7 @@ import { AlertsTab } from "@/components/console/AlertsTab";
 import { RecommendationsTab } from "@/components/console/RecommendationsTab";
 import { TimelineTab } from "@/components/console/TimelineTab";
 import { PolicyTab } from "@/components/console/PolicyTab";
+import { StoreContextSelector } from "@/components/console/StoreContextSelector";
 import { EmptyState } from "@/components/shared/EmptyState";
 import {
   LayoutDashboard,
@@ -18,6 +20,7 @@ import {
   History,
   Shield,
   EyeOff,
+  Store,
 } from "lucide-react";
 
 const ALL_TABS = [
@@ -33,6 +36,7 @@ type TabKey = (typeof ALL_TABS)[number]["key"];
 
 export default function ConsolePage() {
   const { can, isLoading: isAuthLoading } = useCapabilities();
+  const { storeId, store, isLoading: storeLoading, needsStoreSelection } = useStoreContext();
   const hasReadAccess = can("inventory", "read");
 
   // Filter tabs based on read permission
@@ -47,12 +51,12 @@ export default function ConsolePage() {
     // Will be handled on next render
   }
 
-  if (isAuthLoading) {
+  if (isAuthLoading || storeLoading) {
     return (
       <div className="p-6 space-y-6">
         <div>
           <h1 className="text-2xl font-bold text-foreground tracking-tight">Console Operacional</h1>
-          <p className="text-muted-foreground text-sm mt-0.5">Carregando permissoes...</p>
+          <p className="text-muted-foreground text-sm mt-0.5">Carregando...</p>
         </div>
       </div>
     );
@@ -70,6 +74,23 @@ export default function ConsolePage() {
     );
   }
 
+  // Master admin without store selected: prompt to choose one
+  if (needsStoreSelection) {
+    return (
+      <div className="p-6">
+        <EmptyState
+          title="Selecione uma loja"
+          description="Como administrador sem loja fixa, selecione uma loja para visualizar o Console Operacional."
+          icon={Store}
+        >
+          <div className="mt-4">
+            <StoreContextSelector />
+          </div>
+        </EmptyState>
+      </div>
+    );
+  }
+
   return (
     <div className="p-6 space-y-6">
       {/* Page Header */}
@@ -77,6 +98,7 @@ export default function ConsolePage() {
         <h1 className="text-2xl font-bold text-foreground tracking-tight">Console Operacional</h1>
         <p className="text-muted-foreground text-sm mt-0.5">
           Monitoramento e gestao inteligente de estoque
+          {store && <span className="ml-2 text-xs text-muted-foreground/60">— {store.name}</span>}
         </p>
       </div>
 
