@@ -10,7 +10,7 @@ import type { StockPolicy } from "@/types";
 export const stockPoliciesService = {
   /** List all stock policies with optional filters */
   list: (params?: { limit?: number; isActive?: boolean; storeId?: string; ingredientId?: string }) =>
-    api.get<ApiResponse<{ data: StockPolicy[] }>>("/stock-policies", { params }).then((r) => r.data),
+    api.get<ApiResponse<StockPolicy[]>>("/stock-policies", { params }).then((r) => r.data),
 
   /** Get a single stock policy by ID */
   getById: (id: string) =>

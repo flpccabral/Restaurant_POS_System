@@ -71,7 +71,7 @@ export function PolicyTab() {
     staleTime: 60_000,
   });
 
-  const policies: StockPolicy[] = data?.data?.data ?? [];
+  const policies: StockPolicy[] = data?.data ?? [];
 
   const filtered = useMemo(() => {
     return policies.filter((p) => {
