@@ -309,11 +309,43 @@ export default function RecipesPage() {
                     )}
                   </SelectTrigger>
                   <SelectContent>
-                    {(products || []).map((p: { _id: string; name: string }) => (
-                      <SelectItem key={p._id} value={p._id}>{p.name}</SelectItem>
-                    ))}
+                    {(products || []).map((p: Product) => {
+                      const rule = p.stockImpactRule || 'recipe_composition';
+                      const needsRecipe = rule === 'recipe_composition';
+                      return (
+                        <SelectItem key={p._id} value={p._id}>
+                          {p.name} {needsRecipe ? '' : '(sem receita)'}
+                        </SelectItem>
+                      );
+                    })}
                   </SelectContent>
                 </Select>
+                {editing.product && (() => {
+                  const selectedP = (products || []).find((p: Product) => p._id === editing.product) as Product | undefined;
+                  const rule = selectedP?.stockImpactRule || 'recipe_composition';
+                  if (rule === 'stock_item_direct') {
+                    return (
+                      <p className="text-xs text-amber-400 mt-1">
+                        Este produto usa baixa direta de estoque — nao necessita de ficha tecnica.
+                      </p>
+                    );
+                  }
+                  if (rule === 'no_stock_impact') {
+                    return (
+                      <p className="text-xs text-blue-400 mt-1">
+                        Este produto nao baixa estoque — nao necessita de ficha tecnica.
+                      </p>
+                    );
+                  }
+                  if (rule === 'combo_components') {
+                    return (
+                      <p className="text-xs text-red-400 mt-1">
+                        Combo nao implementado — nao e possivel criar receita para este produto.
+                      </p>
+                    );
+                  }
+                  return null;
+                })()}
               </div>
 
               {/* Recipe name */}
@@ -561,6 +593,15 @@ export default function RecipesPage() {
               disabled={mutation.isPending || !editing?.name || !editing?.sku || !editing?.product || !editing?.variation || editing?.ingredients.length === 0}
               onClick={() => {
                 if (!editing) return;
+
+                // Verificar se o produto precisa de receita
+                const selectedP = (products || []).find((p: Product) => p._id === editing.product) as Product | undefined;
+                const rule = selectedP?.stockImpactRule || 'recipe_composition';
+                if (rule !== 'recipe_composition') {
+                  toast.error(`Produto com regra "${rule}" nao necessita de ficha tecnica. Altere a regra de impacto em estoque do produto para recipe_composition.`);
+                  return;
+                }
+
                 mutation.mutate({
                   method: editing._id ? "put" : "post",
                   id: editing._id,

@@ -4,13 +4,14 @@ const Category = require("../models/categoryModel");
 const Recipe = require("../models/recipeModel");
 const { generateUniqueSku } = require("../utils/slugGenerator");
 const ws = require("../services/websocketService");
+const { computeProductReadinessStatus } = require("../services/productReadinessService");
 
 /**
  * Criar produto
  */
 const createProduct = async (req, res, next) => {
     try {
-        const { name, description, categoryId, price, variations, attributes, image, tags } = req.body;
+        const { name, description, categoryId, price, variations, attributes, image, tags, sellableType, stockImpactRule, directStockItem, directStockQuantity, directStockUnit } = req.body;
 
         // Validação de campos obrigatórios
         if (!name) {
@@ -51,7 +52,12 @@ const createProduct = async (req, res, next) => {
             description,
             category: categoryId,
             image,
-            tags: tags || []
+            tags: tags || [],
+            ...(sellableType && { sellableType }),
+            ...(stockImpactRule && { stockImpactRule }),
+            ...(directStockItem && { directStockItem }),
+            ...(directStockQuantity != null && { directStockQuantity }),
+            ...(directStockUnit && { directStockUnit })
         });
 
         // Adicionar variações se fornecidas, ou criar variação padrão
@@ -160,6 +166,7 @@ const getProducts = async (req, res, next) => {
             storeFilter.store = products[0].store;
         }
 
+        // Build recipe lookup for performance
         let productsWithActiveRecipe = new Set();
         if (storeFilter.store) {
             const activeRecipes = await Recipe.find({
@@ -174,15 +181,30 @@ const getProducts = async (req, res, next) => {
             }
         }
 
-        res.status(200).json({
-            success: true,
-            count: products.length,
-            data: products.map(p => ({
-                ...p.toObject(),
+        // Enrich each product with readiness and stock impact data
+        const enrichedData = await Promise.all(products.map(async (p) => {
+            const pObj = p.toObject();
+            const readiness = await computeProductReadinessStatus(p);
+            return {
+                ...pObj,
                 startingAt: p.startingAt,
                 hasVariations: p.hasVariations,
-                hasActiveRecipe: productsWithActiveRecipe.has(p._id.toString())
-            }))
+                hasActiveRecipe: productsWithActiveRecipe.has(p._id.toString()) || readiness.hasActiveRecipe,
+                sellableType: p.sellableType,
+                stockImpactRule: p.stockImpactRule,
+                directStockItem: p.directStockItem,
+                directStockQuantity: p.directStockQuantity,
+                directStockUnit: p.directStockUnit,
+                productReadinessStatus: readiness.status,
+                productReadinessLabel: readiness.label,
+                productReadinessReason: readiness.reason
+            };
+        }));
+
+        res.status(200).json({
+            success: true,
+            count: enrichedData.length,
+            data: enrichedData
         });
     } catch (error) {
         next(error);
@@ -211,6 +233,8 @@ const getProductById = async (req, res, next) => {
             return next(error);
         }
 
+        const readiness = await computeProductReadinessStatus(product);
+
         res.status(200).json({
             success: true,
             data: {
@@ -221,7 +245,15 @@ const getProductById = async (req, res, next) => {
                     store: product.store,
                     product: product._id,
                     isActive: true
-                }).then(r => !!r)
+                }).then(r => !!r) || readiness.hasActiveRecipe,
+                sellableType: product.sellableType,
+                stockImpactRule: product.stockImpactRule,
+                directStockItem: product.directStockItem,
+                directStockQuantity: product.directStockQuantity,
+                directStockUnit: product.directStockUnit,
+                productReadinessStatus: readiness.status,
+                productReadinessLabel: readiness.label,
+                productReadinessReason: readiness.reason
             }
         });
     } catch (error) {
@@ -273,7 +305,7 @@ const getProductBySku = async (req, res, next) => {
 const updateProduct = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const { name, description, categoryId, price, image, tags, isCurrent, isActive } = req.body;
+        const { name, description, categoryId, price, image, tags, isCurrent, isActive, sellableType, stockImpactRule, directStockItem, directStockQuantity, directStockUnit } = req.body;
 
         const product = await Product.findById(id);
 
@@ -309,6 +341,13 @@ const updateProduct = async (req, res, next) => {
                 isActive: true
             });
         }
+
+        // Atualizar campos de impacto em estoque (Fase 9.1A)
+        if (sellableType !== undefined) product.sellableType = sellableType;
+        if (stockImpactRule !== undefined) product.stockImpactRule = stockImpactRule;
+        if (directStockItem !== undefined) product.directStockItem = directStockItem;
+        if (directStockQuantity !== undefined) product.directStockQuantity = directStockQuantity;
+        if (directStockUnit !== undefined) product.directStockUnit = directStockUnit;
 
         // Atualizar categoria se fornecida
         if (categoryId) {

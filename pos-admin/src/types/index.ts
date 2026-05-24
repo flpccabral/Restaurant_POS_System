@@ -40,13 +40,22 @@ export interface Product {
   _id: string;
   name: string;
   description: string;
-  category: string;
+  category: string | { _id: string; name: string };
   price: number;
   isActive: boolean;
   isCurrent?: boolean;
   variations?: ProductVariation[];
   store: string;
   hasActiveRecipe?: boolean;
+  // Fase 9.1A — Regra de Impacto em Estoque
+  sellableType?: 'prepared_product' | 'industrialized_resale' | 'combo' | 'service_fee';
+  stockImpactRule?: 'recipe_composition' | 'stock_item_direct' | 'no_stock_impact' | 'combo_components';
+  directStockItem?: string | { _id: string; name: string };
+  directStockQuantity?: number;
+  directStockUnit?: string;
+  productReadinessStatus?: string;
+  productReadinessLabel?: string;
+  productReadinessReason?: string;
 }
 
 export interface ProductVariation {
@@ -73,6 +82,9 @@ export interface Ingredient {
   averageCost: number;
   minimumStock: number;
   isActive: boolean;
+  // Fase 9.1A
+  isSellableDirectly?: boolean;
+  itemType?: string;
 }
 
 export interface InventoryItem {

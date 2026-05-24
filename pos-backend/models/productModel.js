@@ -84,7 +84,32 @@ const productSchema = new mongoose.Schema({
     tags: [{
         type: String,
         trim: true
-    }]
+    }],
+    // Fase 9.1A — Regra de Impacto em Estoque
+    sellableType: {
+        type: String,
+        enum: ['prepared_product', 'industrialized_resale', 'combo', 'service_fee'],
+        default: 'prepared_product'
+    },
+    stockImpactRule: {
+        type: String,
+        enum: ['recipe_composition', 'stock_item_direct', 'no_stock_impact', 'combo_components'],
+        default: 'recipe_composition'
+    },
+    directStockItem: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'GlobalIngredient',
+        default: null
+    },
+    directStockQuantity: {
+        type: Number,
+        default: 1,
+        min: 0
+    },
+    directStockUnit: {
+        type: String,
+        default: null
+    }
 }, { timestamps: true });
 
 // Índices compostos
@@ -160,5 +185,44 @@ productSchema.path('variations').validate(function(variations) {
     const duplicates = names.filter((name, index) => names.indexOf(name) !== index);
     return duplicates.length === 0;
 }, 'Variation names must be unique within a product');
+
+// Validação de stockImpactRule
+productSchema.pre('validate', function(next) {
+    // stock_item_direct exige directStockItem, directStockQuantity > 0, directStockUnit
+    if (this.stockImpactRule === 'stock_item_direct') {
+        if (!this.directStockItem) {
+            this.invalidate('directStockItem', 'stock_item_direct requires a directStockItem');
+        }
+        if (!this.directStockQuantity || this.directStockQuantity <= 0) {
+            this.invalidate('directStockQuantity', 'stock_item_direct requires directStockQuantity > 0');
+        }
+        if (!this.directStockUnit) {
+            this.invalidate('directStockUnit', 'stock_item_direct requires a directStockUnit');
+        }
+    }
+
+    // no_stock_impact não deve ter directStockItem nem exigir Recipe
+    if (this.stockImpactRule === 'no_stock_impact') {
+        this.directStockItem = null;
+        this.directStockQuantity = 0;
+        this.directStockUnit = null;
+    }
+
+    // combo_components não deve ter directStockItem
+    if (this.stockImpactRule === 'combo_components') {
+        this.directStockItem = null;
+        this.directStockQuantity = 0;
+        this.directStockUnit = null;
+    }
+
+    // recipe_composition não deve ter directStockItem
+    if (this.stockImpactRule === 'recipe_composition') {
+        this.directStockItem = null;
+        this.directStockQuantity = 0;
+        this.directStockUnit = null;
+    }
+
+    next();
+});
 
 module.exports = mongoose.model("Product", productSchema);

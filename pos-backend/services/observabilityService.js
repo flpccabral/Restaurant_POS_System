@@ -350,9 +350,14 @@ const registerPurchase = async (storeId, data, userId) => {
 };
 
 /**
- * Gera alertas para produtos ativos sem ficha técnica (TASK 10 — Fase 8.4.2).
- * Varre todos os produtos ativos da loja e verifica se possuem Recipe.isActive=true.
- * Cria alertas do tipo 'product_without_recipe' por produto.
+ * Gera alertas para produtos com regras de impacto em estoque ausentes ou incompletas (Fase 9.1A).
+ *
+ * Regras por stockImpactRule:
+ *   recipe_composition  → verifica Recipe ativa; se faltar, cria product_without_recipe
+ *   stock_item_direct   → verifica directStockItem + qty > 0 + unit; se faltar, cria product_missing_stock_rule
+ *   no_stock_impact     → NÃO gera alerta (sem baixa intencional)
+ *   combo_components    → NÃO gera alerta (não implementado — retorna incomplete_config no checkout)
+ *   sem regra           → cria product_without_recipe (compatibilidade)
  */
 const checkProductsWithoutRecipe = async (storeId) => {
     const Product = mongoose.model('Product');
@@ -360,7 +365,7 @@ const checkProductsWithoutRecipe = async (storeId) => {
 
     const products = await Product.find({ store: storeId, isActive: true })
         .populate('category', 'name')
-        .select('name variations');
+        .select('name variations stockImpactRule directStockItem directStockQuantity directStockUnit');
 
     const recipes = await Recipe.find({ store: storeId, isActive: true })
         .select('product variation')
@@ -372,23 +377,89 @@ const checkProductsWithoutRecipe = async (storeId) => {
         recipeMap.set(`${r.product.toString()}:${r.variation}`, r);
     }
 
-    const missingRecipes = [];
+    const issues = [];
+    const productsWithoutRecipe = [];
+    const productsMissingStockRule = [];
+
     for (const product of products) {
-        const vars = product.variations || [];
-        if (vars.length === 0) {
-            missingRecipes.push({ productId: product._id, productName: product.name });
-        } else {
-            for (const v of vars) {
-                if (!v.isActive) continue;
-                const key = `${product._id.toString()}:${v.sku}`;
-                if (!recipeMap.has(key)) {
-                    missingRecipes.push({
+        const rule = product.stockImpactRule || 'recipe_composition';
+
+        switch (rule) {
+            case 'no_stock_impact':
+                // Sem baixa intencional — não gerar alerta
+                break;
+
+            case 'combo_components':
+                // Não implementado — o checkout já retorna incomplete_config
+                break;
+
+            case 'stock_item_direct': {
+                const hasValidConfig = product.directStockItem &&
+                    product.directStockQuantity > 0 &&
+                    product.directStockUnit;
+
+                if (!hasValidConfig) {
+                    issues.push({
+                        type: 'product_missing_stock_rule',
+                        severity: 'high',
                         productId: product._id,
                         productName: product.name,
-                        variationName: v.name,
-                        sku: v.sku
+                        reason: 'stock_item_direct sem configuracao valida (directStockItem, quantidade ou unidade)'
+                    });
+                    productsMissingStockRule.push({
+                        productId: product._id.toString(),
+                        productName: product.name,
+                        reason: 'missing_direct_config'
                     });
                 }
+                break;
+            }
+
+            case 'recipe_composition':
+            default: {
+                // Comportamento original: verificar Recipe ativa
+                const vars = product.variations || [];
+                let hasAnyRecipe = false;
+                const missingVariations = [];
+
+                if (vars.length === 0) {
+                    missingVariations.push({ variationName: null, sku: null });
+                } else {
+                    for (const v of vars) {
+                        if (!v.isActive) continue;
+                        const key = `${product._id.toString()}:${v.sku}`;
+                        if (recipeMap.has(key)) {
+                            hasAnyRecipe = true;
+                        } else {
+                            missingVariations.push({
+                                variationName: v.name,
+                                sku: v.sku
+                            });
+                        }
+                    }
+                }
+
+                if (!hasAnyRecipe) {
+                    for (const mv of missingVariations) {
+                        issues.push({
+                            type: 'product_without_recipe',
+                            severity: 'high',
+                            productId: product._id,
+                            productName: product.name,
+                            variationName: mv.variationName,
+                            sku: mv.sku,
+                            reason: 'recipe_composition sem ficha tecnica ativa'
+                        });
+                        productsWithoutRecipe.push({
+                            productId: product._id.toString(),
+                            productName: product.name,
+                            variationName: mv.variationName,
+                            sku: mv.sku,
+                            missingRecipe: true
+                        });
+                    }
+                }
+                break;
             }
         }
     }
@@ -396,21 +467,30 @@ const checkProductsWithoutRecipe = async (storeId) => {
     const generatedAlerts = [];
     const store = await mongoose.model('Store').findById(storeId).select('name').lean();
 
-    for (const item of missingRecipes) {
+    for (const item of issues) {
         try {
+            let message;
+            if (item.type === 'product_missing_stock_rule') {
+                message = `Produto '${item.productName}' possui regra stock_item_direct mas sem configuração válida em ${store?.name || 'loja'}. Defina directStockItem, quantidade e unidade para garantir baixa de estoque e CMV corretos.`;
+            } else {
+                message = `Produto '${item.productName}'${item.variationName ? ` (variação: ${item.variationName})` : ''} não possui ficha técnica ativa em ${store?.name || 'loja'}. Vendas deste produto não geram baixa de estoque nem CMV.`;
+            }
+
             const alert = await OperationalAlert.findOrCreate({
-                type: 'product_without_recipe',
-                severity: 'high',
+                type: item.type,
+                severity: item.severity,
                 store: storeId,
                 status: 'new',
-                message: `Produto '${item.productName}'${item.variationName ? ` (variação: ${item.variationName})` : ''} não possui ficha técnica ativa em ${store?.name || 'loja'}. Vendas deste produto não geram baixa de estoque nem CMV.`,
+                message,
                 currentValue: 1,
                 metadata: {
                     productId: item.productId?.toString(),
                     productName: item.productName,
                     variationName: item.variationName,
                     sku: item.sku,
-                    missingRecipe: true
+                    stockImpactRule: item.rule,
+                    reason: item.reason,
+                    missingRecipe: item.type === 'product_without_recipe'
                 }
             });
             generatedAlerts.push(alert);
@@ -419,12 +499,12 @@ const checkProductsWithoutRecipe = async (storeId) => {
         }
     }
 
-    // Also check for recipe-less products and create consolidated summary
     return {
         storeId,
         storeName: store?.name,
-        totalMissing: missingRecipes.length,
-        productsWithoutRecipe: missingRecipes,
+        totalMissing: issues.length,
+        productsWithoutRecipe,
+        productsMissingStockRule,
         alertsCreated: generatedAlerts.length,
         alerts: generatedAlerts
     };

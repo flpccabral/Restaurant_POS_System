@@ -304,6 +304,7 @@ const getOverview = async (req, res, next) => {
             newAlerts: alerts.filter(a => a.status === 'new').length,
             saleWithoutDeduction: alerts.filter(a => a.type === 'sale_without_stock_deduction').length,
             productsWithoutRecipe: alerts.filter(a => a.type === 'product_without_recipe').length,
+            productsMissingStockRule: alerts.filter(a => a.type === 'product_missing_stock_rule').length,
             pendingRecommendations,
             alerts: alerts.slice(0, 10)
         };

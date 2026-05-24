@@ -107,60 +107,221 @@ const processOrderStockDeduction = async ({ storeId, orderId, orderItems, userId
             cogs: 0,
             ingredientCosts: [],
             stockDeductionStatus: 'pending',
-            movements: []
+            movements: [],
+            stockImpactRule: null
         };
 
         try {
-            // 1. Encontrar ficha técnica
-            const recipe = await findRecipeForItem(storeId, item.product, item.variation);
+            // 0. Buscar produto para determinar regra de impacto em estoque
+            const product = await Product.findById(item.product).lean();
 
-            if (!recipe) {
-                itemResult.stockDeductionStatus = 'no_recipe';
+            if (!product) {
+                itemResult.stockDeductionStatus = 'error';
                 result.errors.push({
                     item: item.name,
-                    reason: `No active recipe found for product ${item.name}${item.variation ? ` (variation: ${item.variation})` : ''}`
+                    reason: `Product not found: ${item.name}`
                 });
                 result.items.push(itemResult);
                 continue;
             }
 
-            itemResult.recipeId = recipe._id.toString();
-            itemResult.recipeVersion = recipe.version;
+            const rule = product.stockImpactRule || 'recipe_composition';
+            itemResult.stockImpactRule = rule;
 
-            // 2. Simular consumo (validação pré-baixa)
-            const simulation = await simulateItemConsumption(recipe, item.quantity, storeLocation._id);
+            switch (rule) {
+                case 'recipe_composition': {
+                    // Comportamento atual: encontrar Recipe, simular, baixar
+                    const recipe = await findRecipeForItem(storeId, item.product, item.variation);
 
-            if (!simulation.allIngredientsAvailable) {
-                itemResult.stockDeductionStatus = 'insufficient_stock';
-                result.errors.push({
-                    item: item.name,
-                    reason: 'Insufficient stock',
-                    details: simulation.wouldFail
-                });
-                result.items.push(itemResult);
-                continue;
+                    if (!recipe) {
+                        itemResult.stockDeductionStatus = 'no_recipe';
+                        result.errors.push({
+                            item: item.name,
+                            reason: `No active recipe found for product ${item.name}${item.variation ? ` (variation: ${item.variation})` : ''}`
+                        });
+                        result.items.push(itemResult);
+                        continue;
+                    }
+
+                    itemResult.recipeId = recipe._id.toString();
+                    itemResult.recipeVersion = recipe.version;
+
+                    // 2. Simular consumo (validação pré-baixa)
+                    const simulation = await simulateItemConsumption(recipe, item.quantity, storeLocation._id);
+
+                    if (!simulation.allIngredientsAvailable) {
+                        itemResult.stockDeductionStatus = 'insufficient_stock';
+                        result.errors.push({
+                            item: item.name,
+                            reason: 'Insufficient stock',
+                            details: simulation.wouldFail
+                        });
+                        result.items.push(itemResult);
+                        continue;
+                    }
+
+                    // 3. Executar baixa transacional
+                    const deductionResult = await executeDeduction(
+                        recipe,
+                        item.quantity,
+                        storeId,
+                        storeLocation,
+                        orderId,
+                        item,
+                        userId,
+                        session
+                    );
+
+                    itemResult.cogs = deductionResult.totalCost;
+                    itemResult.ingredientCosts = deductionResult.ingredientCosts;
+                    itemResult.stockDeductionStatus = 'deducted';
+                    itemResult.movements = deductionResult.movements;
+
+                    result.totalCOGS += deductionResult.totalCost;
+                    break;
+                }
+
+                case 'stock_item_direct': {
+                    // Baixa direta de um item de estoque específico
+                    if (!product.directStockItem) {
+                        itemResult.stockDeductionStatus = 'error';
+                        result.errors.push({
+                            item: item.name,
+                            reason: `Product ${item.name} has stock_item_direct rule but no directStockItem configured`
+                        });
+                        result.items.push(itemResult);
+                        continue;
+                    }
+
+                    const StockBalance = mongoose.model('StockBalance');
+                    const StockMovement = mongoose.model('StockMovement');
+
+                    // Buscar ingrediente com averageCost
+                    const GlobalIngredient = mongoose.model('GlobalIngredient');
+                    const directIngredient = await GlobalIngredient.findById(product.directStockItem).lean();
+
+                    if (!directIngredient) {
+                        itemResult.stockDeductionStatus = 'error';
+                        result.errors.push({
+                            item: item.name,
+                            reason: `Direct stock ingredient not found for product ${item.name}`
+                        });
+                        result.items.push(itemResult);
+                        continue;
+                    }
+
+                    const qtyPerUnit = product.directStockQuantity || 1;
+                    const totalQty = qtyPerUnit * item.quantity;
+                    const deductionUnit = product.directStockUnit || directIngredient.baseUnit;
+
+                    // Buscar saldo no estoque local
+                    let stockBalance = await StockBalance.findOne({
+                        location: storeLocation._id,
+                        ingredient: directIngredient._id
+                    }).session(session);
+
+                    if (!stockBalance) {
+                        itemResult.stockDeductionStatus = 'error';
+                        result.errors.push({
+                            item: item.name,
+                            reason: `Stock balance not found for ingredient ${directIngredient.name}`
+                        });
+                        result.items.push(itemResult);
+                        continue;
+                    }
+
+                    if (stockBalance.balance < totalQty) {
+                        itemResult.stockDeductionStatus = 'insufficient_stock';
+                        result.errors.push({
+                            item: item.name,
+                            reason: `Insufficient stock for ${directIngredient.name}: available ${stockBalance.balance}, required ${totalQty} ${deductionUnit}`
+                        });
+                        result.items.push(itemResult);
+                        continue;
+                    }
+
+                    // Baixar saldo
+                    const balanceBefore = stockBalance.balance;
+                    stockBalance.balance -= totalQty;
+                    await stockBalance.save({ session });
+
+                    const itemCost = totalQty * (directIngredient.averageCost || 0);
+                    result.totalCOGS += itemCost;
+
+                    itemResult.cogs = itemCost;
+                    itemResult.ingredientCosts.push({
+                        ingredientId: directIngredient._id,
+                        ingredientName: directIngredient.name,
+                        quantity: totalQty,
+                        unit: deductionUnit,
+                        cost: Math.round(itemCost * 100) / 100,
+                        balanceBefore,
+                        balanceAfter: stockBalance.balance
+                    });
+
+                    // Registrar movimento
+                    const movement = await StockMovement.create([{
+                        store: storeId,
+                        location: storeLocation._id,
+                        ingredient: directIngredient._id,
+                        type: 'direct_sale_deduction',
+                        quantity: totalQty,
+                        unit: deductionUnit,
+                        balanceBefore,
+                        balanceAfter: stockBalance.balance,
+                        reason: `Baixa direta por venda — ${item.name} (Pedido ${orderId})`,
+                        reference: orderId,
+                        product: item.product,
+                        user: userId,
+                        metadata: {
+                            stockImpactRule: 'stock_item_direct',
+                            productId: item.product?.toString(),
+                            productName: item.name,
+                            directStockItem: directIngredient._id.toString(),
+                            directStockItemName: directIngredient.name,
+                            directStockQuantity: qtyPerUnit,
+                            directStockUnit: deductionUnit,
+                            orderId,
+                            orderItemId: item._id?.toString(),
+                            quantitySold: item.quantity,
+                            totalDeducted: totalQty,
+                            stockDeduction: 'automatic_sale_direct'
+                        }
+                    }], { session });
+
+                    itemResult.stockDeductionStatus = 'deducted';
+                    itemResult.movements.push(movement[0]._id);
+                    break;
+                }
+
+                case 'no_stock_impact': {
+                    // Sem baixa intencional — CMV = 0
+                    itemResult.stockDeductionStatus = 'not_applicable';
+                    itemResult.cogs = 0;
+                    result.items.push(itemResult);
+                    continue;
+                }
+
+                case 'combo_components': {
+                    // Combo não implementado — gerar alerta
+                    itemResult.stockDeductionStatus = 'incomplete_config';
+                    result.errors.push({
+                        item: item.name,
+                        reason: `Product ${item.name} has combo_components rule which is not implemented yet`
+                    });
+                    result.items.push(itemResult);
+                    continue;
+                }
+
+                default: {
+                    itemResult.stockDeductionStatus = 'error';
+                    result.errors.push({
+                        item: item.name,
+                        reason: `Unknown stockImpactRule '${rule}' for product ${item.name}`
+                    });
+                    result.items.push(itemResult);
+                }
             }
-
-            // 3. Executar baixa transacional
-            const deductionResult = await executeDeduction(
-                recipe,
-                item.quantity,
-                storeId,
-                storeLocation,
-                orderId,
-                item,
-                userId,
-                session
-            );
-
-            itemResult.cogs = deductionResult.totalCost;
-            itemResult.ingredientCosts = deductionResult.ingredientCosts;
-            itemResult.stockDeductionStatus = 'deducted';
-            itemResult.movements = deductionResult.movements;
-
-            result.totalCOGS += deductionResult.totalCost;
-            result.items.push(itemResult);
-
         } catch (error) {
             itemResult.stockDeductionStatus = 'error';
             result.errors.push({
@@ -174,8 +335,10 @@ const processOrderStockDeduction = async ({ storeId, orderId, orderItems, userId
     result.totalCOGS = Math.round(result.totalCOGS * 100) / 100;
 
     // Se houve erro em algum item, falhar a transação inteira
+    // "No active recipe", incomplete_config e unknown rule não bloqueiam a venda
+    const softErrorPatterns = ['No active recipe', 'combo_components rule which is not implemented', 'Unknown stockImpactRule'];
     const hasHardErrors = result.errors.some(e =>
-        e.reason && !e.reason.includes('No active recipe')
+        e.reason && !softErrorPatterns.some(p => e.reason.includes(p))
     );
 
     if (hasHardErrors) {
@@ -185,27 +348,43 @@ const processOrderStockDeduction = async ({ storeId, orderId, orderItems, userId
         );
     }
 
-    // GERAR ALERTAS para itens sem ficha técnica (TASK 11 — Fase 8.4.2)
+    // GERAR ALERTAS para itens com problemas de baixa de estoque
     // Executado fora da transação — não deve bloquear a venda
-    const noRecipeItems = result.items.filter(i => i.stockDeductionStatus === 'no_recipe');
-    if (noRecipeItems.length > 0) {
+    const problematicItems = result.items.filter(i =>
+        ['no_recipe', 'incomplete_config', 'error'].includes(i.stockDeductionStatus)
+    );
+    if (problematicItems.length > 0) {
         try {
-            const alerts = noRecipeItems.map(item => ({
-                type: 'sale_without_stock_deduction',
-                severity: 'critical',
-                store: storeId,
-                status: 'new',
-                message: `Venda realizada sem baixa de estoque — Produto '${item.productName}' (Pedido: ${orderId}) não possui ficha técnica ativa. CMV e saldo de estoque podem estar incorretos.`,
-                currentValue: item.quantity,
-                metadata: {
-                    orderId,
-                    productId: item.productId,
-                    productName: item.productName,
-                    quantity: item.quantity,
-                    reason: 'no_active_recipe',
-                    stockDeductionStatus: item.stockDeductionStatus
+            const alerts = problematicItems.map(item => {
+                let reason = 'no_active_recipe';
+                let message = `Venda realizada sem baixa de estoque — Produto '${item.productName}' (Pedido: ${orderId}) não possui ficha técnica ativa. CMV e saldo de estoque podem estar incorretos.`;
+
+                if (item.stockDeductionStatus === 'incomplete_config') {
+                    reason = 'incomplete_stock_rule';
+                    message = `Venda realizada sem baixa de estoque — Produto '${item.productName}' (Pedido: ${orderId}) possui regra de impacto incompleta (combo_components). CMV e saldo podem estar incorretos.`;
+                } else if (item.stockDeductionStatus === 'error') {
+                    reason = 'stock_deduction_error';
+                    message = `Venda realizada sem baixa de estoque — Produto '${item.productName}' (Pedido: ${orderId}) falhou na baixa: ${item.errors?.join(', ') || 'erro desconhecido'}. CMV e saldo podem estar incorretos.`;
                 }
-            }));
+
+                return {
+                    type: 'sale_without_stock_deduction',
+                    severity: 'critical',
+                    store: storeId,
+                    status: 'new',
+                    message,
+                    currentValue: item.quantity,
+                    metadata: {
+                        orderId,
+                        productId: item.productId,
+                        productName: item.productName,
+                        quantity: item.quantity,
+                        reason,
+                        stockDeductionStatus: item.stockDeductionStatus,
+                        stockImpactRule: item.stockImpactRule
+                    }
+                };
+            });
 
             // Create alerts in parallel (outside session, non-blocking)
             for (const alertData of alerts) {

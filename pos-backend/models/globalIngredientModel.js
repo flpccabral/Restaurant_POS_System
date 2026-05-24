@@ -47,12 +47,13 @@ const globalIngredientSchema = new mongoose.Schema({
         default: true
     },
     // Campos Fase 5.1A — produção interna e subprodutos
+    // Fase 9.1A — adicionado 'industrialized'
     itemType: {
         type: String,
-        enum: ['raw_material', 'prepared', 'byproduct', 'packaging', 'consumable'],
+        enum: ['raw_material', 'prepared', 'byproduct', 'packaging', 'consumable', 'industrialized'],
         default: 'raw_material',
         index: true,
-        comment: 'Tipo do item no estoque (Fase 5.1A)'
+        comment: 'Tipo do item no estoque (Fase 5.1A / 9.1A)'
     },
     productionState: {
         type: String,
@@ -71,6 +72,13 @@ const globalIngredientSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'GlobalIngredient',
         comment: 'Ingrediente bruto de origem para subprodutos/preparados (Fase 5.1A)'
+    },
+    // Fase 9.1A — pode ser vendido diretamente como stock_item_direct
+    isSellableDirectly: {
+        type: Boolean,
+        default: false,
+        index: true,
+        comment: 'True se pode ser vendido diretamente como stock_item_direct (Fase 9.1A)'
     },
     compatibleOperations: {
         type: [String],

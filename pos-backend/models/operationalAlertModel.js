@@ -25,6 +25,7 @@ const operationalAlertSchema = new mongoose.Schema({
             'refund_without_stock_reversal',
             'sale_without_stock_deduction',
             'product_without_recipe',
+            'product_missing_stock_rule',
             'purchase_registered'
         ],
         index: true
