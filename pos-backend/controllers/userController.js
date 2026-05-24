@@ -170,7 +170,15 @@ const getUserData = async (req, res, next) => {
         const user = await User.findById(req.user._id)
             .populate('store')
             .populate('role');
-        res.status(200).json({success: true, data: user});
+
+        const userObj = user.toObject();
+
+        // Flatten role permissions to top-level for frontend useCapabilities hook
+        if (userObj.role && userObj.role.permissions) {
+            userObj.rolePermissions = userObj.role.permissions;
+        }
+
+        res.status(200).json({success: true, data: userObj});
 
     } catch (error) {
         next(error);
