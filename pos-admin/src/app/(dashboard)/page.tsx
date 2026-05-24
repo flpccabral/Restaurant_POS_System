@@ -101,10 +101,13 @@ export default function DashboardPage() {
     new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-6 relative">
+      {/* Subtle decorative gradient glow behind header area */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[280px] bg-brand/5 rounded-full blur-[120px] pointer-events-none -z-10" />
+
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
+        <div className="relative">
           <h1 className="text-2xl font-bold text-foreground tracking-tight">Dashboard</h1>
           <p className="text-muted-foreground text-sm mt-0.5">
             Visao geral do desempenho operacional

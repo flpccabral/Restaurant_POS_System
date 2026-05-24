@@ -57,6 +57,8 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+  --shadow-card: var(--shadow-card-value);
+  --shadow-elevated: var(--shadow-elevated-value);
 }
 
 :root {
@@ -95,6 +97,8 @@
   --info: oklch(0.55 0.15 240);
   --info-foreground: oklch(0.985 0 0);
   --radius: 0.625rem;
+  --shadow-card-value: 0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.04);
+  --shadow-elevated-value: 0 4px 12px rgb(0 0 0 / 0.08), 0 0 0 1px rgb(0 0 0 / 0.02);
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
@@ -168,6 +172,8 @@
   --sidebar-ring: oklch(0.72 0.18 75 / 0.4);
 
   --radius: 0.625rem;
+  --shadow-card-value: 0 1px 3px 0 rgb(0 0 0 / 0.4), 0 0 0 1px rgb(255 255 255 / 0.03);
+  --shadow-elevated-value: 0 4px 16px rgb(0 0 0 / 0.5), 0 0 0 1px rgb(255 255 255 / 0.05);
 }
 
 @layer base {
@@ -179,5 +185,17 @@
   }
   html {
     @apply font-sans;
+  }
+}
+
+@layer utilities {
+  .shadow-card {
+    box-shadow: var(--shadow-card-value);
+  }
+  .shadow-elevated {
+    box-shadow: var(--shadow-elevated-value);
+  }
+  .hover\:shadow-elevated:hover {
+    box-shadow: var(--shadow-elevated-value);
   }
 }

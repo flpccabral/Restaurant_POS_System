@@ -88,9 +88,12 @@ export function Sidebar() {
       <nav className="flex flex-col gap-5 p-4">
         {navSections.map((section) => (
           <div key={section.label} className="flex flex-col gap-0.5">
-            <span className="px-3 pb-1 text-[10px] font-semibold text-sidebar-foreground/30 uppercase tracking-widest">
-              {section.label}
-            </span>
+            <div className="flex items-center gap-3 px-3 pb-1">
+              <span className="text-[10px] font-semibold text-sidebar-foreground/45 uppercase tracking-widest">
+                {section.label}
+              </span>
+              <span className="flex-1 h-px bg-sidebar-border/30" />
+            </div>
             {section.items.map((item) => {
               const isActive = pathname === item.href;
               return (
@@ -98,15 +101,15 @@ export function Sidebar() {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "relative flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150",
+                    "relative flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200",
                     isActive
-                      ? "text-brand bg-brand-muted"
-                      : "text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent"
+                      ? "text-brand bg-brand-muted shadow-[inset_0_1px_0_0_rgba(255,180,0,0.06)]"
+                      : "text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent hover:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.03)]"
                   )}
                 >
-                  {/* Active indicator */}
+                  {/* Active indicator — thicker bar with subtle glow */}
                   {isActive && (
-                    <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 rounded-full bg-brand" />
+                    <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-full bg-brand shadow-[0_0_8px_rgba(255,180,0,0.35)]" />
                   )}
                   <item.icon className={cn("h-4 w-4 shrink-0", isActive ? "text-brand" : "")} />
                   {item.label}

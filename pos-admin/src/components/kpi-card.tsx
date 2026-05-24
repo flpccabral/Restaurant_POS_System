@@ -10,9 +10,30 @@ interface KpiCardProps {
   color?: string;
 }
 
+/**
+ * Maps text color classes to subtle icon container backgrounds.
+ */
+const iconBgMap: Record<string, string> = {
+  "text-brand": "bg-brand-muted",
+  "text-success": "bg-success/10",
+  "text-warning": "bg-warning/10",
+  "text-critical": "bg-critical/10",
+  "text-info": "bg-info/10",
+};
+
 export function KpiCard({ title, value, icon: Icon, trend, color = "text-brand" }: KpiCardProps) {
+  // Derive the CSS variable name from the color prop (e.g. "text-brand" -> "brand")
+  const colorName = color.replace("text-", "");
+  const cssVar = `var(--${colorName})`;
+  const iconBgClass = iconBgMap[color] || "bg-brand-muted";
+
   return (
-    <Card className="group/card">
+    <Card className="group/card relative overflow-hidden">
+      {/* Colored top accent bar — gives each KPI card a scannable visual identity */}
+      <span
+        className="absolute inset-x-0 top-0 h-0.5"
+        style={{ backgroundColor: cssVar, opacity: 0.6 }}
+      />
       <CardContent className="p-5">
         <div className="flex items-start justify-between">
           <div className="space-y-2">
@@ -38,7 +59,7 @@ export function KpiCard({ title, value, icon: Icon, trend, color = "text-brand" 
           </div>
           <div className={cn(
             "flex items-center justify-center w-11 h-11 rounded-xl shrink-0",
-            "bg-brand-muted"
+            iconBgClass
           )}>
             <Icon className={cn("h-5 w-5", color)} />
           </div>
