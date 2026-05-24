@@ -13,7 +13,7 @@ import { KpiCard } from "@/components/kpi-card";
 import { StatusBadge } from "@/components/status-badge";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { EmptyState } from "@/components/shared/EmptyState";
-import { Skeleton } from "@/components/ui/skeleton";
+import { StatsGridSkeleton } from "@/components/ui/skeleton-loaders";
 
 export function OverviewTab() {
   const { storeId } = useStoreContext();
@@ -42,20 +42,14 @@ export function OverviewTab() {
   });
 
   if (!storeId) {
-    return <EmptyState title="Nenhuma loja" description="Nenhuma loja associada ao usuario." />;
+    return <EmptyState variant="empty" title="Nenhuma loja" description="Nenhuma loja associada ao usuario." />;
   }
 
   const isLoading = healthLoading || alertsLoading;
   const isError = healthError || alertsError;
 
   if (isLoading) {
-    return (
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <Skeleton key={i} className="h-[132px] rounded-xl" />
-        ))}
-      </div>
-    );
+    return <StatsGridSkeleton count={4} />;
   }
 
   if (isError) {

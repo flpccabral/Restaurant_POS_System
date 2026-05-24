@@ -66,6 +66,7 @@ export default function ConsolePage() {
     return (
       <div className="p-6">
         <EmptyState
+          variant="alert"
           title="Sem permissao"
           description="Voce nao tem permissao para visualizar o Console Operacional. Contate o administrador."
           icon={EyeOff}
@@ -79,6 +80,7 @@ export default function ConsolePage() {
     return (
       <div className="p-6">
         <EmptyState
+          variant="empty"
           title="Selecione uma loja"
           description="Como administrador sem loja fixa, selecione uma loja para visualizar o Console Operacional."
           icon={Store}

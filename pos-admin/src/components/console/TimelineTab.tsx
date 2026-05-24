@@ -8,7 +8,7 @@ import { StatusBadge } from "@/components/status-badge";
 import { FilterPills } from "@/components/shared/FilterPills";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { EmptyState } from "@/components/shared/EmptyState";
-import { Skeleton } from "@/components/ui/skeleton";
+import { FilterPillsSkeleton, TimelineSkeleton } from "@/components/ui/skeleton-loaders";
 import {
   ArrowUpFromLine,
   ArrowDownToLine,
@@ -51,22 +51,14 @@ export function TimelineTab() {
   });
 
   if (!storeId) {
-    return <EmptyState title="Nenhuma loja" description="Nenhuma loja associada ao usuario." />;
+    return <EmptyState variant="empty" title="Nenhuma loja" description="Nenhuma loja associada ao usuario." />;
   }
 
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <div className="flex gap-2">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-8 w-20 rounded-full" />
-          ))}
-        </div>
-        <div className="space-y-2">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="h-16 w-full rounded-lg" />
-          ))}
-        </div>
+        <FilterPillsSkeleton count={4} />
+        <TimelineSkeleton rows={6} />
       </div>
     );
   }
@@ -88,7 +80,7 @@ export function TimelineTab() {
       : events.filter((e) => e.type === typeFilter);
 
   if (events.length === 0) {
-    return <EmptyState title="Nenhum evento" description="Nenhum evento operacional registrado." />;
+    return <EmptyState variant="alert" title="Nenhum evento" description="Nenhum evento operacional registrado." />;
   }
 
   return (
@@ -101,7 +93,7 @@ export function TimelineTab() {
       />
 
       {filtered.length === 0 ? (
-        <EmptyState title="Nenhum evento" description="Nenhum evento com este filtro." />
+        <EmptyState variant="search" title="Nenhum evento" description="Nenhum evento com este filtro." />
       ) : (
         <div className="space-y-2">
           {filtered.map((event, idx) => {

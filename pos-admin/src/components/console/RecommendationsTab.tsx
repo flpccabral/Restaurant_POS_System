@@ -10,7 +10,7 @@ import { FilterPills } from "@/components/shared/FilterPills";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+import { FilterPillsSkeleton } from "@/components/ui/skeleton-loaders";
 import { Badge } from "@/components/ui/badge";
 import { Truck, ArrowLeftRight, ShoppingCart, Lightbulb } from "lucide-react";
 import { ConfirmActionModal } from "./ConfirmActionModal";
@@ -69,14 +69,24 @@ export function RecommendationsTab() {
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <div className="flex gap-2">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-8 w-20 rounded-full" />
-          ))}
-        </div>
+        <FilterPillsSkeleton count={4} />
         <div className="space-y-3">
           {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-24 w-full rounded-lg" />
+            <div
+              key={i}
+              className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 space-y-3"
+            >
+              <div className="flex items-center gap-2">
+                <div className="h-4 w-4 rounded-full bg-zinc-800/60 animate-pulse" />
+                <div className="h-4 w-20 rounded bg-zinc-800/60 animate-pulse" />
+                <div className="h-4 w-32 rounded bg-zinc-800/60 animate-pulse" />
+              </div>
+              <div className="h-3.5 w-3/4 rounded bg-zinc-800/60 animate-pulse" />
+              <div className="flex gap-4">
+                <div className="h-3 w-28 rounded bg-zinc-800/60 animate-pulse" />
+                <div className="h-3 w-24 rounded bg-zinc-800/60 animate-pulse" />
+              </div>
+            </div>
           ))}
         </div>
       </div>
@@ -190,6 +200,7 @@ export function RecommendationsTab() {
   if (recommendations.length === 0) {
     return (
       <EmptyState
+        variant="success"
         title="Nenhuma recomendacao"
         description="A rede esta com estoques saudaveis. Nenhuma recomendacao no momento."
       />
@@ -217,7 +228,7 @@ export function RecommendationsTab() {
 
       {/* Recommendation list */}
       {filtered.length === 0 ? (
-        <EmptyState title="Nenhuma recomendacao" description="Nenhuma recomendacao com este filtro." />
+        <EmptyState variant="search" title="Nenhuma recomendacao" description="Nenhuma recomendacao com este filtro." />
       ) : (
         <div className="space-y-3">
           {filtered.map((rec, idx) => {

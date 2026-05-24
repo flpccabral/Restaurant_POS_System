@@ -9,7 +9,7 @@ import { FilterPills } from "@/components/shared/FilterPills";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { Input } from "@/components/ui/input";
-import { Skeleton } from "@/components/ui/skeleton";
+import { FilterPillsSkeleton, TableSkeleton } from "@/components/ui/skeleton-loaders";
 import {
   Table,
   TableBody,
@@ -43,23 +43,14 @@ export function StockHealthTab() {
   });
 
   if (!storeId) {
-    return <EmptyState title="Nenhuma loja" description="Nenhuma loja associada ao usuario." />;
+    return <EmptyState variant="empty" title="Nenhuma loja" description="Nenhuma loja associada ao usuario." />;
   }
 
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <div className="flex gap-2">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <Skeleton key={i} className="h-8 w-20 rounded-full" />
-          ))}
-        </div>
-        <Skeleton className="h-10 w-72" />
-        <div className="space-y-2">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="h-12 w-full" />
-          ))}
-        </div>
+        <FilterPillsSkeleton count={5} />
+        <TableSkeleton rows={6} columns={7} search />
       </div>
     );
   }
@@ -86,7 +77,7 @@ export function StockHealthTab() {
   }, [ingredients, search, statusFilter]);
 
   if (ingredients.length === 0) {
-    return <EmptyState title="Nenhum ingrediente" description="Nenhum ingrediente com saldo cadastrado." />;
+    return <EmptyState variant="inventory" title="Nenhum ingrediente" description="Nenhum ingrediente com saldo cadastrado." />;
   }
 
   return (
@@ -115,7 +106,7 @@ export function StockHealthTab() {
 
       {/* Table */}
       {filtered.length === 0 ? (
-        <EmptyState title="Nenhum resultado" description="Nenhum ingrediente encontrado com este filtro." />
+        <EmptyState variant="search" title="Nenhum resultado" description="Nenhum ingrediente encontrado com este filtro." />
       ) : (
         <div className="rounded-lg border border-border overflow-hidden">
           <Table>

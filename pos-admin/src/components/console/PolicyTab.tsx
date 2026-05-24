@@ -11,7 +11,7 @@ import { ErrorState } from "@/components/shared/ErrorState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+import { FilterPillsSkeleton, TableSkeleton } from "@/components/ui/skeleton-loaders";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { PolicyFormModal } from "./PolicyFormModal";
 import {
@@ -141,17 +141,8 @@ export function PolicyTab() {
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <div className="flex gap-2">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-8 w-20 rounded-full" />
-          ))}
-        </div>
-        <Skeleton className="h-10 w-72" />
-        <div className="space-y-2">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <Skeleton key={i} className="h-12 w-full" />
-          ))}
-        </div>
+        <FilterPillsSkeleton count={4} />
+        <TableSkeleton rows={5} columns={11} search />
       </div>
     );
   }
@@ -208,6 +199,7 @@ export function PolicyTab() {
       {policies.length === 0 && !search && !priorityFilter && !activeFilter ? (
         <div className="space-y-4">
           <EmptyState
+            variant="inventory"
             title="Nenhuma politica cadastrada"
             description="Crie a primeira politica de estoque para comecar."
             actionLabel={canAdjust ? "Criar Politica" : undefined}
@@ -216,6 +208,7 @@ export function PolicyTab() {
         </div>
       ) : filtered.length === 0 ? (
         <EmptyState
+          variant="search"
           title="Nenhum resultado"
           description="Nenhuma politica encontrada com este filtro."
         />

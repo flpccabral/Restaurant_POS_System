@@ -11,7 +11,7 @@ import { FilterPills } from "@/components/shared/FilterPills";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+import { FilterPillsSkeleton, TimelineSkeleton } from "@/components/ui/skeleton-loaders";
 import { ConfirmActionModal } from "./ConfirmActionModal";
 import type { OperationalAlert } from "@/types";
 
@@ -57,22 +57,14 @@ export function AlertsTab() {
   const canAdjust = can("inventory", "adjust");
 
   if (!storeId) {
-    return <EmptyState title="Nenhuma loja" description="Nenhuma loja associada ao usuario." />;
+    return <EmptyState variant="empty" title="Nenhuma loja" description="Nenhuma loja associada ao usuario." />;
   }
 
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <div className="flex gap-2">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-8 w-20 rounded-full" />
-          ))}
-        </div>
-        <div className="space-y-2">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-20 w-full rounded-lg" />
-          ))}
-        </div>
+        <FilterPillsSkeleton count={4} />
+        <TimelineSkeleton rows={4} />
       </div>
     );
   }
@@ -133,7 +125,7 @@ export function AlertsTab() {
 
       {/* Alert list */}
       {alerts.length === 0 ? (
-        <EmptyState title="Nenhum alerta" description="Nenhum alerta encontrado com os filtros atuais." />
+        <EmptyState variant="search" title="Nenhum alerta" description="Nenhum alerta encontrado com os filtros atuais." />
       ) : (
         <div className="space-y-3">
           {alerts.map((alert) => (

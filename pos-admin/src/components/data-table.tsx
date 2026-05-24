@@ -11,7 +11,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Skeleton } from "@/components/ui/skeleton";
+import { TableSkeleton } from "@/components/ui/skeleton-loaders";
+import { EmptyState } from "@/components/shared/EmptyState";
 import { Plus, Search, Pencil, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -90,13 +91,7 @@ export function DataTable({
   const displayData = pageSize > 0 ? paginatedData : filtered;
 
   if (loading) {
-    return (
-      <div className="space-y-3">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <Skeleton key={i} className="h-10 w-full" />
-        ))}
-      </div>
-    );
+    return <TableSkeleton rows={5} columns={columns.length} />;
   }
 
   return (

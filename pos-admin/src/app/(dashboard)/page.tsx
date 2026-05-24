@@ -37,7 +37,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Skeleton } from "@/components/ui/skeleton";
+import { StatsGridSkeleton, TableSkeleton } from "@/components/ui/skeleton-loaders";
 import {
   LineChart,
   Line,
@@ -128,12 +128,10 @@ export default function DashboardPage() {
       </div>
 
       {/* KPI Row */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {kpisLoading ? (
-          Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-[132px] rounded-xl" />
-          ))
-        ) : (
+      {kpisLoading ? (
+        <StatsGridSkeleton count={4} />
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <>
             <KpiCard
               title="Faturamento"
@@ -166,8 +164,8 @@ export default function DashboardPage() {
               color={(kpis?.operational.activeAlerts || 0) > 0 ? "text-critical" : "text-success"}
             />
           </>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Secondary Metric Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -346,8 +344,8 @@ export default function DashboardPage() {
                 </TableBody>
               </Table>
             ) : (
-              <div className="px-4">
-                <Skeleton className="h-32 w-full" />
+              <div className="p-4">
+                <TableSkeleton rows={4} columns={3} />
               </div>
             )}
           </CardContent>
@@ -379,8 +377,8 @@ export default function DashboardPage() {
                 </TableBody>
               </Table>
             ) : (
-              <div className="px-4">
-                <Skeleton className="h-32 w-full" />
+              <div className="p-4">
+                <TableSkeleton rows={4} columns={3} />
               </div>
             )}
           </CardContent>
