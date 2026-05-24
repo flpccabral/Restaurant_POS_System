@@ -1,6 +1,21 @@
 import { cn } from "@/lib/utils";
 
 /* ------------------------------------------------------------------ */
+/*  Helpers                                                            */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Deterministic pseudo-random number seeded by an index.
+ * Replaces Math.random() to avoid SSR hydration mismatches.
+ */
+function hash(i: number, seed = 0): number {
+  let h = (i + seed) * 2654435761;
+  h = Math.imul(h ^ (h >>> 16), 2246822507);
+  h = Math.imul(h ^ (h >>> 13), 3266489909);
+  return (h >>> 0) / 4294967296;
+}
+
+/* ------------------------------------------------------------------ */
 /*  Base Skeleton helper                                               */
 /* ------------------------------------------------------------------ */
 
@@ -48,7 +63,7 @@ export function TableSkeleton({
             <Bone
               key={`h-${i}`}
               className="h-4 rounded"
-              style={{ width: `${50 + Math.random() * 30}%` }}
+              style={{ width: `${50 + hash(i) * 30}%` }}
             />
           ))}
         </div>
@@ -60,7 +75,7 @@ export function TableSkeleton({
                 <Bone
                   key={`c-${r}-${c}`}
                   className="h-4 rounded"
-                  style={{ width: `${40 + Math.random() * 50}%` }}
+                  style={{ width: `${40 + hash(r * columns + c) * 50}%` }}
                 />
               ))}
             </div>
@@ -162,7 +177,7 @@ export function FormSkeleton({
           <Bone className="h-3.5 w-28 rounded" />
           <Bone
             className="h-10 rounded-md"
-            style={{ width: `${60 + Math.random() * 40}%` }}
+            style={{ width: `${60 + hash(i) * 40}%` }}
           />
         </div>
       ))}
@@ -195,7 +210,7 @@ export function FilterPillsSkeleton({
         <Bone
           key={i}
           className="h-8 rounded-full"
-          style={{ width: `${60 + Math.random() * 40}px` }}
+          style={{ width: `${60 + hash(i) * 40}px` }}
         />
       ))}
     </div>
