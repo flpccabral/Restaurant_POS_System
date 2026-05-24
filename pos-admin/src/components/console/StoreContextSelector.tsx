@@ -90,7 +90,9 @@ export function StoreContextSelector() {
         >
           <div className="flex items-center gap-2">
             <Store className="h-3.5 w-3.5 text-brand shrink-0" />
-            <SelectValue placeholder="Selecione uma loja..." />
+            <SelectValue placeholder="Selecione uma loja...">
+              {store?.name}
+            </SelectValue>
           </div>
         </SelectTrigger>
         <SelectContent>
