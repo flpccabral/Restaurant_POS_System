@@ -44,7 +44,7 @@ export function StoreContextSelector() {
   if (!storeId) {
     return (
       <div className="flex items-center gap-2">
-        <Select onValueChange={(v: string | null) => { if (v !== null) setStoreId(v); }}>
+        <Select value={storeId ?? ""} onValueChange={(v) => { if (v) setStoreId(v); }}>
           <SelectTrigger className="w-56 h-8 text-xs border-dashed border-warning/50 text-warning">
             <SelectValue placeholder="Selecione uma loja..." />
           </SelectTrigger>
