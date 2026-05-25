@@ -33,10 +33,10 @@ const PdvFooterActions = () => {
 
   const buttons = [
     {
-      label: 'Funcoes',
-      icon: FiGrid,
-      onClick: () => navigate('/'),
-      active: isActive('/'),
+      label: 'PDV',
+      icon: FiShoppingBag,
+      onClick: () => navigate('/menu'),
+      active: isActive('/menu'),
       disabled: false,
     },
     {

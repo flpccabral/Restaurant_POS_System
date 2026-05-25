@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { FiSearch, FiBell, FiMonitor, FiGrid, FiLogOut } from 'react-icons/fi';
+import { FiSearch, FiBell, FiGrid, FiLogOut } from 'react-icons/fi';
 import { FaUserCircle } from 'react-icons/fa';
 import logo from '../../assets/images/logo.png';
 import { useSelector } from 'react-redux';
@@ -70,15 +70,6 @@ const Header = () => {
 
       {/* Right: Operator + Actions */}
       <div className="flex items-center gap-2">
-        {/* Console */}
-        <button
-          onClick={() => navigate('/console')}
-          className="p-2 hover:bg-white/10 rounded-lg transition-colors"
-          title="Console Operacional"
-        >
-          <FiMonitor size={18} />
-        </button>
-
         {/* Dashboard (Admin only) */}
         {userData.role === 'Admin' && (
           <button
