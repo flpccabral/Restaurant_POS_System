@@ -31,7 +31,9 @@ const orderItemSchema = new mongoose.Schema({
     productReadinessStatus: { type: String, comment: 'Status de prontidão do produto no momento da venda (Fase 9.1D)' },
     // Campos Fase 5.5 — reversão por item
     stockReversalStatus: { type: String, default: 'not_applicable', enum: ['not_applicable', 'reversed', 'partial'], comment: 'Reversão por item (Fase 5.5)' },
-    stockReversalMovements: [{ type: mongoose.Schema.Types.ObjectId, ref: 'StockMovement', comment: 'Movimentos de reversão do item (Fase 5.5)' }]
+    stockReversalMovements: [{ type: mongoose.Schema.Types.ObjectId, ref: 'StockMovement', comment: 'Movimentos de reversão do item (Fase 5.5)' }],
+    // Fase 9.3C — Observações do item
+    notes: { type: String, maxlength: 300, default: '', comment: 'Observação do item (ex: ponto da carne, alergias)' }
 }, { _id: true });
 
 const orderSchema = new mongoose.Schema({
@@ -73,7 +75,12 @@ const orderSchema = new mongoose.Schema({
     stockReversalStatus: { type: String, default: 'not_applicable', enum: ['not_applicable', 'pending', 'reversed', 'partial', 'failed'], comment: 'Status da reversão de estoque (Fase 5.5)' },
     stockReversedAt: { type: Date, comment: 'Timestamp da reversão (Fase 5.5)' },
     stockReversalReason: { type: String, maxlength: 500, comment: 'Motivo da reversão (Fase 5.5)' },
-    stockReversalMovements: [{ type: mongoose.Schema.Types.ObjectId, ref: 'StockMovement', comment: 'Movimentos de reversão (Fase 5.5)' }]
+    stockReversalMovements: [{ type: mongoose.Schema.Types.ObjectId, ref: 'StockMovement', comment: 'Movimentos de reversão (Fase 5.5)' }],
+    // Fase 9.3C — Evolução mínima do PDV
+    orderType: { type: String, enum: ['dine_in', 'counter', 'pickup', 'delivery'], default: 'dine_in', comment: 'Tipo de pedido (dine_in, counter, pickup, delivery)' },
+    paymentStatus: { type: String, enum: ['unpaid', 'partially_paid', 'paid', 'refunded'], default: 'unpaid', comment: 'Status financeiro do pedido' },
+    closeStatus: { type: String, enum: ['open', 'closing', 'closed'], default: 'open', comment: 'Status de fechamento da conta' },
+    observations: { type: String, maxlength: 500, default: '', comment: 'Observações gerais do pedido' }
 }, { timestamps: true });
 
 // Compound index for efficient store-scoped order queries

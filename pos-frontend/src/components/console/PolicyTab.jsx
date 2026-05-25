@@ -218,7 +218,7 @@ const PolicyTab = () => {
                 <th className="py-3 px-3">Localizacao</th>
                 <th className="py-3 px-3">Ingrediente</th>
                 <th className="py-3 px-3 text-right">Min</th>
-                <th className="py-3 px-3 text-right">Reorder</th>
+                <th className="py-3 px-3 text-right">Ressuprimento</th>
                 <th className="py-3 px-3 text-right">Ideal</th>
                 <th className="py-3 px-3 text-right">Max</th>
                 <th className="py-3 px-3">Unidade</th>

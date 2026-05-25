@@ -1,62 +1,52 @@
-import React, { useEffect } from "react";
-import BottomNav from "../components/shared/BottomNav";
-import BackButton from "../components/shared/BackButton";
-import { MdRestaurantMenu } from "react-icons/md";
-import MenuContainer from "../components/menu/MenuContainer";
-import CustomerInfo from "../components/menu/CustomerInfo";
-import CartInfo from "../components/menu/CartInfo";
-import Bill from "../components/menu/Bill";
-import { useSelector } from "react-redux";
+import React, { useEffect } from 'react';
+import PdvFooterActions from '../components/pdv/PdvFooterActions';
+import MenuContainer from '../components/menu/MenuContainer';
+import CustomerInfo from '../components/menu/CustomerInfo';
+import CartInfo from '../components/menu/CartInfo';
+import Bill from '../components/menu/Bill';
+import { useSelector } from 'react-redux';
+import PdvModeBadge from '../components/pdv/PdvModeBadge';
 
 const Menu = () => {
-
-    useEffect(() => {
-      document.title = "POS | Menu"
-    }, [])
+  useEffect(() => {
+    document.title = 'POS | PDV';
+  }, []);
 
   const customerData = useSelector((state) => state.customer);
 
   return (
-    <section className="bg-[#1f1f1f] h-[calc(100vh-5rem)] overflow-hidden flex gap-3">
-      {/* Left Div */}
-      <div className="flex-[3]">
-        <div className="flex items-center justify-between px-10 py-4">
-          <div className="flex items-center gap-4">
-            <BackButton />
-            <h1 className="text-[#f5f5f5] text-2xl font-bold tracking-wider">
-              Menu
-            </h1>
+    <section className="h-[calc(100vh-3.5rem)] bg-gray-100 overflow-hidden flex flex-col">
+      <div className="flex-1 flex overflow-hidden">
+        {/* ===== LEFT PANEL — Cart & Totals (fixed width) ===== */}
+        <div className="w-[380px] bg-white border-r border-gray-200 flex flex-col flex-shrink-0 shadow-sm">
+          {/* Mini mode badge for mobile */}
+          <div className="flex-shrink-0 px-4 pt-3 pb-1 md:hidden">
+            <PdvModeBadge
+              orderType={customerData.orderType}
+              tableNo={customerData.table?.tableNo}
+            />
           </div>
-          <div className="flex items-center justify-around gap-4">
-            <div className="flex items-center gap-3 cursor-pointer">
-              <MdRestaurantMenu className="text-[#f5f5f5] text-4xl" />
-              <div className="flex flex-col items-start">
-                <h1 className="text-md text-[#f5f5f5] font-semibold tracking-wide">
-                  {customerData.customerName || "Customer Name"}
-                </h1>
-                <p className="text-xs text-[#ababab] font-medium">
-                  Table : {customerData.table?.tableNo || "N/A"}
-                </p>
-              </div>
-            </div>
+
+          {/* Customer summary */}
+          <div className="flex-shrink-0">
+            <CustomerInfo />
           </div>
+
+          {/* Cart items — scrollable */}
+          <CartInfo />
+
+          {/* Totals + Payment — fixed at bottom */}
+          <Bill />
         </div>
 
-        <MenuContainer />
-      </div>
-      {/* Right Div */}
-      <div className="flex-[1] bg-[#1a1a1a] mt-4 mr-3 h-[780px] rounded-lg pt-2">
-        {/* Customer Info */}
-        <CustomerInfo />
-        <hr className="border-[#2a2a2a] border-t-2" />
-        {/* Cart Items */}
-        <CartInfo />
-        <hr className="border-[#2a2a2a] border-t-2" />
-        {/* Bills */}
-        <Bill />
+        {/* ===== RIGHT PANEL — Categories + Products ===== */}
+        <div className="flex-1 flex flex-col overflow-hidden bg-gray-50">
+          <MenuContainer />
+        </div>
       </div>
 
-      <BottomNav />
+      {/* ===== OPERATIONAL FOOTER (Area 5) ===== */}
+      <PdvFooterActions />
     </section>
   );
 };

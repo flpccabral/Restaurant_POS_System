@@ -54,7 +54,7 @@ const Register = ({setIsRegister}) => {
       <form onSubmit={handleSubmit}>
         <div>
           <label className="block text-[#ababab] mb-2 text-sm font-medium">
-            Employee Name
+            Nome do funcionário
           </label>
           <div className="flex item-center rounded-lg p-5 px-4 bg-[#1f1f1f]">
             <input
@@ -62,7 +62,7 @@ const Register = ({setIsRegister}) => {
               name="name"
               value={formData.name}
               onChange={handleChange}
-              placeholder="Enter employee name"
+              placeholder="Digite o nome"
               className="bg-transparent flex-1 text-white focus:outline-none"
               required
             />
@@ -70,7 +70,7 @@ const Register = ({setIsRegister}) => {
         </div>
         <div>
           <label className="block text-[#ababab] mb-2 mt-3 text-sm font-medium">
-            Employee Email
+            E-mail do funcionário
           </label>
           <div className="flex item-center rounded-lg p-5 px-4 bg-[#1f1f1f]">
             <input
@@ -78,7 +78,7 @@ const Register = ({setIsRegister}) => {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              placeholder="Enter employee email"
+              placeholder="Digite o e-mail"
               className="bg-transparent flex-1 text-white focus:outline-none"
               required
             />
@@ -86,7 +86,7 @@ const Register = ({setIsRegister}) => {
         </div>
         <div>
           <label className="block text-[#ababab] mb-2 mt-3 text-sm font-medium">
-            Employee Phone
+            Telefone do funcionário
           </label>
           <div className="flex item-center rounded-lg p-5 px-4 bg-[#1f1f1f]">
             <input
@@ -94,7 +94,7 @@ const Register = ({setIsRegister}) => {
               name="phone"
               value={formData.phone}
               onChange={handleChange}
-              placeholder="Enter employee phone"
+              placeholder="Digite o telefone"
               className="bg-transparent flex-1 text-white focus:outline-none"
               required
             />
@@ -102,7 +102,7 @@ const Register = ({setIsRegister}) => {
         </div>
         <div>
           <label className="block text-[#ababab] mb-2 mt-3 text-sm font-medium">
-            Password
+            Senha
           </label>
           <div className="flex item-center rounded-lg p-5 px-4 bg-[#1f1f1f]">
             <input
@@ -110,7 +110,7 @@ const Register = ({setIsRegister}) => {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              placeholder="Enter password"
+              placeholder="Digite a senha"
               className="bg-transparent flex-1 text-white focus:outline-none"
               required
             />
@@ -118,11 +118,11 @@ const Register = ({setIsRegister}) => {
         </div>
         <div>
           <label className="block text-[#ababab] mb-2 mt-3 text-sm font-medium">
-            Choose your role
+            Escolha o cargo
           </label>
 
           <div className="flex item-center gap-3 mt-4">
-            {["Waiter", "Cashier", "Admin"].map((role) => {
+            {["Garçom", "Caixa", "Administrador"].map((role) => {
               return (
                 <button
                   key={role}
@@ -143,7 +143,7 @@ const Register = ({setIsRegister}) => {
           type="submit"
           className="w-full rounded-lg mt-6 py-3 text-lg bg-yellow-400 text-gray-900 font-bold"
         >
-          Sign up
+          Cadastrar
         </button>
       </form>
     </div>

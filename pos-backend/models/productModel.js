@@ -136,6 +136,14 @@ productSchema.virtual('hasVariations').get(function() {
     return this.variations && this.variations.length > 0;
 });
 
+// Virtual para expor o menor preço ativo como root price (PDV e diagnostics)
+productSchema.virtual('price').get(function() {
+    if (!this.variations || this.variations.length === 0) return null;
+    const activeVars = this.variations.filter(v => v.isActive !== false);
+    if (activeVars.length === 0) return null;
+    return Math.min(...activeVars.map(v => v.price));
+});
+
 // Método para gerar SKU baseado no nome do produto e variação
 productSchema.methods.generateSku = function(variationName) {
     const normalize = (str) => str

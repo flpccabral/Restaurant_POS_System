@@ -4,6 +4,9 @@ const { default: mongoose } = require("mongoose");
 const ws = require("../services/websocketService");
 const orderCheckoutService = require("../services/orderCheckoutService");
 const OperationalAlert = require("../models/operationalAlertModel");
+const KDSOrder = require("../models/kdsOrderModel");
+const KDSConfig = require("../models/kdsConfigModel");
+const Table = require("../models/tableModel");
 
 /**
  * MULTI-TENANCY FIX: Helper to build store-scoped filter
@@ -18,18 +21,150 @@ const storeFilter = (req) => {
   return storeRef ? { store: storeRef } : {};
 };
 
+/**
+ * Sincroniza um Order recem-criado para o KDS (colecao kds_orders).
+ * Fire-and-forget — falhas aqui nao bloqueiam a venda.
+ */
+const syncOrderToKds = async (order, storeRef, io) => {
+  try {
+    const config = await KDSConfig.getStoreConfig(storeRef);
+
+    // Fetch table number since order.table is an unpopulated ObjectId
+    let tableNumber = null;
+    if (order.table) {
+      const Table = mongoose.model('Table');
+      const tableDoc = await Table.findById(order.table).select('tableNo').lean();
+      tableNumber = tableDoc?.tableNo;
+    }
+
+    // Build category -> station map from KDS config
+    const Product = mongoose.model('Product');
+    const productIds = order.items
+      .filter(item => item.product)
+      .map(item => item.product);
+    const products = productIds.length > 0
+      ? await Product.find({ _id: { $in: productIds } }).select('category').lean()
+      : [];
+    const productCategoryMap = {};
+    for (const p of products) {
+      productCategoryMap[p._id.toString()] = p.category?.toString();
+    }
+
+    // Category -> station routing
+    const categoryStationMap = {};
+    const activeStations = (config.stations || []).filter(s => s.isActive && s.autoRouteItems);
+    for (const station of activeStations) {
+      for (const catId of (station.itemCategories || [])) {
+        categoryStationMap[catId.toString()] = station.id;
+      }
+    }
+
+    const resolveStation = (productId) => {
+      if (!productId) return config.defaultStation || 'kitchen';
+      const catId = productCategoryMap[productId.toString()];
+      if (!catId) return config.defaultStation || 'kitchen';
+      return categoryStationMap[catId] || config.defaultStation || 'kitchen';
+    };
+
+    // Fase 9.3C: Map orderType to KDS orderType format (dine_in -> dine-in)
+    const orderType = order.orderType || 'dine_in';
+    const kdsOrderType = orderType === 'dine_in' ? 'dine-in' :
+                         orderType === 'counter' ? 'counter' :
+                         orderType === 'pickup' ? 'pickup' :
+                         orderType === 'delivery' ? 'delivery' : 'dine-in';
+
+    // Fase 9.3D: Route items to correct station based on product category
+    // Items without a matching station category go to default (kitchen)
+    const items = order.items
+      .filter(item => item.name || item.productName)
+      .map(item => ({
+        orderItem: item._id,
+        productId: item.product || undefined,
+        productName: item.name || item.productName,
+        quantity: item.quantity || 1,
+        station: resolveStation(item.product),
+        prepTimeMinutes: config.slaSettings?.defaultPrepTime || 15,
+        notes: item.notes || '',
+        modifiers: item.modifiers || []
+      }));
+
+    if (items.length === 0) {
+      console.warn(`[orderController] KDS sync skipped for order ${order._id}: no items with valid name`);
+      return;
+    }
+
+    const kdsOrder = await KDSOrder.create({
+      store: storeRef,
+      order: order._id,
+      orderNumber: `#${Math.floor(new Date(order.orderDate).getTime())}`,
+      table: order.table?._id || order.table,
+      tableNumber,
+      customerName: order.customerDetails?.name,
+      orderType: kdsOrderType,
+      items,
+      estimatedReady: new Date(Date.now() + (config.slaSettings?.defaultPrepTime || 15) * 60000),
+      metadata: {
+        channel: 'pos',
+        notes: order.observations || ''
+      }
+    });
+
+    if (io) {
+      io.to(`store:${storeRef}`).emit('kds:order-synced', {
+        kdsOrderId: kdsOrder.kdsOrderId,
+        orderNumber: kdsOrder.orderNumber,
+        tableNumber: kdsOrder.tableNumber,
+        itemsCount: kdsOrder.items.length,
+        timestamp: new Date().toISOString()
+      });
+    }
+  } catch (err) {
+    console.error(`[orderController] KDS sync failed for order ${order._id}: ${err.message}`);
+  }
+};
+
 const addOrder = async (req, res, next) => {
   try {
     // MULTI-TENANCY LOCK: Force the order to belong to the authenticated user's store
-    const order = new Order({
-      ...req.body,
-      store: req.storeId || req.user.store,
-    });
+    const storeRef = req.storeId || req.user.store;
+    const orderData = { ...req.body, store: storeRef };
+
+    // Fase 9.3C: Set defaults for new fields
+    if (!orderData.orderType) orderData.orderType = 'dine_in';
+    if (!orderData.paymentStatus) orderData.paymentStatus = 'unpaid';
+    if (!orderData.closeStatus) orderData.closeStatus = 'open';
+
+    const order = new Order(orderData);
     await order.save();
+
+    // Fase 9.3C: Update table association — accept Booked tables, point currentOrder to latest order
+    if (order.table) {
+      try {
+        // Find the table first to check current status
+        const table = await Table.findById(order.table);
+        if (table) {
+          const updateData = { currentOrder: order._id };
+          // Only set to Booked if table was Available (if already Booked, keep it Booked)
+          if (table.status === 'Available') {
+            updateData.status = 'Booked';
+          }
+          await Table.findOneAndUpdate(
+            { _id: order.table, store: storeRef },
+            updateData,
+            { new: true }
+          );
+        }
+      } catch (tableErr) {
+        console.error(`[orderController] Table booking failed for table ${order.table}: ${tableErr.message}`);
+      }
+    }
 
     // Emit WebSocket event
     const io = req.app.get('io');
     ws.emitOrderCreated(io, order);
+
+    // Sync to KDS (fire-and-forget) — pass orderType to KDS sync
+    syncOrderToKds(order, storeRef, io);
 
     res
       .status(201)
@@ -104,6 +239,44 @@ const updateOrder = async (req, res, next) => {
     // If status changed, emit specific event (now uses corrected 'store' field)
     if (oldStatus !== orderStatus) {
       ws.emitOrderStatusChanged(io, order.store, order, oldStatus);
+
+      // Sync KDS status when order status changes
+      if (orderStatus === 'Ready') {
+        try {
+          const kdsOrder = await KDSOrder.findOne({ order: order._id });
+          if (kdsOrder && kdsOrder.status !== 'ready' && kdsOrder.status !== 'served') {
+            await kdsOrder.markReady();
+            io.to(`store:${order.store}`).emit('kds:order-ready', {
+              kdsOrderId: kdsOrder.kdsOrderId,
+              orderNumber: kdsOrder.orderNumber,
+              tableNumber: kdsOrder.tableNumber,
+              timestamp: new Date().toISOString()
+            });
+          }
+        } catch (kdsErr) {
+          console.error(`[orderController] KDS status sync failed for order ${id}: ${kdsErr.message}`);
+        }
+      }
+
+      // When order is finalized/completed, mark KDS as served
+      if (orderStatus === 'completed') {
+        try {
+          const kdsOrder = await KDSOrder.findOne({ order: order._id });
+          if (kdsOrder && kdsOrder.status !== 'served') {
+            await kdsOrder.markServed();
+            io.to(`store:${order.store}`).emit('kds:order-served', {
+              kdsOrderId: kdsOrder.kdsOrderId,
+              orderNumber: kdsOrder.orderNumber,
+              timestamp: new Date().toISOString()
+            });
+          }
+        } catch (kdsErr) {
+          console.error(`[orderController] KDS status sync failed for order ${id}: ${kdsErr.message}`);
+        }
+
+        // Fase 9.3C: Table release removed from here — table is only released by PDV closing/payment
+        // dine-in tables stay Booked after KDS served; counter/pickup have no table
+      }
     }
 
     res

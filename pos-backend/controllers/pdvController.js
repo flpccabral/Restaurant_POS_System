@@ -3,6 +3,7 @@ const createHttpError = require("http-errors");
 const CashSession = require("../models/cashSessionModel");
 const Payment = require("../models/paymentModel");
 const Order = require("../models/orderModel");
+const Table = require("../models/tableModel");
 const SessionLog = require("../models/sessionLogModel");
 const orderCheckoutService = require("../services/orderCheckoutService");
 const stockReversalService = require("../services/stockReversalService");
@@ -309,7 +310,31 @@ const processPayment = async (req, res, next) => {
         // Atualizar pedido
         order.orderStatus = 'paid';
         order.paymentMethod = method;
+        // Fase 9.3C: Payment also updates paymentStatus and closeStatus
+        order.paymentStatus = 'paid';
+        order.closeStatus = 'closed';
         await order.save();
+
+        // Fase 9.3C: Release table when payment is processed (dine-in orders)
+        if (order.table) {
+            try {
+                await Table.findOneAndUpdate(
+                    { _id: order.table, store: storeRef },
+                    { status: "Available", $unset: { currentOrder: "" } }
+                );
+                // Emit WebSocket event for table release
+                const io_table = req.app.get('io');
+                if (io_table) {
+                    io_table.to(`store:${storeRef}`).emit('table:released', {
+                        tableId: order.table.toString(),
+                        orderId: order._id.toString(),
+                        timestamp: new Date().toISOString()
+                    });
+                }
+            } catch (tableErr) {
+                console.error(`[pdvController] Failed to release table ${order.table}: ${tableErr.message}`);
+            }
+        }
 
         // Log
         await SessionLog.create({

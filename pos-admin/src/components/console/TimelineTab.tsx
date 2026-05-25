@@ -20,6 +20,47 @@ import {
 } from "lucide-react";
 import type { TimelineEvent } from "@/types";
 
+const eventTypeLabels: Record<string, string> = {
+  // Movement types (StockMovement.type)
+  purchase_receipt: "Recebimento de Compra",
+  transfer_out: "Transferência Enviada",
+  transfer_in: "Transferência Recebida",
+  recipe_deduction: "Dedução de Receita",
+  adjustment: "Ajuste Manual",
+  waste: "Desperdício",
+  inventory_count_adjustment: "Ajuste de Inventário",
+  production_consumption: "Consumo de Produção",
+  production_output: "Saída de Produção",
+  production_byproduct: "Subproduto Gerado",
+  production_waste: "Resíduo de Produção",
+  recipe_deduction_reversal: "Reversão de Dedução",
+  direct_sale_deduction: "Dedução de Venda Direta",
+
+  // Production types
+  production_completed: "Produção Concluída",
+
+  // Alert types (OperationalAlert.type)
+  stockout: "Estoque Zerado",
+  critical_stock: "Estoque Crítico",
+  low_stock: "Estoque Baixo",
+  excess_stock: "Estoque Excedente",
+  dead_stock: "Estoque Parado",
+  no_policy: "Sem Política Definida",
+  byproduct_available: "Subproduto Disponível",
+  replenishment_needed: "Reabastecimento Necessário",
+  transfer_recommended: "Transferência Recomendada",
+  refund_without_stock_reversal: "Reembolso sem Estorno",
+  sale_without_stock_deduction: "Venda sem Baixa",
+  product_without_recipe: "Produto sem Ficha Técnica",
+  product_missing_stock_rule: "Regra de Estoque Ausente",
+  purchase_registered: "Compra Registrada",
+
+  // Top-level types (fallback)
+  movement: "Movimentação",
+  production: "Produção",
+  alert: "Alerta",
+};
+
 const eventTypeIcons: Record<string, React.ReactNode> = {
   addition: <Plus className="h-4 w-4 text-success" />,
   deduction: <Minus className="h-4 w-4 text-critical" />,
@@ -113,7 +154,7 @@ export function TimelineTab() {
                 <div className="flex-1 min-w-0 space-y-0.5">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-sm font-medium text-foreground/90">
-                      {(event.eventType || event.type).replace(/_/g, " ")}
+                      {eventTypeLabels[event.eventType] || eventTypeLabels[event.type] || (event.eventType || event.type).replace(/_/g, " ")}
                     </span>
                     {event.severity && (
                       <StatusBadge status={event.severity} />
@@ -143,7 +184,7 @@ export function TimelineTab() {
                   {event.type === "production" && (
                     <div className="text-xs text-muted-foreground">
                       <span>
-                        Outputs:{" "}
+                        Saidas:{" "}
                         {event.outputs
                           ?.map((o) => `${o.ingredient} (${o.quantity}${o.unit})`)
                           .join(", ") || "-"}

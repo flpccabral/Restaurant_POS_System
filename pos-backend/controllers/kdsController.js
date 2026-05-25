@@ -3,6 +3,7 @@ const createHttpError = require("http-errors");
 const KDSConfig = require("../models/kdsConfigModel");
 const KDSOrder = require("../models/kdsOrderModel");
 const Order = require("../models/orderModel");
+const Table = require("../models/tableModel");
 const ws = require("../services/websocketService");
 
 /**
@@ -228,6 +229,13 @@ const markOrderReady = async (req, res, next) => {
 
         await order.markReady();
 
+        // Atualizar Order do PDV para "Ready"
+        try {
+            await Order.findByIdAndUpdate(order.order, { orderStatus: 'Ready' });
+        } catch (err) {
+            console.error(`[kdsController] Failed to sync PDV order ${order.order} to Ready: ${err.message}`);
+        }
+
         // Emit WebSocket event
         const io = req.app.get('io');
         io.to(`store:${order.store}`).emit('kds:order-ready', {
@@ -254,27 +262,61 @@ const markOrderServed = async (req, res, next) => {
     try {
         const { id } = req.params;
 
-        const order = await KDSOrder.findOne({ kdsOrderId: id });
+        const kdsOrder = await KDSOrder.findOne({ kdsOrderId: id });
 
-        if (!order) {
+        if (!kdsOrder) {
             const error = createHttpError(404, "KDS order not found!");
             return next(error);
         }
 
-        await order.markServed();
+        await kdsOrder.markServed();
+
+        // Atualizar Order do PDV para "completed"
+        try {
+            await Order.findByIdAndUpdate(kdsOrder.order, { orderStatus: 'completed' });
+        } catch (err) {
+            console.error(`[kdsController] Failed to sync PDV order ${kdsOrder.order} to completed: ${err.message}`);
+        }
 
         // Emit WebSocket event
         const io = req.app.get('io');
-        io.to(`store:${order.store}`).emit('kds:order-served', {
-            kdsOrderId: order.kdsOrderId,
-            orderNumber: order.orderNumber,
+
+        // Fase 9.3C: Conditional table release based on orderType
+        // dine_in: KDS served marks order as completed but does NOT release table
+        // counter/pickup: no table involved, release is a no-op
+        // Table release for dine_in is handled by PDV closing/payment endpoint
+        const orderType = kdsOrder.orderType || 'dine-in';
+        if (orderType === 'dine-in' && kdsOrder.table) {
+            // Dine-in: do NOT release table — it stays Booked until PDV closing
+            // Only update orderStatus to completed (done above)
+            console.log(`[kdsController] Dine-in order ${kdsOrder.kdsOrderId} served — table ${kdsOrder.tableNumber} NOT released (will be released by PDV closing)`);
+        } else if (kdsOrder.table) {
+            // Non-dine-in with table reference: clean up but this shouldn't normally happen
+            try {
+                await Table.findOneAndUpdate(
+                    { _id: kdsOrder.table, store: kdsOrder.store },
+                    { status: "Available", $unset: { currentOrder: "" } }
+                );
+                io.to(`store:${kdsOrder.store}`).emit('table:released', {
+                    tableId: kdsOrder.table,
+                    tableNumber: kdsOrder.tableNumber,
+                    timestamp: new Date().toISOString()
+                });
+            } catch (tableErr) {
+                console.error(`[kdsController] Failed to release table ${kdsOrder.table}: ${tableErr.message}`);
+            }
+        }
+
+        io.to(`store:${kdsOrder.store}`).emit('kds:order-served', {
+            kdsOrderId: kdsOrder.kdsOrderId,
+            orderNumber: kdsOrder.orderNumber,
             timestamp: new Date().toISOString()
         });
 
         res.status(200).json({
             success: true,
             message: "Order marked as served!",
-            data: order
+            data: kdsOrder
         });
     } catch (error) {
         next(error);
@@ -370,7 +412,7 @@ const syncOrderToKDS = async (req, res, next) => {
         const { orderId } = req.body;
 
         const order = await Order.findById(orderId)
-            .populate('table', 'name number');
+            .populate('table', 'name tableNo');
 
         if (!order) {
             const error = createHttpError(404, "Order not found!");
@@ -384,36 +426,62 @@ const syncOrderToKDS = async (req, res, next) => {
 
         if (kdsOrder) {
             // Atualizar existente
-            kdsOrder.orderType = order.orderType || 'dine-in';
+            // Fase 9.3C: Map orderType (dine_in -> dine-in)
+            const orderType = order.orderType || 'dine_in';
+            kdsOrder.orderType = orderType === 'dine_in' ? 'dine-in' : orderType;
             kdsOrder.table = order.table?._id;
-            kdsOrder.tableNumber = order.table?.number;
+            kdsOrder.tableNumber = order.table?.tableNo;
             kdsOrder.customerName = order.customerDetails?.name;
+            if (order.observations) {
+                if (!kdsOrder.metadata) {
+                    kdsOrder.metadata = { channel: 'pos' };
+                }
+                kdsOrder.set('metadata.notes', order.observations);
+            }
             await kdsOrder.save();
         } else {
             // Criar novo
             const config = await KDSConfig.getStoreConfig(storeRef);
 
-            const items = order.items.map(item => ({
-                orderItem: item._id,
-                productId: item.product,
-                productName: item.name,
-                quantity: item.quantity,
-                station: config.defaultStation,
-                prepTimeMinutes: config.slaSettings?.defaultPrepTime || 15,
-                notes: item.notes,
-                modifiers: item.modifiers || []
-            }));
+            // Fase 9.3C: Map orderType (dine_in -> dine-in)
+            const orderType = order.orderType || 'dine_in';
+
+            const items = order.items
+                .filter(item => item.name || item.productName)
+                .map(item => ({
+                    orderItem: item._id,
+                    productId: item.product || undefined,
+                    productName: item.name || item.productName,
+                    quantity: item.quantity || 1,
+                    station: config.defaultStation,
+                    prepTimeMinutes: config.slaSettings?.defaultPrepTime || 15,
+                    notes: item.notes || '',
+                    modifiers: item.modifiers || []
+                }));
+
+            if (items.length === 0) {
+                console.warn(`[kdsController] KDS sync skipped for order ${orderId}: no items with valid name`);
+                return res.status(200).json({
+                    success: true,
+                    message: "Order has no KDS-compatible items — sync skipped",
+                    data: null
+                });
+            }
 
             kdsOrder = await KDSOrder.create({
                 store: storeRef,
                 order: orderId,
                 orderNumber: order.orderNumber || `ORD-${Date.now()}`,
                 table: order.table?._id,
-                tableNumber: order.table?.number,
+                tableNumber: order.table?.tableNo,
                 customerName: order.customerDetails?.name,
-                orderType: order.orderType || 'dine-in',
+                orderType: orderType === 'dine_in' ? 'dine-in' : orderType,
                 items,
-                estimatedReady: new Date(Date.now() + (config.slaSettings?.defaultPrepTime || 15) * 60000)
+                estimatedReady: new Date(Date.now() + (config.slaSettings?.defaultPrepTime || 15) * 60000),
+                metadata: {
+                    channel: 'pos',
+                    notes: order.observations || ''
+                }
             });
         }
 
@@ -452,8 +520,8 @@ const cancelKDSOrder = async (req, res, next) => {
             return next(error);
         }
 
-        if (order.status === 'served') {
-            const error = createHttpError(400, "Cannot cancel served order!");
+        if (order.status !== 'pending') {
+            const error = createHttpError(400, `Nao e possivel cancelar pedido com status "${order.status}". Apenas pedidos pendentes podem ser cancelados.`);
             return next(error);
         }
 

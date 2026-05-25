@@ -101,7 +101,7 @@ const StockHealthTab = () => {
                 <th className="py-3 px-4">Cons. 24h</th>
                 <th className="py-3 px-4">Média Diária</th>
                 <th className="py-3 px-4">Dias p/ Ruptura</th>
-                <th className="py-3 px-4">Política (Min / Reorder / Max)</th>
+                <th className="py-3 px-4">Política (Min / Ressuprimento / Max)</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#262626]">

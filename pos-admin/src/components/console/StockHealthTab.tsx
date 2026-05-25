@@ -118,7 +118,7 @@ export function StockHealthTab() {
                 <TableHead className="text-right">Cons. 24h</TableHead>
                 <TableHead className="text-right">Media Diaria</TableHead>
                 <TableHead className="text-right">Dias p/ Ruptura</TableHead>
-                <TableHead>Politica (Min / Reorder / Max)</TableHead>
+                <TableHead>Politica (Min / Ressuprimento / Max)</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

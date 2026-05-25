@@ -19,7 +19,7 @@ export const SEVERITY_CONFIG = {
   high: { bg: "bg-[#3a1a1a]", text: "text-[#ff6b6b]", label: "Alto" },
   medium: { bg: "bg-[#4a4a1a]", text: "text-[#feca57]", label: "Médio" },
   low: { bg: "bg-[#1a2a4a]", text: "text-[#54a0ff]", label: "Baixo" },
-  info: { bg: "bg-[#2a2a2a]", text: "text-[#ababab]", label: "Info" },
+  info: { bg: "bg-[#2a2a2a]", text: "text-[#ababab]", label: "Informativo" },
 };
 
 export const getStatusConfig = (status) =>

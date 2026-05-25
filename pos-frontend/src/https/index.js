@@ -14,6 +14,14 @@ export const getTables = () => axiosWrapper.get("/api/table");
 export const updateTable = ({ tableId, ...tableData }) =>
   axiosWrapper.put(`/api/table/${tableId}`, tableData);
 
+// Fase 9.3C — Close table (PDV closing/payment)
+export const closeTable = (tableId, data) =>
+  axiosWrapper.post(`/api/table/${tableId}/close`, data);
+
+// Fase 9.3C — Get accumulated table bill
+export const getTableBill = (tableId) =>
+  axiosWrapper.get(`/api/table/${tableId}/bill`);
+
 // Payment Endpoints
 export const createOrderRazorpay = (data) =>
   axiosWrapper.post("/api/payment/create-order", data);
@@ -57,6 +65,20 @@ export const getStores = () =>
   axiosWrapper.get("/api/store");
 export const getLocations = (params = {}) =>
   axiosWrapper.get("/api/stock/locations", { params });
+
+// Product Endpoints (Fase 9.1B-FIX)
+export const getProducts = (params = {}) =>
+  axiosWrapper.get("/api/product", { params });
+
+// Category Endpoints
+export const getCategories = (params = {}) =>
+  axiosWrapper.get("/api/category", { params });
+
+// Dashboard Endpoints
+export const getDashboardKPIs = (params = {}) =>
+  axiosWrapper.get("/api/dashboard/kpi", { params });
+export const getTopProducts = (params = {}) =>
+  axiosWrapper.get("/api/dashboard/products/top", { params });
 
 // Phase 7B — Acoes assistidas
 export const resolveAlert = (alertId, data) =>

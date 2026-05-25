@@ -168,14 +168,40 @@ const getUserData = async (req, res, next) => {
     try {
 
         const user = await User.findById(req.user._id)
-            .populate('store')
-            .populate('role');
+            .populate('store');
 
         const userObj = user.toObject();
 
-        // Flatten role permissions to top-level for frontend useCapabilities hook
-        if (userObj.role && userObj.role.permissions) {
-            userObj.rolePermissions = userObj.role.permissions;
+        // Populate role manually — the field is Mixed (string or ObjectId),
+        // so Mongoose's .populate('role') does not work without a ref.
+        if (userObj.role && typeof userObj.role !== 'string') {
+            try {
+                const roleDoc = await Role.findById(userObj.role).lean();
+                if (roleDoc) {
+                    userObj.role = roleDoc;
+                    userObj.rolePermissions = roleDoc.permissions;
+                }
+            } catch {
+                // Role not found — leave as-is
+            }
+        } else if (typeof userObj.role === 'string') {
+            // Legacy string role — grant broad permissions for Admin
+            if (userObj.role.toLowerCase() === 'admin') {
+                userObj.rolePermissions = {
+                    inventory: { read: true, create: true, update: true, adjust: true, transfer: true },
+                    orders: { read: true, create: true, update: true, cancel: true },
+                    products: { read: true, create: true, update: true },
+                    tables: { read: true, create: true, update: true },
+                    reports: { read: true, export: true, financial: true },
+                    settings: { read: true, update: true },
+                };
+            } else {
+                userObj.rolePermissions = {
+                    orders: { read: true, create: true },
+                    tables: { read: true },
+                    products: { read: true },
+                };
+            }
         }
 
         res.status(200).json({success: true, data: userObj});

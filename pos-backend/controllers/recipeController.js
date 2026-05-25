@@ -108,6 +108,13 @@ const createRecipe = async (req, res, next) => {
             yieldQuantity: yieldQuantity || 1
         });
 
+        // Calcular custo da receita
+        try {
+            await recipeService.calculateCost(recipe._id);
+        } catch (err) {
+            console.error('Recipe cost calculation failed:', err.message);
+        }
+
         const populatedRecipe = await Recipe.findById(recipe._id)
             .populate('product', 'name')
             .populate('ingredients.ingredient', 'name category');
@@ -294,6 +301,13 @@ const updateRecipe = async (req, res, next) => {
         }
 
         await recipe.save();
+
+        // Recalcular custo apos atualizacao
+        try {
+            await recipeService.calculateCost(recipe._id);
+        } catch (err) {
+            console.error('Recipe cost calculation failed:', err.message);
+        }
 
         const populatedRecipe = await Recipe.findById(recipe._id)
             .populate('product', 'name')

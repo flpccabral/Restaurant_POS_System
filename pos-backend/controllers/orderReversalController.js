@@ -1,6 +1,7 @@
 const createHttpError = require("http-errors");
 const stockReversalService = require("../services/stockReversalService");
 const Order = require("../models/orderModel");
+const Table = require("../models/tableModel");
 const SessionLog = require("../models/sessionLogModel");
 
 /**
@@ -115,6 +116,26 @@ const cancelOrder = async (req, res, next) => {
                 reason,
                 stockReversed: result.stockReversed
             });
+        }
+
+        // Release the table when order is cancelled
+        if (order.table) {
+            try {
+                await Table.findOneAndUpdate(
+                    { _id: order.table, store: storeRef },
+                    { status: "Available", $unset: { currentOrder: "" } }
+                );
+                if (io) {
+                    io.to(`store:${storeRef}`).emit('table:released', {
+                        tableId: order.table.toString(),
+                        orderId: req.params.id,
+                        reason: 'cancelled',
+                        timestamp: new Date().toISOString()
+                    });
+                }
+            } catch (tableErr) {
+                console.error(`[orderReversal] Table release failed for table ${order.table}: ${tableErr.message}`);
+            }
         }
 
         res.status(200).json({

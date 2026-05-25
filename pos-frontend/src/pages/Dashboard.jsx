@@ -1,75 +1,77 @@
-import React, { useState, useEffect } from "react";
-import { MdTableBar, MdCategory } from "react-icons/md";
-import { BiSolidDish } from "react-icons/bi";
-import Metrics from "../components/dashboard/Metrics";
-import RecentOrders from "../components/dashboard/RecentOrders";
-import Modal from "../components/dashboard/Modal";
+import React, { useState, useEffect } from 'react';
+import { MdTableBar, MdCategory } from 'react-icons/md';
+import { BiSolidDish } from 'react-icons/bi';
+import Metrics from '../components/dashboard/Metrics';
+import RecentOrders from '../components/dashboard/RecentOrders';
+import Modal from '../components/dashboard/Modal';
 
 const buttons = [
-  { label: "Add Table", icon: <MdTableBar />, action: "table" },
-  { label: "Add Category", icon: <MdCategory />, action: "category" },
-  { label: "Add Dishes", icon: <BiSolidDish />, action: "dishes" },
+  { label: 'Adicionar Mesa', icon: <MdTableBar />, action: 'table' },
+  { label: 'Adicionar Categoria', icon: <MdCategory />, action: 'category' },
+  { label: 'Adicionar Pratos', icon: <BiSolidDish />, action: 'dishes' },
 ];
 
-const tabs = ["Metrics", "Orders", "Payments"];
+const tabs = ['Metricas', 'Pedidos', 'Pagamentos'];
 
 const Dashboard = () => {
-
   useEffect(() => {
-    document.title = "POS | Admin Dashboard"
-  }, [])
+    document.title = 'POS | Painel Admin';
+  }, []);
 
   const [isTableModalOpen, setIsTableModalOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("Metrics");
+  const [activeTab, setActiveTab] = useState('Metricas');
 
   const handleOpenModal = (action) => {
-    if (action === "table") setIsTableModalOpen(true);
+    if (action === 'table') setIsTableModalOpen(true);
   };
 
   return (
-    <div className="bg-[#1f1f1f] h-[calc(100vh-5rem)]">
-      <div className="container mx-auto flex items-center justify-between py-14 px-6 md:px-4">
-        <div className="flex items-center gap-3">
-          {buttons.map(({ label, icon, action }) => {
-            return (
+    <div className="h-[calc(100vh-3.5rem)] bg-gray-100 overflow-y-auto">
+      <div className="container mx-auto px-6 py-6">
+        {/* Action buttons + Tabs */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            {buttons.map(({ label, icon, action }) => (
               <button
+                key={action}
                 onClick={() => handleOpenModal(action)}
-                className="bg-[#1a1a1a] hover:bg-[#262626] px-8 py-3 rounded-lg text-[#f5f5f5] font-semibold text-md flex items-center gap-2"
+                className="bg-white hover:bg-gray-50 border border-gray-200 px-5 py-2.5 rounded-lg text-gray-700 font-semibold text-sm flex items-center gap-2 shadow-sm transition-colors"
               >
                 {label} {icon}
               </button>
-            );
-          })}
-        </div>
+            ))}
+          </div>
 
-        <div className="flex items-center gap-3">
-          {tabs.map((tab) => {
-            return (
+          <div className="flex items-center gap-1 bg-gray-200 rounded-lg p-1">
+            {tabs.map((tab) => (
               <button
-                className={`
-                px-8 py-3 rounded-lg text-[#f5f5f5] font-semibold text-md flex items-center gap-2 ${
+                key={tab}
+                className={`px-5 py-2 rounded-md text-sm font-semibold transition-all ${
                   activeTab === tab
-                    ? "bg-[#262626]"
-                    : "bg-[#1a1a1a] hover:bg-[#262626]"
+                    ? 'bg-white text-blue-700 shadow-sm'
+                    : 'text-gray-500 hover:text-gray-700'
                 }`}
                 onClick={() => setActiveTab(tab)}
               >
                 {tab}
               </button>
-            );
-          })}
+            ))}
+          </div>
         </div>
+
+        {/* Content */}
+        {activeTab === 'Metricas' && <Metrics />}
+        {activeTab === 'Pedidos' && <RecentOrders />}
+        {activeTab === 'Pagamentos' && (
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-10 text-center">
+            <p className="text-gray-400 text-sm">
+              Componente de Pagamento em Breve
+            </p>
+          </div>
+        )}
+
+        {isTableModalOpen && <Modal setIsTableModalOpen={setIsTableModalOpen} />}
       </div>
-
-      {activeTab === "Metrics" && <Metrics />}
-      {activeTab === "Orders" && <RecentOrders />}
-      {activeTab === "Payments" && 
-        <div className="text-white p-6 container mx-auto">
-          Payment Component Coming Soon
-        </div>
-      }
-
-      {isTableModalOpen && <Modal setIsTableModalOpen={setIsTableModalOpen} />}
     </div>
   );
 };

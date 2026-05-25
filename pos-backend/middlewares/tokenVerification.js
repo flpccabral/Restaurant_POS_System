@@ -34,7 +34,7 @@ const isVerifiedUser = async (req, res, next) => {
 
         const decodeToken = jwt.verify(accessToken, config.accessTokenSecret);
 
-        const user = await User.findById(decodeToken._id).populate('store');
+        const user = await User.findById(decodeToken._id);
         if (!user) {
             const error = createHttpError(401, "User not exist!");
             return next(error);
@@ -55,11 +55,6 @@ const isVerifiedUser = async (req, res, next) => {
                 const error = createHttpError(403, "User role is deactivated!");
                 return next(error);
             }
-        }
-
-        // Injetar storeId para o middleware storeIsolation
-        if (user.store) {
-            user.storeId = user.store._id;
         }
 
         req.user = user;

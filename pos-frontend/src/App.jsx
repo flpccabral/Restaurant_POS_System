@@ -5,7 +5,7 @@ import {
   useLocation,
   Navigate,
 } from "react-router-dom";
-import { Home, Auth, Orders, Tables, Menu, Dashboard, OperationalConsole } from "./pages";
+import { Home, Auth, Orders, Tables, Menu, Dashboard, OperationalConsole, TableBill } from "./pages";
 import Header from "./components/shared/Header";
 import { useSelector } from "react-redux";
 import useLoadData from "./hooks/useLoadData";
@@ -69,6 +69,14 @@ function Layout() {
           element={
             <ProtectedRoutes>
               <OperationalConsole />
+            </ProtectedRoutes>
+          }
+        />
+        <Route
+          path="/table/:id/bill"
+          element={
+            <ProtectedRoutes>
+              <TableBill />
             </ProtectedRoutes>
           }
         />

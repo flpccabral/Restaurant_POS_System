@@ -1,13 +1,13 @@
-import React from "react";
-import { FaSearch } from "react-icons/fa";
-import OrderList from "./OrderList";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { enqueueSnackbar } from "notistack";
-import { getOrders } from "../../https/index";
+import React from 'react';
+import { FiSearch } from 'react-icons/fi';
+import OrderList from './OrderList';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { enqueueSnackbar } from 'notistack';
+import { getOrders } from '../../https/index';
 
 const RecentOrders = () => {
   const { data: resData, isError } = useQuery({
-    queryKey: ["orders"],
+    queryKey: ['orders'],
     queryFn: async () => {
       return await getOrders();
     },
@@ -15,40 +15,42 @@ const RecentOrders = () => {
   });
 
   if (isError) {
-    enqueueSnackbar("Something went wrong!", { variant: "error" });
+    enqueueSnackbar('Algo deu errado!', { variant: 'error' });
   }
 
-  return (
-    <div className="px-8 mt-6">
-      <div className="bg-[#1a1a1a] w-full h-[450px] rounded-lg">
-        <div className="flex justify-between items-center px-6 py-4">
-          <h1 className="text-[#f5f5f5] text-lg font-semibold tracking-wide">
-            Recent Orders
-          </h1>
-          <a href="" className="text-[#025cca] text-sm font-semibold">
-            View all
-          </a>
-        </div>
+  const orders = resData?.data.data || [];
 
-        <div className="flex items-center gap-4 bg-[#1f1f1f] rounded-[15px] px-6 py-4 mx-6">
-          <FaSearch className="text-[#f5f5f5]" />
+  return (
+    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+      <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+        <h2 className="text-gray-900 text-lg font-bold tracking-tight">
+          Pedidos Recentes
+        </h2>
+        <a href="/orders" className="text-blue-600 text-sm font-semibold hover:text-blue-800 transition-colors">
+          Ver todos
+        </a>
+      </div>
+
+      <div className="px-5 py-3">
+        <div className="flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5">
+          <FiSearch className="text-gray-400 flex-shrink-0" size={16} />
           <input
             type="text"
-            placeholder="Search recent orders"
-            className="bg-[#1f1f1f] outline-none text-[#f5f5f5]"
+            placeholder="Buscar pedidos recentes"
+            className="bg-transparent outline-none text-gray-900 text-sm w-full placeholder:text-gray-400"
           />
         </div>
+      </div>
 
-        {/* Order list */}
-        <div className="mt-4 px-6 overflow-y-scroll h-[300px] scrollbar-hide">
-          {resData?.data.data.length > 0 ? (
-            resData.data.data.map((order) => {
-              return <OrderList key={order._id} order={order} />;
-            })
-          ) : (
-            <p className="col-span-3 text-gray-500">No orders available</p>
-          )}
-        </div>
+      {/* Order list */}
+      <div className="px-3 pb-3 max-h-[300px] overflow-y-auto scrollbar-hide">
+        {orders.length > 0 ? (
+          orders.map((order) => <OrderList key={order._id} order={order} />)
+        ) : (
+          <p className="text-gray-400 text-sm text-center py-8">
+            Nenhum pedido disponivel
+          </p>
+        )}
       </div>
     </div>
   );

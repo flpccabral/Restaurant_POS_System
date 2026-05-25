@@ -31,6 +31,8 @@ export const formatDate = (date) => {
   return `${months[date.getMonth()]} ${String(date.getDate()).padStart(2, '0')}, ${date.getFullYear()}`;
 };
 
+export { translateOrderStatus, translateTableStatus } from "./orderStatus";
+
 export const formatDateAndTime = (date) => {
   const dateAndTime = new Date(date).toLocaleString("en-US", {
     month: "long",

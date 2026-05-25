@@ -56,7 +56,9 @@ const stockMovementSchema = new mongoose.Schema({
             'production_byproduct',
             'production_waste',
             // Fase 5.5 — reversão de baixa por venda
-            'recipe_deduction_reversal'
+            'recipe_deduction_reversal',
+            // Fase 9.1C — baixa direta de item de estoque por venda
+            'direct_sale_deduction'
         ],
         required: true,
         index: true

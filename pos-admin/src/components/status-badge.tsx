@@ -50,6 +50,7 @@ const statusLabels: Record<string, string> = {
   pending: "Pendente",
   high: "Alta prioridade",
   medium: "Media prioridade",
+  info: "Informativo",
 };
 
 const statusIcons: Record<string, LucideIcon | undefined> = {

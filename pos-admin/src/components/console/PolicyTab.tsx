@@ -221,7 +221,7 @@ export function PolicyTab() {
                 <TableHead>Localizacao</TableHead>
                 <TableHead>Ingrediente</TableHead>
                 <TableHead className="text-right">Min</TableHead>
-                <TableHead className="text-right">Reorder</TableHead>
+                <TableHead className="text-right">Ressuprimento</TableHead>
                 <TableHead className="text-right">Ideal</TableHead>
                 <TableHead className="text-right">Max</TableHead>
                 <TableHead>Unidade</TableHead>

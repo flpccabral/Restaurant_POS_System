@@ -150,9 +150,9 @@ const RecommendationsTab = () => {
     }
 
     if (selectedRec.type === "central_to_store") {
-      details.risks = `Central warehouse will reduce stock by ${selectedRec.suggestedQuantity}${selectedRec.unit}.`;
+      details.risks = `O depósito central reduzirá o estoque em ${selectedRec.suggestedQuantity}${selectedRec.unit}.`;
     } else if (selectedRec.type === "inter_store_transfer") {
-      details.risks = selectedRec.risks?.join("; ") || "Verify store compatibility before proceeding.";
+      details.risks = selectedRec.risks?.join("; ") || "Verifique a compatibilidade entre lojas antes de prosseguir.";
     }
 
     return details;

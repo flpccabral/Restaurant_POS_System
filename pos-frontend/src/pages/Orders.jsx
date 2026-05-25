@@ -1,64 +1,94 @@
-import React, { useState, useEffect } from "react";
-import BottomNav from "../components/shared/BottomNav";
-import OrderCard from "../components/orders/OrderCard";
-import BackButton from "../components/shared/BackButton";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { getOrders } from "../https/index";
-import { enqueueSnackbar } from "notistack"
+import React, { useState, useEffect } from 'react';
+import BottomNav from '../components/shared/BottomNav';
+import BackButton from '../components/shared/BackButton';
+import OrderCard from '../components/orders/OrderCard';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { getOrders } from '../https/index';
+import { enqueueSnackbar } from 'notistack';
 
 const Orders = () => {
+  const [status, setStatus] = useState('all');
 
-  const [status, setStatus] = useState("all");
-
-    useEffect(() => {
-      document.title = "POS | Orders"
-    }, [])
+  useEffect(() => {
+    document.title = 'POS | Pedidos';
+  }, []);
 
   const { data: resData, isError } = useQuery({
-    queryKey: ["orders"],
+    queryKey: ['orders'],
     queryFn: async () => {
       return await getOrders();
     },
-    placeholderData: keepPreviousData
-  })
+    placeholderData: keepPreviousData,
+  });
 
-  if(isError) {
-    enqueueSnackbar("Something went wrong!", {variant: "error"})
+  if (isError) {
+    enqueueSnackbar('Algo deu errado!', { variant: 'error' });
   }
 
+  const STATUS_FILTER_MAP = {
+    all: null,
+    progress: ['In Progress', 'pending', 'accepted', 'preparing'],
+    ready: ['Ready'],
+    completed: ['completed'],
+  };
+
+  const filteredOrders = (() => {
+    const orders = resData?.data.data || [];
+    const matchStatuses = STATUS_FILTER_MAP[status];
+    if (!matchStatuses) return orders;
+    return orders.filter((order) => matchStatuses.includes(order.orderStatus));
+  })();
+
+  const tabs = [
+    { key: 'all', label: 'Todos' },
+    { key: 'progress', label: 'Em Preparo' },
+    { key: 'ready', label: 'Pronto' },
+    { key: 'completed', label: 'Concluido' },
+  ];
+
   return (
-    <section className="bg-[#1f1f1f]  h-[calc(100vh-5rem)] overflow-hidden">
-      <div className="flex items-center justify-between px-10 py-4">
-        <div className="flex items-center gap-4">
-          <BackButton />
-          <h1 className="text-[#f5f5f5] text-2xl font-bold tracking-wider">
-            Orders
-          </h1>
-        </div>
-        <div className="flex items-center justify-around gap-4">
-          <button onClick={() => setStatus("all")} className={`text-[#ababab] text-lg ${status === "all" && "bg-[#383838] rounded-lg px-5 py-2"}  rounded-lg px-5 py-2 font-semibold`}>
-            All
-          </button>
-          <button onClick={() => setStatus("progress")} className={`text-[#ababab] text-lg ${status === "progress" && "bg-[#383838] rounded-lg px-5 py-2"}  rounded-lg px-5 py-2 font-semibold`}>
-            In Progress
-          </button>
-          <button onClick={() => setStatus("ready")} className={`text-[#ababab] text-lg ${status === "ready" && "bg-[#383838] rounded-lg px-5 py-2"}  rounded-lg px-5 py-2 font-semibold`}>
-            Ready
-          </button>
-          <button onClick={() => setStatus("completed")} className={`text-[#ababab] text-lg ${status === "completed" && "bg-[#383838] rounded-lg px-5 py-2"}  rounded-lg px-5 py-2 font-semibold`}>
-            Completed
-          </button>
+    <section className="h-[calc(100vh-3.5rem)] bg-gray-100 overflow-hidden flex flex-col">
+      {/* Header */}
+      <div className="flex-shrink-0 bg-white border-b border-gray-200 px-6 py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <BackButton />
+            <h1 className="text-gray-900 text-xl font-bold tracking-tight">
+              Pedidos
+            </h1>
+          </div>
+          {/* Filter tabs */}
+          <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+            {tabs.map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => setStatus(tab.key)}
+                className={`px-4 py-1.5 rounded-md text-sm font-semibold transition-all ${
+                  status === tab.key
+                    ? 'bg-white text-blue-700 shadow-sm'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-3 px-16 py-4 overflow-y-scroll scrollbar-hide">
-        {
-          resData?.data.data.length > 0 ? (
-            resData.data.data.map((order) => {
-              return <OrderCard key={order._id} order={order} />
-            })
-          ) : <p className="col-span-3 text-gray-500">No orders available</p>
-        }
+      {/* Orders list */}
+      <div className="flex-1 overflow-y-auto p-6">
+        {filteredOrders.length > 0 ? (
+          <div className="flex flex-wrap gap-4">
+            {filteredOrders.map((order) => (
+              <OrderCard key={order._id} order={order} />
+            ))}
+          </div>
+        ) : (
+          <div className="flex items-center justify-center h-48">
+            <p className="text-gray-400 text-sm">Nenhum pedido disponivel</p>
+          </div>
+        )}
       </div>
 
       <BottomNav />

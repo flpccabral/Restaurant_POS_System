@@ -16,8 +16,8 @@ import { kdsService } from "@/services/api/kds";
 
 const statusConfig: Record<string, { label: string; color: string; bg: string }> = {
   pending: { label: "Pendente", color: "text-amber-400", bg: "bg-amber-500/10 border-amber-500/20" },
-  accepted: { label: "Aceito", color: "text-blue-400", bg: "bg-blue-500/10 border-blue-500/20" },
   preparing: { label: "Preparando", color: "text-brand", bg: "bg-brand-muted border-brand/20" },
+  partially_ready: { label: "Parcialmente Pronto", color: "text-orange-400", bg: "bg-orange-500/10 border-orange-500/20" },
   ready: { label: "Pronto", color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/20" },
   served: { label: "Entregue", color: "text-zinc-400", bg: "bg-zinc-500/10 border-zinc-500/20" },
   cancelled: { label: "Cancelado", color: "text-red-400", bg: "bg-red-500/10 border-red-500/20" },
@@ -29,6 +29,7 @@ export default function KDSPage() {
   const { data: tickets, isLoading } = useQuery({
     queryKey: ["kds-tickets"],
     queryFn: () => kdsService.getTickets().then((r) => r.data.data),
+    refetchInterval: 30_000,
   });
 
   const { data: stats } = useQuery({
@@ -137,7 +138,7 @@ export default function KDSPage() {
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-zinc-200 text-sm">
-                        #{(ticket._id as string).slice(-6)}
+                        {String(ticket.orderNumber || '#' + String(ticket.kdsOrderId || ticket._id).slice(-6))}
                       </CardTitle>
                       <div className="flex items-center gap-2">
                         <Clock className="h-3.5 w-3.5 text-zinc-500" />
@@ -149,13 +150,32 @@ export default function KDSPage() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-3">
+                    {/* Fase 9.3C: Show order observations/metadata */}
+                    {(() => {
+                      const meta = ticket.metadata as Record<string, string> | null | undefined;
+                      const notes = meta?.notes;
+                      return notes ? (
+                        <p className="text-xs text-yellow-400 italic">
+                          Obs pedido: {String(notes)}
+                        </p>
+                      ) : null;
+                    })()}
                     <div className="space-y-1">
                       {items.map((item, i) => {
                         const it = item as Record<string, unknown>;
+                        const itemNotes = it.notes as string;
                         return (
-                        <div key={i} className="flex justify-between text-sm">
-                          <span className="text-zinc-300">{String(it.quantity)}x {String(it.name)}</span>
-                          <span className="text-zinc-500 text-xs">{String(it.status)}</span>
+                        <div key={i} className="flex flex-col">
+                          <div className="flex justify-between text-sm">
+                            <span className="text-zinc-300">{String(it.quantity)}x {String(it.productName || it.name)}</span>
+                            <span className="text-zinc-500 text-xs">{String(it.status)}</span>
+                          </div>
+                          {/* Fase 9.3C: Item notes */}
+                          {itemNotes && (
+                            <p className="text-xs text-yellow-400/70 italic mt-0.5">
+                              Obs: {itemNotes}
+                            </p>
+                          )}
                         </div>
                         );
                       })}
@@ -163,22 +183,22 @@ export default function KDSPage() {
 
                     <div className="flex gap-2 pt-2 border-t border-zinc-800">
                       {status === "pending" && (
-                        <Button size="sm" className="flex-1 bg-blue-600 hover:bg-blue-700" onClick={() => acceptMutation.mutate(ticket._id as string)}>
+                        <Button size="sm" className="flex-1 bg-blue-600 hover:bg-blue-700" onClick={() => acceptMutation.mutate(ticket.kdsOrderId as string)}>
                           <CheckCircle className="h-3.5 w-3.5 mr-1" /> Aceitar
                         </Button>
                       )}
-                      {(status === "accepted" || status === "preparing") && (
-                        <Button size="sm" className="flex-1 bg-emerald-600 hover:bg-emerald-700" onClick={() => readyMutation.mutate(ticket._id as string)}>
+                      {(status === "preparing" || status === "partially_ready") && (
+                        <Button size="sm" className="flex-1 bg-emerald-600 hover:bg-emerald-700" onClick={() => readyMutation.mutate(ticket.kdsOrderId as string)}>
                           <ChefHat className="h-3.5 w-3.5 mr-1" /> Pronto
                         </Button>
                       )}
                       {status === "ready" && (
-                        <Button size="sm" className="flex-1 bg-brand hover:bg-brand-muted text-brand-foreground" onClick={() => servedMutation.mutate(ticket._id as string)}>
+                        <Button size="sm" className="flex-1 bg-brand hover:bg-brand-muted text-brand-foreground" onClick={() => servedMutation.mutate(ticket.kdsOrderId as string)}>
                           <CheckCircle className="h-3.5 w-3.5 mr-1" /> Entregue
                         </Button>
                       )}
-                      {status !== "cancelled" && (
-                        <Button size="sm" variant="destructive" onClick={() => cancelMutation.mutate(ticket._id as string)}>
+                      {status === "pending" && (
+                        <Button size="sm" variant="destructive" onClick={() => cancelMutation.mutate(ticket.kdsOrderId as string)}>
                           <XCircle className="h-3.5 w-3.5" />
                         </Button>
                       )}
@@ -206,7 +226,7 @@ export default function KDSPage() {
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-zinc-400 text-sm">
-                        #{(ticket._id as string).slice(-6)}
+                        {String(ticket.orderNumber || '#' + String(ticket.kdsOrderId || ticket._id).slice(-6))}
                       </CardTitle>
                       <Badge className={`${cfg.bg} ${cfg.color} text-xs`}>{cfg.label}</Badge>
                     </div>
@@ -217,7 +237,7 @@ export default function KDSPage() {
                         const it = item as Record<string, unknown>;
                         return (
                         <div key={i} className="flex justify-between text-sm">
-                          <span className="text-zinc-500">{String(it.quantity)}x {String(it.name)}</span>
+                          <span className="text-zinc-500">{String(it.quantity)}x {String(it.productName || it.name)}</span>
                         </div>
                         );
                       })}

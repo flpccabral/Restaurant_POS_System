@@ -14,6 +14,47 @@ import {
   MdRemove,
 } from "react-icons/md";
 
+const eventTypeLabels = {
+  // Movement types (StockMovement.type)
+  purchase_receipt: "Recebimento de Compra",
+  transfer_out: "Transferência Enviada",
+  transfer_in: "Transferência Recebida",
+  recipe_deduction: "Dedução de Receita",
+  adjustment: "Ajuste Manual",
+  waste: "Desperdício",
+  inventory_count_adjustment: "Ajuste de Inventário",
+  production_consumption: "Consumo de Produção",
+  production_output: "Saída de Produção",
+  production_byproduct: "Subproduto Gerado",
+  production_waste: "Resíduo de Produção",
+  recipe_deduction_reversal: "Reversão de Dedução",
+  direct_sale_deduction: "Dedução de Venda Direta",
+
+  // Production types
+  production_completed: "Produção Concluída",
+
+  // Alert types (OperationalAlert.type)
+  stockout: "Estoque Zerado",
+  critical_stock: "Estoque Crítico",
+  low_stock: "Estoque Baixo",
+  excess_stock: "Estoque Excedente",
+  dead_stock: "Estoque Parado",
+  no_policy: "Sem Política Definida",
+  byproduct_available: "Subproduto Disponível",
+  replenishment_needed: "Reabastecimento Necessário",
+  transfer_recommended: "Transferência Recomendada",
+  refund_without_stock_reversal: "Reembolso sem Estorno",
+  sale_without_stock_deduction: "Venda sem Baixa",
+  product_without_recipe: "Produto sem Ficha Técnica",
+  product_missing_stock_rule: "Regra de Estoque Ausente",
+  purchase_registered: "Compra Registrada",
+
+  // Top-level types (fallback)
+  movement: "Movimentação",
+  production: "Produção",
+  alert: "Alerta",
+};
+
 const eventTypeIcons = {
   addition: <MdAdd className="text-[#2ed573]" />,
   deduction: <MdRemove className="text-[#ff6b6b]" />,
@@ -108,7 +149,7 @@ const TimelineTab = () => {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-0.5 flex-wrap">
                     <span className="text-[#f5f5f5] text-sm font-medium">
-                      {event.eventType || event.type}
+                      {eventTypeLabels[event.eventType] || eventTypeLabels[event.type] || event.eventType || event.type}
                     </span>
                     {event.severity && (
                       <StatusBadge type="severity" value={event.severity} />
@@ -139,7 +180,7 @@ const TimelineTab = () => {
                   {event.type === "production" && (
                     <div className="text-xs text-[#ababab]">
                       <span>
-                        Outputs:{" "}
+                        Saidas:{" "}
                         {event.outputs
                           ?.map(
                             (o) =>

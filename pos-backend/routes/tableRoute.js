@@ -1,5 +1,5 @@
 const express = require("express");
-const { addTable, getTables, updateTable } = require("../controllers/tableController");
+const { addTable, getTables, updateTable, closeTable, getTableBill } = require("../controllers/tableController");
 const { isVerifiedUser } = require("../middlewares/tokenVerification");
 const { storeIsolation } = require("../middlewares/storeIsolation");
 const { checkPermission } = require("../middlewares/checkPermission");
@@ -13,5 +13,11 @@ router.route("/")
 
 router.route("/:id")
   .put(isVerifiedUser, storeIsolation, checkPermission("tables", "update"), updateTable);
+
+// Fase 9.3C — Fechar mesa (PDV closing/payment)
+router.post("/:id/close", isVerifiedUser, storeIsolation, checkPermission("tables", "update"), closeTable);
+
+// Fase 9.3C — Obter conta acumulada da mesa
+router.get("/:id/bill", isVerifiedUser, storeIsolation, checkPermission("tables", "read"), getTableBill);
 
 module.exports = router;

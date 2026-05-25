@@ -8,7 +8,7 @@ const kdsOrderItemSchema = new mongoose.Schema({
     productId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Product',
-        required: true
+        required: false
     },
     productName: {
         type: String,
@@ -80,7 +80,7 @@ const kdsOrderSchema = new mongoose.Schema({
     customerName: String,
     orderType: {
         type: String,
-        enum: ['dine-in', 'takeout', 'delivery'],
+        enum: ['dine-in', 'takeout', 'delivery', 'counter', 'pickup'],
         default: 'dine-in'
     },
     items: [kdsOrderItemSchema],

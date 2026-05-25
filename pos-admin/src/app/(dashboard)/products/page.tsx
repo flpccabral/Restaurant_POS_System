@@ -146,7 +146,11 @@ export default function ProductsPage() {
     {
       key: "price",
       header: "Preco",
-      cell: (row: unknown) => `R$ ${Number((row as Record<string, unknown>).price).toFixed(2)}`,
+      cell: (row: unknown) => {
+        const r = row as Record<string, unknown>;
+        const price = r.price ?? (r.variations as Array<{ price?: number }>)?.[0]?.price ?? 0;
+        return `R$ ${Number(price).toFixed(2)}`;
+      },
     },
     {
       key: "productReadinessStatus",
@@ -194,7 +198,7 @@ export default function ProductsPage() {
       _id: product._id,
       name: product.name,
       description: product.description || "",
-      price: String(product.price || 0),
+      price: String(product.price || product.variations?.[0]?.price || 0),
       category: typeof cat === "string" ? cat : (cat as { _id?: string })?._id || "",
       sellableType: product.sellableType || "prepared_product",
       stockImpactRule: product.stockImpactRule || "recipe_composition",

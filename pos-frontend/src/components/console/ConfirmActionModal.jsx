@@ -7,35 +7,35 @@ const actionLabels = {
     title: "Resolver Alerta",
     confirm: "Resolver",
     description:
-      "This will mark the alert as resolved. The system will stop showing this alert unless the condition reoccurs.",
+      "Isso marcará o alerta como resolvido. O sistema deixará de exibir este alerta, a menos que a condição se repita.",
     icon: <MdCheckCircle className="text-[#2ed573] text-2xl" />,
   },
   dismiss: {
     title: "Ignorar Alerta",
     confirm: "Ignorar",
     description:
-      "This will dismiss the alert. It will be hidden from the active alerts list.",
+      "Isso descartará o alerta. Ele será ocultado da lista de alertas ativos.",
     icon: <MdClose className="text-[#ababab] text-2xl" />,
   },
   central_to_store: {
     title: "Transferencia Central -> Loja",
     confirm: "Executar Transferencia",
     description:
-      "This will transfer stock from the central warehouse to the store. This action cannot be undone automatically.",
+      "Isso transferirá o estoque do depósito central para a loja. Esta ação não pode ser desfeita automaticamente.",
     icon: <MdWarning className="text-[#feca57] text-2xl" />,
   },
   inter_store_transfer: {
     title: "Transferencia entre Lojas",
     confirm: "Executar Transferencia",
     description:
-      "This will transfer stock from one store to another. Verify that both stores are compatible before proceeding.",
+      "Isso transferirá o estoque de uma loja para outra. Verifique se ambas as lojas são compatíveis antes de prosseguir.",
     icon: <MdWarning className="text-[#feca57] text-2xl" />,
   },
   purchase_needed: {
     title: "Registrar Compra",
     confirm: "Registrar",
     description:
-      "This will register a purchase note. No actual purchase order is created -- this is just a record.",
+      "Isso registrará uma nota de compra. Nenhum pedido de compra real é criado -- é apenas um registro.",
     icon: <MdCheckCircle className="text-[#54a0ff] text-2xl" />,
   },
 };

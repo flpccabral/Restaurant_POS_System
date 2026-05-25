@@ -28,9 +28,8 @@ const Login = () => {
       mutationFn: (reqData) => login(reqData),
       onSuccess: (res) => {
           const { data } = res;
-          console.log(data);
-          const { _id, name, email, phone, role } = data.data;
-          dispatch(setUser({ _id, name, email, phone, role }));
+          const { _id, name, email, phone, role, store, isMasterAdmin } = data.data;
+          dispatch(setUser({ _id, name, email, phone, role, store, isMasterAdmin }));
           navigate("/");
       },
       onError: (error) => {
@@ -44,7 +43,7 @@ const Login = () => {
       <form onSubmit={handleSubmit}>
         <div>
           <label className="block text-[#ababab] mb-2 mt-3 text-sm font-medium">
-            Employee Email
+            E-mail do funcionário
           </label>
           <div className="flex item-center rounded-lg p-5 px-4 bg-[#1f1f1f]">
             <input
@@ -52,7 +51,7 @@ const Login = () => {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              placeholder="Enter employee email"
+              placeholder="Digite o e-mail"
               className="bg-transparent flex-1 text-white focus:outline-none"
               required
             />
@@ -60,7 +59,7 @@ const Login = () => {
         </div>
         <div>
           <label className="block text-[#ababab] mb-2 mt-3 text-sm font-medium">
-            Password
+            Senha
           </label>
           <div className="flex item-center rounded-lg p-5 px-4 bg-[#1f1f1f]">
             <input
@@ -68,7 +67,7 @@ const Login = () => {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              placeholder="Enter password"
+              placeholder="Digite a senha"
               className="bg-transparent flex-1 text-white focus:outline-none"
               required
             />
@@ -79,7 +78,7 @@ const Login = () => {
           type="submit"
           className="w-full rounded-lg mt-6 py-3 text-lg bg-yellow-400 text-gray-900 font-bold"
         >
-          Sign in
+          Entrar
         </button>
       </form>
     </div>

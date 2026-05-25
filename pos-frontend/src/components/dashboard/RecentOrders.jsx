@@ -1,97 +1,129 @@
-import React from "react";
-import { orders } from "../../constants";
-import { GrUpdate } from "react-icons/gr";
-import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { enqueueSnackbar } from "notistack";
-import { getOrders, updateOrderStatus } from "../../https/index";
-import { formatDateAndTime } from "../../utils";
+import React from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { enqueueSnackbar } from 'notistack';
+import { getOrders, updateOrderStatus } from '../../https/index';
+import { formatDateAndTime } from '../../utils';
 
 const RecentOrders = () => {
   const queryClient = useQueryClient();
-  const handleStatusChange = ({orderId, orderStatus}) => {
-    console.log(orderId)
-    orderStatusUpdateMutation.mutate({orderId, orderStatus});
+  const handleStatusChange = ({ orderId, orderStatus }) => {
+    orderStatusUpdateMutation.mutate({ orderId, orderStatus });
   };
 
   const orderStatusUpdateMutation = useMutation({
-    mutationFn: ({orderId, orderStatus}) => updateOrderStatus({orderId, orderStatus}),
-    onSuccess: (data) => {
-      enqueueSnackbar("Order status updated successfully!", { variant: "success" });
-      queryClient.invalidateQueries(["orders"]); // Refresh order list
+    mutationFn: ({ orderId, orderStatus }) =>
+      updateOrderStatus({ orderId, orderStatus }),
+    onSuccess: () => {
+      enqueueSnackbar('Status do pedido atualizado com sucesso!', {
+        variant: 'success',
+      });
+      queryClient.invalidateQueries(['orders']);
     },
     onError: () => {
-      enqueueSnackbar("Failed to update order status!", { variant: "error" });
-    }
-  })
+      enqueueSnackbar('Falha ao atualizar status do pedido!', {
+        variant: 'error',
+      });
+    },
+  });
 
   const { data: resData, isError } = useQuery({
-    queryKey: ["orders"],
+    queryKey: ['orders'],
     queryFn: async () => {
       return await getOrders();
     },
-    placeholderData: keepPreviousData,
   });
 
   if (isError) {
-    enqueueSnackbar("Something went wrong!", { variant: "error" });
+    enqueueSnackbar('Algo deu errado!', { variant: 'error' });
   }
 
-  console.log(resData.data.data);
+  const orders = resData?.data.data || [];
 
   return (
-    <div className="container mx-auto bg-[#262626] p-4 rounded-lg">
-      <h2 className="text-[#f5f5f5] text-xl font-semibold mb-4">
-        Recent Orders
-      </h2>
+    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+      <div className="px-5 py-4 border-b border-gray-100">
+        <h2 className="text-gray-900 text-lg font-bold">Pedidos Recentes</h2>
+      </div>
       <div className="overflow-x-auto">
-        <table className="w-full text-left text-[#f5f5f5]">
-          <thead className="bg-[#333] text-[#ababab]">
+        <table className="w-full text-left text-sm">
+          <thead className="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider">
             <tr>
-              <th className="p-3">Order ID</th>
-              <th className="p-3">Customer</th>
-              <th className="p-3">Status</th>
-              <th className="p-3">Date & Time</th>
-              <th className="p-3">Items</th>
-              <th className="p-3">Table No</th>
-              <th className="p-3">Total</th>
-              <th className="p-3 text-center">Payment Method</th>
+              <th className="p-3 font-semibold">ID do Pedido</th>
+              <th className="p-3 font-semibold">Cliente</th>
+              <th className="p-3 font-semibold">Status</th>
+              <th className="p-3 font-semibold">Data e Hora</th>
+              <th className="p-3 font-semibold">Itens</th>
+              <th className="p-3 font-semibold">Mesa</th>
+              <th className="p-3 font-semibold">Total</th>
+              <th className="p-3 font-semibold">Pagamento</th>
             </tr>
           </thead>
-          <tbody>
-            {resData?.data.data.map((order, index) => (
-              <tr
-                key={index}
-                className="border-b border-gray-600 hover:bg-[#333]"
-              >
-                <td className="p-4">#{Math.floor(new Date(order.orderDate).getTime())}</td>
-                <td className="p-4">{order.customerDetails.name}</td>
-                <td className="p-4">
-                  <select
-                    className={`bg-[#1a1a1a] text-[#f5f5f5] border border-gray-500 p-2 rounded-lg focus:outline-none ${
-                      order.orderStatus === "Ready"
-                        ? "text-green-500"
-                        : "text-yellow-500"
-                    }`}
-                    value={order.orderStatus}
-                    onChange={(e) => handleStatusChange({orderId: order._id, orderStatus: e.target.value})}
-                  >
-                    <option className="text-yellow-500" value="In Progress">
-                      In Progress
-                    </option>
-                    <option className="text-green-500" value="Ready">
-                      Ready
-                    </option>
-                  </select>
-                </td>
-                <td className="p-4">{formatDateAndTime(order.orderDate)}</td>
-                <td className="p-4">{order.items.length} Items</td>
-                <td className="p-4">Table - {order.table.tableNo}</td>
-                <td className="p-4">₹{order.bills.totalWithTax}</td>
-                <td className="p-4">
-                  {order.paymentMethod}
+          <tbody className="text-gray-700">
+            {orders.length === 0 ? (
+              <tr>
+                <td colSpan={8} className="p-6 text-center text-gray-400">
+                  Nenhum pedido encontrado
                 </td>
               </tr>
-            ))}
+            ) : (
+              orders.map((order, index) => (
+                <tr
+                  key={index}
+                  className="border-t border-gray-100 hover:bg-gray-50 transition-colors"
+                >
+                  <td className="p-3 font-medium text-gray-900">
+                    #{Math.floor(new Date(order.orderDate).getTime()).toString().slice(-8)}
+                  </td>
+                  <td className="p-3">{order.customerDetails.name}</td>
+                  <td className="p-3">
+                    <select
+                      className={`border border-gray-200 bg-white p-1.5 rounded-lg text-xs font-medium outline-none focus:border-blue-400 ${
+                        order.orderStatus === 'Ready'
+                          ? 'text-emerald-600'
+                          : order.orderStatus === 'completed'
+                          ? 'text-blue-600'
+                          : order.orderStatus === 'cancelled'
+                          ? 'text-red-500'
+                          : 'text-amber-600'
+                      }`}
+                      value={order.orderStatus}
+                      onChange={(e) =>
+                        handleStatusChange({
+                          orderId: order._id,
+                          orderStatus: e.target.value,
+                        })
+                      }
+                    >
+                      <option className="text-amber-600" value="In Progress">
+                        Em Preparo
+                      </option>
+                      <option className="text-emerald-600" value="Ready">
+                        Pronto
+                      </option>
+                      <option className="text-blue-600" value="completed">
+                        Concluido
+                      </option>
+                      <option className="text-red-500" value="cancelled">
+                        Cancelado
+                      </option>
+                    </select>
+                  </td>
+                  <td className="p-3 text-gray-500 text-xs">
+                    {formatDateAndTime(order.orderDate)}
+                  </td>
+                  <td className="p-3">{order.items.length} Itens</td>
+                  <td className="p-3">Mesa - {order.table?.tableNo || 'Balcao'}</td>
+                  <td className="p-3 font-semibold text-gray-900">
+                    R${(order.bills?.totalWithTax || 0).toFixed(2)}
+                  </td>
+                  <td className="p-3">
+                    <span className="bg-gray-100 text-gray-600 text-[11px] px-2 py-1 rounded-full font-medium">
+                      {order.paymentMethod || '—'}
+                    </span>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

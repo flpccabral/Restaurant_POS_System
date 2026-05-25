@@ -51,7 +51,7 @@ const generateAlerts = async (storeId) => {
                 location: ingredient.location?.id,
                 ingredient: ingredient.ingredient?.id,
                 status: 'new',
-                message: `Byproduct '${ingredient.ingredient?.name}' available (${ingredient.balance}${ingredient.unit}). Consider transfer to compatible operations.`,
+                message: `Subproduto '${ingredient.ingredient?.name}' disponivel (${ingredient.balance}${ingredient.unit}). Considere transferir para operacoes compativeis.`,
                 currentValue: ingredient.balance,
                 metadata: {
                     itemType: ingredient.ingredient?.itemType,
@@ -272,27 +272,27 @@ const _mapHealthToAlert = (ingredient, store) => {
         case 'stockout':
             type = 'stockout';
             severity = 'critical';
-            message = `Stockout: '${name}' has 0${unit} at ${store?.name || 'store'}. Immediate replenishment required.`;
+            message = `Estoque zerado: '${name}' com 0${unit} em ${store?.name || 'loja'}. Reabastecimento imediato necessario.`;
             break;
         case 'critical':
             type = 'critical_stock';
             severity = 'high';
-            message = `Critical stock: '${name}' at ${balance}${unit} (min: ${policy?.minQuantity}${unit}). Urgent replenishment needed.`;
+            message = `Estoque critico: '${name}' com ${balance}${unit} (minimo: ${policy?.minQuantity}${unit}). Reabastecimento urgente necessario.`;
             break;
         case 'low':
             type = 'low_stock';
             severity = 'medium';
-            message = `Low stock: '${name}' at ${balance}${unit} (reorder point: ${policy?.reorderPoint}${unit}). Consider replenishment.`;
+            message = `Estoque baixo: '${name}' com ${balance}${unit} (ponto de ressuprimento: ${policy?.reorderPoint}${unit}. Considere reabastecer.`;
             break;
         case 'excess':
             type = 'excess_stock';
             severity = 'low';
-            message = `Excess stock: '${name}' at ${balance}${unit} (max: ${policy?.maxQuantity}${unit}). Consider transfer to other stores.`;
+            message = `Estoque excedente: '${name}' com ${balance}${unit} (maximo: ${policy?.maxQuantity}${unit}). Considere transferir para outras lojas.`;
             break;
         case 'no_policy':
             type = 'no_policy';
             severity = 'info';
-            message = `No stock policy defined for '${name}'. Consider creating a StockPolicy for better monitoring.`;
+            message = `Nenhuma politica de estoque definida para '${name}'. Crie uma StockPolicy para melhor monitoramento.`;
             break;
         default:
             return null;
@@ -335,7 +335,7 @@ const registerPurchase = async (storeId, data, userId) => {
         ingredient: data.ingredientId,
         location: data.locationId,
         status: 'resolved',
-        message: data.message || `Purchase registered for '${data.ingredientName || 'ingredient'}' (${data.quantity || ''}${data.unit || ''})`,
+        message: data.message || `Compra registrada para '${data.ingredientName || 'ingrediente'}' (${data.quantity || ''}${data.unit || ''})`,
         currentValue: data.quantity,
         metadata: {
             purchaseNotes: data.notes,

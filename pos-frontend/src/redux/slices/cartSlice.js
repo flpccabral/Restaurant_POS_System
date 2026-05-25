@@ -16,10 +16,19 @@ const cartSlice = createSlice({
 
         removeAllItems: (state) => {
             return [];
+        },
+
+        // Fase 9.3C: Update item notes
+        updateItemNotes: (state, action) => {
+            const { id, notes } = action.payload;
+            const item = state.find(item => item.id === id);
+            if (item) {
+                item.notes = notes;
+            }
         }
     }
 })
 
 export const getTotalPrice = (state) => state.cart.reduce((total, item) => total + item.price, 0);
-export const { addItems, removeItem, removeAllItems } = cartSlice.actions;
+export const { addItems, removeItem, removeAllItems, updateItemNotes } = cartSlice.actions;
 export default cartSlice.reducer;

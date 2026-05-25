@@ -45,6 +45,8 @@ const createProduct = async (req, res, next) => {
             return next(error);
         }
 
+        const defaultPrice = price !== undefined ? price : 0;
+
         // Criar produto base
         const product = new Product({
             store: storeRef,
@@ -53,6 +55,7 @@ const createProduct = async (req, res, next) => {
             category: categoryId,
             image,
             tags: tags || [],
+            price: defaultPrice,
             ...(sellableType && { sellableType }),
             ...(stockImpactRule && { stockImpactRule }),
             ...(directStockItem && { directStockItem }),
@@ -84,7 +87,6 @@ const createProduct = async (req, res, next) => {
 
         // Se nenhuma variação foi adicionada, criar variação "Padrão" automaticamente
         if (product.variations.length === 0) {
-            const defaultPrice = price !== undefined ? price : 0;
             const sku = generateUniqueSku(name, 'Padrao', []);
             product.variations.push({
                 name: 'Padrão',
@@ -342,6 +344,13 @@ const updateProduct = async (req, res, next) => {
             });
         }
 
+        // Sincronizar price raiz com primeira variação ativa
+        if (price !== undefined) {
+            product.price = price;
+        } else if (product.variations.length > 0) {
+            product.price = product.variations[0].price;
+        }
+
         // Atualizar campos de impacto em estoque (Fase 9.1A)
         if (sellableType !== undefined) product.sellableType = sellableType;
         if (stockImpactRule !== undefined) product.stockImpactRule = stockImpactRule;
@@ -464,6 +473,10 @@ const updateVariation = async (req, res, next) => {
         if (name !== undefined) variation.name = name;
         if (price !== undefined) variation.price = price;
         if (isActive !== undefined) variation.isActive = isActive;
+
+        // Sincronizar price raiz com primeira variação ativa
+        const activeVar = product.variations.find(v => v.isActive !== false);
+        if (activeVar) product.price = activeVar.price;
 
         // Regenerar SKU se nome mudou
         if (name !== undefined) {

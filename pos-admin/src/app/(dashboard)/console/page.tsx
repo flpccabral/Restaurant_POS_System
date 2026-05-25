@@ -28,7 +28,7 @@ const ALL_TABS = [
   { key: "stockHealth", label: "Saude do Estoque", icon: Package },
   { key: "alerts", label: "Alertas", icon: AlertTriangle },
   { key: "recommendations", label: "Recomendacoes", icon: Lightbulb },
-  { key: "timeline", label: "Timeline", icon: History },
+  { key: "timeline", label: "Linha do Tempo", icon: History },
   { key: "policies", label: "Politicas", icon: Shield },
 ] as const;
 

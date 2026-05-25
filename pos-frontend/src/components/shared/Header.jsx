@@ -1,87 +1,122 @@
-import React from "react";
-import { FaSearch } from "react-icons/fa";
-import { FaUserCircle } from "react-icons/fa";
-import { FaBell } from "react-icons/fa";
-import logo from "../../assets/images/logo.png";
-import { useDispatch, useSelector } from "react-redux";
-import { IoLogOut } from "react-icons/io5";
-import { useMutation } from "@tanstack/react-query";
-import { logout } from "../../https";
-import { removeUser } from "../../redux/slices/userSlice";
-import { useNavigate } from "react-router-dom";
-import { MdDashboard } from "react-icons/md";
-import { MdOutlineMonitor } from "react-icons/md";
+import React, { useState, useRef } from 'react';
+import { FiSearch, FiBell, FiMonitor, FiGrid, FiLogOut } from 'react-icons/fi';
+import { FaUserCircle } from 'react-icons/fa';
+import logo from '../../assets/images/logo.png';
+import { useSelector } from 'react-redux';
+import { useMutation } from '@tanstack/react-query';
+import { logout } from '../../https';
+import { removeUser } from '../../redux/slices/userSlice';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import PdvModeBadge from '../pdv/PdvModeBadge';
+import PdvSearchBar from '../pdv/PdvSearchBar';
 
 const Header = () => {
   const userData = useSelector((state) => state.user);
+  const customerData = useSelector((state) => state.customer);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const logoutMutation = useMutation({
     mutationFn: () => logout(),
-    onSuccess: (data) => {
-      console.log(data);
+    onSuccess: () => {
       dispatch(removeUser());
-      navigate("/auth");
+      navigate('/auth');
     },
-    onError: (error) => {
-      console.log(error);
-    },
+    onError: () => {},
   });
 
   const handleLogout = () => {
     logoutMutation.mutate();
   };
 
+  // Show mode badge only when on menu (ordering) page
+  const showMode = location.pathname === '/menu';
+  const isCounter = customerData.orderType === 'counter';
+
   return (
-    <header className="flex justify-between items-center py-4 px-8 bg-[#1a1a1a]">
-      {/* LOGO */}
-      <div onClick={() => navigate("/")} className="flex items-center gap-2 cursor-pointer">
-        <img src={logo} className="h-8 w-8" alt="restro logo" />
-        <h1 className="text-lg font-semibold text-[#f5f5f5] tracking-wide">
-          Restro
-        </h1>
-      </div>
-
-      {/* SEARCH */}
-      <div className="flex items-center gap-4 bg-[#1f1f1f] rounded-[15px] px-5 py-2 w-[500px]">
-        <FaSearch className="text-[#f5f5f5]" />
-        <input
-          type="text"
-          placeholder="Search"
-          className="bg-[#1f1f1f] outline-none text-[#f5f5f5]"
-        />
-      </div>
-
-      {/* LOGGED USER DETAILS */}
-      <div className="flex items-center gap-4">
-        {userData.role === "Admin" && (
-          <div onClick={() => navigate("/dashboard")} className="bg-[#1f1f1f] rounded-[15px] p-3 cursor-pointer">
-            <MdDashboard className="text-[#f5f5f5] text-2xl" />
+    <header className="h-14 bg-blue-700 text-white flex items-center justify-between px-4 shadow-md">
+      {/* Left: Logo + Brand + Mode */}
+      <div className="flex items-center gap-3">
+        <button
+          onClick={() => navigate('/')}
+          className="flex items-center gap-2 hover:opacity-90 transition-opacity"
+        >
+          <img src={logo} className="h-7 w-7 brightness-0 invert" alt="logo" />
+          <span className="text-lg font-bold tracking-wide hidden sm:inline">
+            Restro POS
+          </span>
+        </button>
+        {showMode && (
+          <div className="hidden md:flex items-center gap-2 ml-2 border-l border-white/20 pl-3">
+            <PdvModeBadge
+              orderType={customerData.orderType}
+              tableNo={customerData.table?.tableNo}
+            />
+            {!isCounter && customerData.table?.tableNo && (
+              <span className="text-white/80 text-xs font-medium ml-1">
+                {customerData.customerName || '--'}
+              </span>
+            )}
           </div>
         )}
-        <div onClick={() => navigate("/console")} className="bg-[#1f1f1f] rounded-[15px] p-3 cursor-pointer" title="Console Operacional">
-          <MdOutlineMonitor className="text-[#f5f5f5] text-2xl" />
-        </div>
-        <div className="bg-[#1f1f1f] rounded-[15px] p-3 cursor-pointer">
-          <FaBell className="text-[#f5f5f5] text-2xl" />
-        </div>
-        <div className="flex items-center gap-3 cursor-pointer">
-          <FaUserCircle className="text-[#f5f5f5] text-4xl" />
-          <div className="flex flex-col items-start">
-            <h1 className="text-md text-[#f5f5f5] font-semibold tracking-wide">
-              {userData.name || "TEST USER"}
-            </h1>
-            <p className="text-xs text-[#ababab] font-medium">
-              {userData.role || "Role"}
-            </p>
+      </div>
+
+      {/* Center: Search */}
+      <div className="flex-1 flex justify-center px-4">
+        <PdvSearchBar />
+      </div>
+
+      {/* Right: Operator + Actions */}
+      <div className="flex items-center gap-2">
+        {/* Console */}
+        <button
+          onClick={() => navigate('/console')}
+          className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+          title="Console Operacional"
+        >
+          <FiMonitor size={18} />
+        </button>
+
+        {/* Dashboard (Admin only) */}
+        {userData.role === 'Admin' && (
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+            title="Dashboard"
+          >
+            <FiGrid size={18} />
+          </button>
+        )}
+
+        {/* Notifications */}
+        <button className="p-2 hover:bg-white/10 rounded-lg transition-colors relative">
+          <FiBell size={18} />
+          <span className="absolute top-1 right-1 w-2 h-2 bg-red-400 rounded-full" />
+        </button>
+
+        {/* Operator */}
+        <div className="flex items-center gap-2 ml-1 border-l border-white/20 pl-3">
+          <FaUserCircle className="text-white text-2xl" />
+          <div className="hidden md:flex flex-col">
+            <span className="text-sm font-semibold leading-tight">
+              {userData.name || 'OPERADOR'}
+            </span>
+            <span className="text-[10px] text-white/70 font-medium leading-tight">
+              {userData.role || '--'}
+            </span>
           </div>
-          <IoLogOut
-            onClick={handleLogout}
-            className="text-[#f5f5f5] ml-2"
-            size={40}
-          />
         </div>
+
+        {/* Logout */}
+        <button
+          onClick={handleLogout}
+          className="p-2 hover:bg-white/10 rounded-lg transition-colors ml-1"
+          title="Sair"
+        >
+          <FiLogOut size={18} />
+        </button>
       </div>
     </header>
   );

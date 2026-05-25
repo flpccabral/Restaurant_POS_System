@@ -43,7 +43,9 @@ const checkPermission = (module, actions, options = {}) => {
             }
 
             // Verificar se a role pertence à mesma loja (ou é global)
-            if (userRole.store && userRole.store.toString() !== user.store.toString()) {
+            const roleStoreId = (userRole.store?._id || userRole.store)?.toString();
+            const userStoreId = (user.store?._id || user.store)?.toString();
+            if (userRole.store && roleStoreId !== userStoreId) {
                 const error = createHttpError(403, "Role does not belong to user's store!");
                 return next(error);
             }
@@ -117,7 +119,9 @@ const checkResourcePermission = (module, action, resourceParam = 'id', resourceL
                 }
 
                 // Verificar se recurso pertence à mesma loja
-                if (resource.store && resource.store.toString() !== user.store.toString()) {
+                const resourceStoreId = (resource.store?._id || resource.store)?.toString();
+                const userStoreId = (user.store?._id || user.store)?.toString();
+                if (resource.store && resourceStoreId !== userStoreId) {
                     const error = createHttpError(403, "Access denied: Resource belongs to different store!");
                     return next(error);
                 }

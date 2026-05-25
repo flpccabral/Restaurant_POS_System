@@ -13,7 +13,7 @@ const allTabs = [
   { key: "stockHealth", label: "Saude do Estoque", icon: <MdInventory /> },
   { key: "alerts", label: "Alertas", icon: <MdWarning /> },
   { key: "recommendations", label: "Recomendacoes", icon: <MdLightbulb /> },
-  { key: "timeline", label: "Timeline", icon: <MdTimeline /> },
+  { key: "timeline", label: "Linha do Tempo", icon: <MdTimeline /> },
   { key: "policies", label: "Politicas", icon: <MdGavel /> },
 ];
 
