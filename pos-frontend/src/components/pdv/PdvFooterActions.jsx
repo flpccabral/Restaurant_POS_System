@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
-  FiGrid, FiShoppingBag, FiCoffee, FiMonitor,
+  FiShoppingBag, FiCoffee, FiMonitor,
   FiDollarSign, FiPrinter, FiLogOut, FiMapPin, FiMenu
 } from 'react-icons/fi';
 import { useDispatch } from 'react-redux';
@@ -33,13 +33,6 @@ const PdvFooterActions = () => {
 
   const buttons = [
     {
-      label: 'PDV',
-      icon: FiShoppingBag,
-      onClick: () => navigate('/menu'),
-      active: isActive('/menu'),
-      disabled: false,
-    },
-    {
       label: 'Pre-venda',
       icon: FiShoppingBag,
       onClick: () => {},
@@ -65,7 +58,7 @@ const PdvFooterActions = () => {
       label: 'Balcao',
       icon: FiMonitor,
       onClick: handleCounterMode,
-      active: isActive('/menu') && false, // not highlighted on menu
+      active: isActive('/menu'),
       disabled: false,
     },
     {
