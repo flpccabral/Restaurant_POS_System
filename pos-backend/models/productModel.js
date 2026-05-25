@@ -115,7 +115,7 @@ const productSchema = new mongoose.Schema({
 // Índices compostos
 productSchema.index({ store: 1, category: 1 });
 productSchema.index({ store: 1, isActive: 1, isCurrent: 1 });
-productSchema.index({ 'variations.sku': 1 });
+// index on variations.sku already declared via field-level index: true in variationSchema
 
 // Virtual para retornar o menor preço entre as variações
 productSchema.virtual('startingAt').get(function() {

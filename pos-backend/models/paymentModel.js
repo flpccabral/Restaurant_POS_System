@@ -111,7 +111,7 @@ const paymentSchema = new mongoose.Schema({
 
 // Índices
 paymentSchema.index({ store: 1, status: 1, createdAt: -1 });
-paymentSchema.index({ order: 1 });
+// index on order already declared via field-level index: true
 paymentSchema.index({ method: 1, status: 1 });
 paymentSchema.index({ 'gateway.transactionId': 1 }, { unique: true, sparse: true });
 

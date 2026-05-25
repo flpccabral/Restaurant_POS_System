@@ -39,6 +39,4 @@ const sessionLogSchema = new mongoose.Schema({
 
 sessionLogSchema.index({ store: 1, createdAt: -1 });
 sessionLogSchema.index({ user: 1, createdAt: -1 });
-sessionLogSchema.index({ action: 1 });
-
 module.exports = mongoose.model("SessionLog", sessionLogSchema);

@@ -24,7 +24,7 @@ const emitOrderCreated = (io, order) => {
             orderNumber: order.orderNumber,
             items: order.items,
             total: order.total,
-            status: order.status,
+            status: order.orderStatus || order.status,
             createdAt: order.createdAt
         },
         timestamp: new Date().toISOString()
@@ -62,20 +62,21 @@ const emitOrderUpdated = (io, order) => {
  * @param {string} oldStatus - Status anterior
  */
 const emitOrderStatusChanged = (io, storeId, order, oldStatus) => {
+    const newStatus = order.orderStatus || order.status;
     const eventData = {
         event: 'order:status-changed',
         data: {
             orderId: order._id,
             storeId: storeId,
             oldStatus: oldStatus,
-            newStatus: order.status,
+            newStatus: newStatus,
             timestamp: new Date().toISOString()
         },
         timestamp: new Date().toISOString()
     };
 
     io.to(`store:${storeId}`).emit('order:status-changed', eventData.data);
-    console.log(`[WebSocket] order:status-changed emitted: ${oldStatus} -> ${order.status}`);
+    console.log(`[WebSocket] order:status-changed emitted: ${oldStatus} -> ${newStatus}`);
 };
 
 /**
