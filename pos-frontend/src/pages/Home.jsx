@@ -7,8 +7,6 @@ import { BsCashCoin } from 'react-icons/bs';
 import { GrInProgress } from 'react-icons/gr';
 import { FiMonitor, FiCoffee, FiClipboard, FiShoppingCart } from 'react-icons/fi';
 import MiniCard from '../components/home/MiniCard';
-import RecentOrders from '../components/home/RecentOrders';
-import PopularDishes from '../components/home/PopularDishes';
 import PdvFooterActions from '../components/pdv/PdvFooterActions';
 import { setOrderType, updateTable } from '../redux/slices/customerSlice';
 import { getDashboardKPIs, getOrders } from '../https';
@@ -104,13 +102,6 @@ const Home = () => {
               footerNum={0}
             />
           </div>
-          <div className="mt-6">
-            <RecentOrders />
-          </div>
-        </div>
-        {/* Right Div */}
-        <div className="flex-[2] overflow-y-auto p-6 pl-0">
-          <PopularDishes />
         </div>
       </div>
       <PdvFooterActions />
