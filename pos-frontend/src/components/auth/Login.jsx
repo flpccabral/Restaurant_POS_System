@@ -30,7 +30,7 @@ const Login = () => {
           const { data } = res;
           const { _id, name, email, phone, role, store, isMasterAdmin } = data.data;
           dispatch(setUser({ _id, name, email, phone, role, store, isMasterAdmin }));
-          navigate("/");
+          navigate("/menu");
       },
       onError: (error) => {
         const { response } = error;

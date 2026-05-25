@@ -4,7 +4,7 @@ import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tansta
 import { enqueueSnackbar } from 'notistack';
 import { getTableBill, closeTable } from '../https';
 import BackButton from '../components/shared/BackButton';
-import BottomNav from '../components/shared/BottomNav';
+import PdvFooterActions from '../components/pdv/PdvFooterActions';
 import { useDispatch } from 'react-redux';
 import { updateTable, setCustomer } from '../redux/slices/customerSlice';
 import { formatDateAndTime } from '../utils';
@@ -94,7 +94,7 @@ const TableBill = () => {
         <div className="flex items-center justify-center h-48">
           <p className="text-red-500 text-sm">Erro ao carregar conta da mesa.</p>
         </div>
-        <BottomNav />
+        <PdvFooterActions />
       </section>
     );
   }
@@ -297,7 +297,7 @@ const TableBill = () => {
         )}
       </div>
 
-      <BottomNav />
+      <PdvFooterActions />
     </section>
   );
 };

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import BottomNav from '../components/shared/BottomNav';
 import BackButton from '../components/shared/BackButton';
+import PdvFooterActions from '../components/pdv/PdvFooterActions';
 import TableCard from '../components/tables/TableCard';
 import { enqueueSnackbar } from 'notistack';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
@@ -110,7 +110,7 @@ const Tables = () => {
         )}
       </div>
 
-      <BottomNav />
+      <PdvFooterActions />
     </section>
   );
 };

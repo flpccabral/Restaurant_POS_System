@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import BottomNav from '../components/shared/BottomNav';
 import BackButton from '../components/shared/BackButton';
+import PdvFooterActions from '../components/pdv/PdvFooterActions';
 import OrderCard from '../components/orders/OrderCard';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { getOrders } from '../https/index';
@@ -91,7 +91,7 @@ const Orders = () => {
         )}
       </div>
 
-      <BottomNav />
+      <PdvFooterActions />
     </section>
   );
 };
