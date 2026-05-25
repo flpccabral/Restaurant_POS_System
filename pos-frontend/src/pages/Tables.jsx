@@ -5,14 +5,9 @@ import TableCard from '../components/tables/TableCard';
 import { enqueueSnackbar } from 'notistack';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { getTables } from '../https';
-import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { setOrderType, updateTable } from '../redux/slices/customerSlice';
 
 const Tables = () => {
   const [status, setStatus] = useState('all');
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   useEffect(() => {
     document.title = 'POS | Mesas';
@@ -29,13 +24,6 @@ const Tables = () => {
   if (isError) {
     enqueueSnackbar('Algo deu errado!', { variant: 'error' });
   }
-
-  // Fase 9.3C: Counter mode — no table, direct ordering
-  const handleCounterMode = () => {
-    dispatch(setOrderType('counter'));
-    dispatch(updateTable({ table: null }));
-    navigate('/menu');
-  };
 
   const tables = resData?.data.data || [];
 
@@ -76,12 +64,6 @@ const Tables = () => {
                 </button>
               ))}
             </div>
-            <button
-              onClick={handleCounterMode}
-              className="bg-blue-600 text-white rounded-lg px-5 py-1.5 font-bold text-sm hover:bg-blue-700 transition-colors"
-            >
-              Atendimento Balcao
-            </button>
           </div>
         </div>
       </div>
