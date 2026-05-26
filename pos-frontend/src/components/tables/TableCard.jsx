@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAvatarName, getBgColor, translateTableStatus } from '../../utils';
 import { useDispatch } from 'react-redux';
-import { updateTable, setCustomer } from '../../redux/slices/customerSlice';
+import { updateTable, setCustomer, setOrderType } from '../../redux/slices/customerSlice';
 import { FiArrowRight, FiEye, FiPlus } from 'react-icons/fi';
 
 const TableCard = ({ id, name, status, initials, seats, customerName, customerPhone, customerGuests }) => {
@@ -18,6 +18,7 @@ const TableCard = ({ id, name, status, initials, seats, customerName, customerPh
 
     const table = { tableId: id, tableNo: name };
     dispatch(updateTable({ table }));
+    dispatch(setOrderType('dine_in'));
     navigate('/menu');
   };
 
@@ -25,6 +26,7 @@ const TableCard = ({ id, name, status, initials, seats, customerName, customerPh
     e.stopPropagation();
     const table = { tableId: id, tableNo: name };
     dispatch(updateTable({ table }));
+    dispatch(setOrderType('dine_in'));
     // Carregar dados do cliente do pedido existente na mesa
     if (customerName) {
       dispatch(setCustomer({

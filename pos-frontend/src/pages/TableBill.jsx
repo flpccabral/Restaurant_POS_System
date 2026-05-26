@@ -6,7 +6,7 @@ import { getTableBill, closeTable } from '../https';
 import BackButton from '../components/shared/BackButton';
 import PdvFooterActions from '../components/pdv/PdvFooterActions';
 import { useDispatch } from 'react-redux';
-import { updateTable, setCustomer } from '../redux/slices/customerSlice';
+import { updateTable, setCustomer, setOrderType } from '../redux/slices/customerSlice';
 import { formatDateAndTime } from '../utils';
 import { FiPlus, FiDollarSign, FiArrowLeft } from 'react-icons/fi';
 
@@ -64,6 +64,7 @@ const TableBill = () => {
     const table = resData?.data?.data?.table;
     if (table) {
       dispatch(updateTable({ table: { tableId: id, tableNo: table.tableNo } }));
+      dispatch(setOrderType('dine_in'));
       // Carregar dados do cliente do primeiro pedido aberto
       const firstOrder = orders?.[0];
       if (firstOrder?.customerDetails?.name) {
