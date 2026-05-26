@@ -5,7 +5,6 @@ import {
   FiDollarSign, FiPrinter, FiLogOut, FiMapPin, FiMenu
 } from 'react-icons/fi';
 import { useDispatch } from 'react-redux';
-import { setOrderType, updateTable } from '../../redux/slices/customerSlice';
 import { useMutation } from '@tanstack/react-query';
 import { logout as logoutApi } from '../../https';
 import { removeUser } from '../../redux/slices/userSlice';
@@ -23,9 +22,7 @@ const PdvFooterActions = () => {
     },
   });
 
-  const handleCounterMode = () => {
-    dispatch(setOrderType('counter'));
-    dispatch(updateTable({ table: null }));
+  const handleCaixa = () => {
     navigate('/menu');
   };
 
@@ -55,9 +52,9 @@ const PdvFooterActions = () => {
       disabled: false,
     },
     {
-      label: 'Balcao',
+      label: 'Caixa',
       icon: FiMonitor,
-      onClick: handleCounterMode,
+      onClick: handleCaixa,
       active: isActive('/menu'),
       disabled: false,
     },
