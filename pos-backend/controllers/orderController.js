@@ -164,12 +164,31 @@ const addOrder = async (req, res, next) => {
       }
     }
 
+    // Determine if order needs kitchen preparation
+    const Product = mongoose.model('Product');
+    const productIds = order.items
+      .filter(item => item.product)
+      .map(item => item.product);
+    const products = productIds.length > 0
+      ? await Product.find({ _id: { $in: productIds } }).select('sellableType stockImpactRule').lean()
+      : [];
+    const needsPrep = products.some(
+      p => p.sellableType !== 'industrialized_resale' && p.stockImpactRule !== 'stock_item_direct'
+    );
+
     // Emit WebSocket event
     const io = req.app.get('io');
     ws.emitOrderCreated(io, order);
 
-    // Sync to KDS (fire-and-forget) — pass orderType to KDS sync
-    syncOrderToKds(order, storeRef, io);
+    if (!needsPrep) {
+      // Drink-only or resale-only order — no kitchen prep needed, mark Ready
+      order.orderStatus = 'Ready';
+      await order.save();
+      console.log(`[orderController] Order ${order._id} auto-advanced to Ready (no kitchen items)`);
+    } else {
+      // Sync to KDS (fire-and-forget) for food items
+      syncOrderToKds(order, storeRef, io);
+    }
 
     res
       .status(201)
