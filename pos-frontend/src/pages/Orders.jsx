@@ -34,7 +34,7 @@ const Orders = () => {
 
   const STATUS_FILTER_MAP = {
     all: null,
-    progress: ['In Progress', 'pending', 'accepted', 'preparing'],
+    progress: ['In Progress', 'Preparing', 'pending', 'accepted', 'preparing'],
     ready: ['Ready', 'done'],
     completed: ['completed', 'Completed', 'paid'],
   };

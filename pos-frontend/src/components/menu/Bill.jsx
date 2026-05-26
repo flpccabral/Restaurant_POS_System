@@ -122,8 +122,9 @@ const Bill = () => {
     };
 
     if (isCounter) {
+      // Counter: payment is immediate, but orderStatus follows normal KDS lifecycle
       orderData.paymentStatus = 'paid';
-      orderData.closeStatus = 'closed';
+      // closeStatus stays 'open' until orderStatus reaches 'completed' (auto-closed by backend)
     }
 
     return orderData;

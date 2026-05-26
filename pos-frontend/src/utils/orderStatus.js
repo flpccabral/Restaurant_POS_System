@@ -1,5 +1,6 @@
 export const ORDER_STATUS_MAP = {
   "In Progress": "Em Preparo",
+  "Preparing": "Preparando",
   "Ready": "Pronto",
   "done": "Pronto",
   "completed": "Concluído",

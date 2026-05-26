@@ -141,11 +141,18 @@ const acceptKDSOrder = async (req, res, next) => {
         order.calculateEstimatedReady();
         await order.save();
 
+        // Persist "Preparing" to the parent Order so the salão sees real status
+        try {
+            await Order.findByIdAndUpdate(order.order, { orderStatus: 'Preparing' });
+        } catch (err) {
+            console.error(`[kdsController] Failed to sync PDV order ${order.order} to Preparing: ${err.message}`);
+        }
+
         // Emit WebSocket event
         const io = req.app.get('io');
         ws.emitOrderStatusChanged(io, order.store, {
             _id: order.order,
-            orderStatus: 'preparing'
+            orderStatus: 'Preparing'
         }, 'pending');
 
         res.status(200).json({
@@ -271,9 +278,14 @@ const markOrderServed = async (req, res, next) => {
 
         await kdsOrder.markServed();
 
-        // Atualizar Order do PDV para "completed"
+        // Atualizar Order do PDV para "completed" — auto-close counter orders
         try {
-            await Order.findByIdAndUpdate(kdsOrder.order, { orderStatus: 'completed' });
+            const updateData = { orderStatus: 'completed' };
+            const parentOrder = await Order.findById(kdsOrder.order).select('orderType paymentStatus').lean();
+            if (parentOrder && parentOrder.orderType === 'counter' && parentOrder.paymentStatus === 'paid') {
+                updateData.closeStatus = 'closed';
+            }
+            await Order.findByIdAndUpdate(kdsOrder.order, updateData);
         } catch (err) {
             console.error(`[kdsController] Failed to sync PDV order ${kdsOrder.order} to completed: ${err.message}`);
         }

@@ -210,9 +210,9 @@ const processPayment = async (req, res, next) => {
             return next(error);
         }
 
-        // Se pedido já está pago, evitar duplicação
-        if (order.orderStatus === 'paid') {
-            const error = createHttpError(400, "Order is already paid!");
+        // Se pedido já está finalizado, evitar duplicação
+        if (order.orderStatus === 'completed') {
+            const error = createHttpError(400, "Order is already completed!");
             return next(error);
         }
 
@@ -308,7 +308,7 @@ const processPayment = async (req, res, next) => {
         }
 
         // Atualizar pedido
-        order.orderStatus = 'paid';
+        order.orderStatus = 'completed';
         order.paymentMethod = method;
         // Fase 9.3C: Payment also updates paymentStatus and closeStatus
         order.paymentStatus = 'paid';

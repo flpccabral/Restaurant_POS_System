@@ -123,6 +123,27 @@ const closeTable = async (req, res, next) => {
       return next(error);
     }
 
+    // Guard: block closure if any order is still in kitchen
+    const pendingOrders = openOrders.filter(
+      o => o.orderStatus === 'In Progress' || o.orderStatus === 'Preparing'
+    );
+    const force = req.body.force === true;
+
+    if (pendingOrders.length > 0 && !force) {
+      const pendingList = pendingOrders.map(o =>
+        `#${o.orderNumber || o._id} (${o.orderStatus})`
+      ).join(', ');
+      const error = createHttpError(
+        409,
+        `Cannot close table: ${pendingOrders.length} order(s) still pending in kitchen — ${pendingList}. Use force=true to override.`
+      );
+      return next(error);
+    }
+
+    if (pendingOrders.length > 0 && force) {
+      console.warn(`[closeTable] FORCED closure of table ${table.tableNo} with ${pendingOrders.length} pending orders (by user ${req.user?._id || 'unknown'})`);
+    }
+
     // Calcular total acumulado
     const totalAmount = openOrders.reduce((sum, o) => sum + (o.bills?.totalWithTax || 0), 0);
     const totalCOGS = openOrders.reduce((sum, o) => sum + (o.totalCOGS || 0), 0);
@@ -138,7 +159,7 @@ const closeTable = async (req, res, next) => {
       Order.findByIdAndUpdate(order._id, {
         paymentStatus: 'paid',
         closeStatus: 'closed',
-        orderStatus: order.orderStatus === 'Ready' ? 'completed' : order.orderStatus,
+        orderStatus: (order.orderStatus === 'Ready' || order.orderStatus === 'In Progress' || order.orderStatus === 'Preparing') ? 'completed' : order.orderStatus,
         paymentMethod: paymentMethod,
         ...(observations ? { observations } : {}),
         ...(paidAmount ? { 'bills.totalWithTax': paidAmount } : {})

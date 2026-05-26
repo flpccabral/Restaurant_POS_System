@@ -180,11 +180,19 @@ const addOrder = async (req, res, next) => {
     const io = req.app.get('io');
     ws.emitOrderCreated(io, order);
 
+    const isCounter = order.orderType === 'counter';
     if (!needsPrep) {
-      // Drink-only or resale-only order — no kitchen prep needed, mark Ready
-      order.orderStatus = 'Ready';
+      // Drink-only or resale-only — no kitchen prep needed
+      if (isCounter) {
+        // Counter: paid already, transaction complete
+        order.orderStatus = 'completed';
+        order.closeStatus = 'closed';
+      } else {
+        // Dine-in: ready to serve, but table still open
+        order.orderStatus = 'Ready';
+      }
       await order.save();
-      console.log(`[orderController] Order ${order._id} auto-advanced to Ready (no kitchen items)`);
+      console.log(`[orderController] Order ${order._id} auto-advanced to ${order.orderStatus} (no kitchen items, ${order.orderType})`);
     } else {
       // Sync to KDS (fire-and-forget) for food items
       syncOrderToKds(order, storeRef, io);
