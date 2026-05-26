@@ -138,6 +138,7 @@ const closeTable = async (req, res, next) => {
       Order.findByIdAndUpdate(order._id, {
         paymentStatus: 'paid',
         closeStatus: 'closed',
+        orderStatus: order.orderStatus === 'Ready' ? 'completed' : order.orderStatus,
         paymentMethod: paymentMethod,
         ...(observations ? { observations } : {}),
         ...(paidAmount ? { 'bills.totalWithTax': paidAmount } : {})

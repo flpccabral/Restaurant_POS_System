@@ -1,7 +1,12 @@
 export const ORDER_STATUS_MAP = {
   "In Progress": "Em Preparo",
   "Ready": "Pronto",
+  "done": "Pronto",
+  "completed": "Concluído",
   "Completed": "Concluído",
+  "paid": "Pago",
+  "cancelled": "Cancelado",
+  "Cancelled": "Cancelado",
 };
 
 export const TABLE_STATUS_MAP = {
