@@ -192,7 +192,7 @@ const TableBill = () => {
                   >
                     <div className="flex-1 min-w-0">
                       <span className="text-gray-800 text-sm font-medium">
-                        {item.quantity}x {item.name || item.productName}
+                        {item.quantity || 1}x {item.name || item.productName}
                       </span>
                       {item.notes && (
                         <p className="text-xs text-amber-600 mt-0.5 ml-4 truncate">
@@ -201,7 +201,7 @@ const TableBill = () => {
                       )}
                     </div>
                     <span className="text-gray-600 text-sm font-semibold ml-4 tabular-nums">
-                      R${((item.price || 0) * (item.quantity || 1)).toFixed(2)}
+                      R${(item.price || 0).toFixed(2)}
                     </span>
                   </div>
                 ))}

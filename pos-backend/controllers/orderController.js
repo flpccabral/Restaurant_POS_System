@@ -37,17 +37,22 @@ const syncOrderToKds = async (order, storeRef, io) => {
       tableNumber = tableDoc?.tableNo;
     }
 
-    // Build category -> station map from KDS config
+    // Build product maps: category routing + kitchen-prep eligibility
     const Product = mongoose.model('Product');
     const productIds = order.items
       .filter(item => item.product)
       .map(item => item.product);
     const products = productIds.length > 0
-      ? await Product.find({ _id: { $in: productIds } }).select('category').lean()
+      ? await Product.find({ _id: { $in: productIds } }).select('category sellableType stockImpactRule').lean()
       : [];
     const productCategoryMap = {};
+    const productNeedsPrep = {}; // true if item requires kitchen preparation
     for (const p of products) {
       productCategoryMap[p._id.toString()] = p.category?.toString();
+      // Industrialized resale (bebidas, etc.) and stock_item_direct items skip kitchen
+      const needsPrep = p.sellableType !== 'industrialized_resale'
+        && p.stockImpactRule !== 'stock_item_direct';
+      productNeedsPrep[p._id.toString()] = needsPrep;
     }
 
     // Category -> station routing
@@ -73,10 +78,9 @@ const syncOrderToKds = async (order, storeRef, io) => {
                          orderType === 'pickup' ? 'pickup' :
                          orderType === 'delivery' ? 'delivery' : 'dine-in';
 
-    // Fase 9.3D: Route items to correct station based on product category
-    // Items without a matching station category go to default (kitchen)
-    const items = order.items
-      .filter(item => item.name || item.productName)
+    // Filter to items that actually need kitchen preparation
+    const kdsItems = order.items
+      .filter(item => (item.name || item.productName) && (!item.product || productNeedsPrep[item.product?.toString()] !== false))
       .map(item => ({
         orderItem: item._id,
         productId: item.product || undefined,
@@ -88,8 +92,9 @@ const syncOrderToKds = async (order, storeRef, io) => {
         modifiers: item.modifiers || []
       }));
 
-    if (items.length === 0) {
-      console.warn(`[orderController] KDS sync skipped for order ${order._id}: no items with valid name`);
+    if (kdsItems.length === 0) {
+      // No items need kitchen prep (e.g., drinks-only order) — skip KDS entirely
+      console.log(`[orderController] KDS skipped for order ${order._id}: no items require kitchen preparation`);
       return;
     }
 
@@ -101,7 +106,7 @@ const syncOrderToKds = async (order, storeRef, io) => {
       tableNumber,
       customerName: order.customerDetails?.name,
       orderType: kdsOrderType,
-      items,
+      items: kdsItems,
       estimatedReady: new Date(Date.now() + (config.slaSettings?.defaultPrepTime || 15) * 60000),
       metadata: {
         channel: 'pos',
@@ -114,7 +119,7 @@ const syncOrderToKds = async (order, storeRef, io) => {
         kdsOrderId: kdsOrder.kdsOrderId,
         orderNumber: kdsOrder.orderNumber,
         tableNumber: kdsOrder.tableNumber,
-        itemsCount: kdsOrder.items.length,
+        itemsCount: kdsItems.length,
         timestamp: new Date().toISOString()
       });
     }
