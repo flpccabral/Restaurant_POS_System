@@ -1,5 +1,8 @@
 require("dotenv").config();
 
+// Lock system timezone to Brazil (UTC-3) — all new Date() and date math use this
+process.env.TZ = process.env.TZ || 'America/Sao_Paulo';
+
 const config = Object.freeze({
     port: process.env.PORT || 3000,
     databaseURI: process.env.MONGODB_URI || "mongodb://localhost:27017/pos-db",
