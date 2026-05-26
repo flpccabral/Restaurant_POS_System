@@ -198,8 +198,19 @@ const getOrderById = async (req, res, next) => {
 
 const getOrders = async (req, res, next) => {
   try {
-    // MULTI-TENANCY LOCK: All queries scoped to user's store
-    const orders = await Order.find(storeFilter(req)).populate("table");
+    const filter = { ...storeFilter(req) };
+
+    // Optional date filter — defaults to today if not provided
+    const dateParam = req.query.date;
+    if (dateParam) {
+      const start = new Date(dateParam);
+      start.setHours(0, 0, 0, 0);
+      const end = new Date(dateParam);
+      end.setHours(23, 59, 59, 999);
+      filter.createdAt = { $gte: start, $lte: end };
+    }
+
+    const orders = await Order.find(filter).populate("table").sort({ createdAt: -1 });
     res.status(200).json({ data: orders });
   } catch (error) {
     next(error);

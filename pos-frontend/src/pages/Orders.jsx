@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import BackButton from '../components/shared/BackButton';
 import PdvFooterActions from '../components/pdv/PdvFooterActions';
 import OrderCard from '../components/orders/OrderCard';
@@ -9,14 +9,18 @@ import { enqueueSnackbar } from 'notistack';
 const Orders = () => {
   const [status, setStatus] = useState('all');
 
+  // Today's date as YYYY-MM-DD for the date input and API filter
+  const today = useMemo(() => new Date().toISOString().split('T')[0], []);
+  const [selectedDate, setSelectedDate] = useState(today);
+
   useEffect(() => {
     document.title = 'POS | Pedidos';
   }, []);
 
   const { data: resData, isError } = useQuery({
-    queryKey: ['orders'],
+    queryKey: ['orders', selectedDate],
     queryFn: async () => {
-      return await getOrders();
+      return await getOrders({ date: selectedDate });
     },
     placeholderData: keepPreviousData,
   });
@@ -57,21 +61,29 @@ const Orders = () => {
               Pedidos
             </h1>
           </div>
-          {/* Filter tabs */}
-          <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
-            {tabs.map((tab) => (
-              <button
-                key={tab.key}
-                onClick={() => setStatus(tab.key)}
-                className={`px-4 py-1.5 rounded-md text-sm font-semibold transition-all ${
-                  status === tab.key
-                    ? 'bg-white text-blue-700 shadow-sm'
-                    : 'text-gray-500 hover:text-gray-700'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
+          {/* Filter tabs + Date picker */}
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.key}
+                  onClick={() => setStatus(tab.key)}
+                  className={`px-4 py-1.5 rounded-md text-sm font-semibold transition-all ${
+                    status === tab.key
+                      ? 'bg-white text-blue-700 shadow-sm'
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+            <input
+              type="date"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm font-medium text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
           </div>
         </div>
       </div>
