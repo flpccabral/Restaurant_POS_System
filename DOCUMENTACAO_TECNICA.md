@@ -436,16 +436,16 @@ const expectedBalance = openingBalance + totalSales - totalSangrias;
 
 ### Autenticação
 
-**Base URL**: `http://localhost:5000/api`
+**Base URL**: `http://localhost:8000/api`
 
 #### Login
 
 ```http
-POST /auth/login
+POST /user/login
 Content-Type: application/json
 
 {
-  "email": "admin@restaurant.com",
+  "email": "admin@pos.com",
   "password": "admin123"
 }
 ```
@@ -458,7 +458,7 @@ Content-Type: application/json
   "user": {
     "_id": "60d5ecb5c7f6b7b4c8e8b456",
     "name": "Admin",
-    "email": "admin@restaurant.com",
+    "email": "admin@pos.com",
     "role": "admin"
   }
 }
@@ -899,7 +899,7 @@ io.to(`table:${tableId}`).emit('order:updated', order);
 **Teste**:
 ```bash
 # Criar pedido
-curl -X POST http://localhost:5000/api/orders \
+curl -X POST http://localhost:8000/api/order \
   -H "Authorization: Bearer {token}" \
   -H "Content-Type: application/json" \
   -d '{
@@ -1285,7 +1285,7 @@ cp .env.example .env
 
 Editar `.env`:
 ```env
-VITE_API_URL=http://localhost:5000
+VITE_BACKEND_URL=http://localhost:8000
 ```
 
 #### 4. MongoDB
@@ -1315,11 +1315,11 @@ rs.initiate()
 
 ```bash
 cd pos-backend
-npm run seed
+node scripts/seed.js
 ```
 
 **Dados criados**:
-- 1 usuário admin: `admin@restaurant.com` / `admin123`
+- 1 usuário admin: `admin@pos.com` / `admin123`
 - 10 produtos de exemplo
 - 5 mesas
 
@@ -1347,7 +1347,7 @@ npm run dev
 npm run dev          # Desenvolvimento (nodemon)
 npm start            # Produção
 npm test             # Testes
-npm run seed         # Popular banco
+node scripts/seed.js # Popular banco
 npm run lint         # Linting
 ```
 
@@ -1368,17 +1368,23 @@ npm run lint         # Linting
 | Variável | Descrição | Padrão |
 |----------|-----------|--------|
 | `NODE_ENV` | Ambiente | `development` |
-| `PORT` | Porta servidor | `5000` |
+| `PORT` | Porta servidor | `8000` |
 | `MONGODB_URI` | URI MongoDB | `mongodb://localhost:27017/restaurant_pos` |
 | `JWT_SECRET` | Segredo JWT | - |
 | `JWT_EXPIRE` | Expiração JWT | `7d` |
 | `CORS_ORIGIN` | Origem permitida | `http://localhost:5173` |
 
-#### Frontend
+#### Frontend (pos-frontend)
 
 | Variável | Descrição | Padrão |
 |----------|-----------|--------|
-| `VITE_API_URL` | URL da API | `http://localhost:5000` |
+| `VITE_BACKEND_URL` | URL da API | `http://localhost:8000` |
+
+#### Frontend (pos-admin)
+
+| Variável | Descrição | Padrão |
+|----------|-----------|--------|
+| `NEXT_PUBLIC_API_URL` | URL da API | `http://localhost:8000` |
 
 ### Deploy
 
@@ -1495,7 +1501,7 @@ mongosh
 
 **Sintoma**:
 ```
-WebSocket connection to 'ws://localhost:5000' failed
+WebSocket connection to 'ws://localhost:8000' failed
 ```
 
 **Solução**:
@@ -1555,7 +1561,7 @@ if (order.paymentStatus === 'paid') {
 **Teste**:
 ```bash
 # Abrir caixa
-curl -X POST http://localhost:5000/api/cash-sessions/open \
+curl -X POST http://localhost:8000/api/pdv/cash-sessions/open \
   -H "Authorization: Bearer {token}" \
   -H "Content-Type: application/json" \
   -d '{"openingBalance": 100}'
@@ -1628,7 +1634,7 @@ await order.save();
 **Teste**:
 ```bash
 # Atualizar commissionRate do garçom
-curl -X PUT http://localhost:5000/api/users/{waiterId} \
+curl -X PUT http://localhost:8000/api/user/{waiterId} \
   -H "Authorization: Bearer {token}" \
   -H "Content-Type: application/json" \
   -d '{"commissionRate": 5}'

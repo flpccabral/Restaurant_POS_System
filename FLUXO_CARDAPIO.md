@@ -55,9 +55,11 @@ O `productReadinessStatus` (prontidão para venda) é um conceito válido, mas n
   category: ObjectId,                  // Categoria
   photos: [String],
 
-  // Tipo de venda
-  sellableType: String,                // sellable | nonsellable | packaging
-  stockImpactRule: String,             // deduct | no_deduct | recipe_only
+  // Tipo de venda (Fase 9.1A)
+  sellableType: String,                // prepared_product | industrialized_resale | combo | service_fee
+  stockImpactRule: String,             // recipe_composition | stock_item_direct | no_stock_impact | combo_components
+  directStockItem: ObjectId,           // GlobalIngredient (obrigatório se stock_item_direct)
+  directStockQuantity: Number,         // Quantidade deduzida por venda (se stock_item_direct)
 
   // Preço
   price: Number,                       // Preço base (se sem variação)
@@ -113,9 +115,11 @@ O `productReadinessStatus` (prontidão para venda) é um conceito válido, mas n
 | Status | Significado | Pode vender? | Na prática |
 |--------|-------------|:------------:|------------|
 | `ready` | Configuração completa | ✅ Sim | Funcionamento normal |
-| `no_recipe` | Sem ficha técnica | ✅ Sim (aviso amarelo) | 80% dos restaurantes — apenas informativo |
-| `incomplete` | Nome e preço OK, sem foto/descrição | ✅ Sim | Só não aparece no cardápio digital |
-| `inactive` | Produto desativado | ❌ Não (oculto) | Fora de linha ou sazonal |
+| `ready_missing_recipe` | `recipe_composition` sem Recipe ativa | ✅ Sim (aviso amarelo) | 80% dos restaurantes — apenas informativo |
+| `ready_missing_direct` | `stock_item_direct` com configuração inválida | ✅ Sim (aviso amarelo) | Ingrediente direto não vinculado |
+| `incomplete_config` | `combo_components` ou configuração desconhecida | ✅ Sim (aviso) | Configuração pendente |
+
+> Produto oculto do PDV é controlado por `isActive: false` (campo separado, não é um status de readiness).
 
 > ⚠️ Produto SEMPRE pode ser vendido se `isActive: true`. A completeza da ficha técnica NUNCA bloqueia venda.
 
@@ -158,15 +162,19 @@ O `productReadinessStatus` (prontidão para venda) é um conceito válido, mas n
   │  SKU: [auto | manual]                   │
   │  Categoria*: [select]                   │
   │                                         │
-  │  TIPO DE VENDA                          │
-  │  ○ Produto vendável (sellable)          │
-  │  ○ Produto interno (consumo próprio)    │
-  │  ○ Embalagem                            │
+  │  TIPO DE VENDA (sellableType)           │
+  │  ○ Produção própria (prepared_product)  │
+  │  ○ Revenda (industrialized_resale)      │
+  │  ○ Combo (combo)                        │
+  │  ○ Taxa de serviço (service_fee)        │
   │                                         │
-  │  IMPACTO NO ESTOQUE                     │
-  │  ○ Deduzir via ficha técnica (recipe)   │
-  │  ○ Deduzir ingrediente direto           │
-  │  ○ Não deduzir estoque                  │
+  │  IMPACTO NO ESTOQUE (stockImpactRule)   │
+  │  ○ Ficha técnica (recipe_composition)   │
+  │  ○ Ingrediente direto (stock_item_      │
+  │    direct)                              │
+  │  ○ Sem impacto (no_stock_impact)        │
+  │  ○ Componentes do combo (combo_         │
+  │    components)                          │
   │                                         │
   │  PREÇO (se sem variação)                │
   │  R$ [________]                          │
@@ -317,9 +325,9 @@ CMV            = 35,71%
 | 1 | Nome do produto é obrigatório e único por loja (caso-insensitive) |
 | 2 | SKU é único por loja (pode ser auto-gerado) |
 | 3 | Categoria é obrigatória (produto sem categoria não é exibido) |
-| 4 | Produto sem preço não pode ser vendido (impossível calcular valor) | Validação de negócio |
-| 5 | Produto sem ficha técnica pode ser vendido normalmente (aviso amarelo) | 80% dos restaurantes |
-| 6 | Alterar preço de produto existente NÃO altera pedidos já criados (cópia no momento da venda) | Consistência
+| 4 | Produto sem preço não pode ser vendido (impossível calcular valor) |
+| 5 | Produto sem ficha técnica pode ser vendido normalmente (aviso amarelo) |
+| 6 | Alterar preço de produto existente NÃO altera pedidos já criados (cópia no momento da venda) |
 | 7 | Desativar categoria desativa todos os produtos dela |
 | 8 | Variação com `isActive: false` não aparece no seletor |
 | 9 | Atributos são tags, não afetam preço (planejado: regras de preço por atributo) |
@@ -330,32 +338,49 @@ CMV            = 35,71%
 ## 7. ENDPOINTS
 
 ```javascript
-// Categorias
+// Categorias (routes/categoryRoute.js)
 GET    /api/category
+GET    /api/category/:id
 POST   /api/category
 PUT    /api/category/:id
+PUT    /api/category/:id/move
+PUT    /api/category/:id/toggle-status
 DELETE /api/category/:id
-PATCH  /api/category/:id/toggle-status
 
-// Produtos
+// Produtos (routes/productRoute.js)
 GET    /api/product
+GET    /api/product/:id
+GET    /api/product/sku/:sku
 POST   /api/product
 PUT    /api/product/:id
 DELETE /api/product/:id
+POST   /api/product/:id/variations
+PUT    /api/product/:id/variations/:variationId
+DELETE /api/product/:id/variations/:variationId
 
-// Atributos
+// Atributos (routes/attributeRoute.js)
 GET    /api/attribute
+GET    /api/attribute/:id
 POST   /api/attribute
 PUT    /api/attribute/:id
+PUT    /api/attribute/:id/toggle-status
 DELETE /api/attribute/:id
+POST   /api/attribute/:id/options
+PUT    /api/attribute/:id/options/:optionId
+DELETE /api/attribute/:id/options/:optionId
 
-// Fichas Técnicas (Recipe)
+// Fichas Técnicas (routes/recipeRoute.js)
 GET    /api/recipe
+GET    /api/recipe/:id
+GET    /api/recipe/sku/:sku
 POST   /api/recipe
 PUT    /api/recipe/:id
+PUT    /api/recipe/:id/toggle-status
 DELETE /api/recipe/:id
-
-// Cardápio público (digital)
-GET    /api/public/:storeSlug/menu
-GET    /api/public/:storeSlug/product/:id
+GET    /api/recipe/:id/cost
+GET    /api/recipe/:id/stock/check
+POST   /api/recipe/:id/stock/deduct
+GET    /api/recipe/product/:productId/sellable
 ```
+
+> ⚠️ **Cardápio público digital** (`GET /api/public/:storeSlug/menu`) é **planejado — não implementado**. Não existem rotas públicas no backend atual; todas as rotas acima exigem autenticação (cookie JWT).

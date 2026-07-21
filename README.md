@@ -91,16 +91,21 @@ cp .env.example .env
 **Backend (.env)**:
 ```env
 NODE_ENV=development
-PORT=5000
+PORT=8000
 MONGODB_URI=mongodb://localhost:27017/restaurant_pos
 JWT_SECRET=seu-segredo-aqui
 JWT_EXPIRE=7d
 CORS_ORIGIN=http://localhost:5173
 ```
 
-**Frontend (.env)**:
+**Frontend (pos-frontend/.env)**:
 ```env
-VITE_API_URL=http://localhost:5000
+VITE_BACKEND_URL=http://localhost:8000
+```
+
+**Frontend (pos-admin/.env)**:
+```env
+NEXT_PUBLIC_API_URL=http://localhost:8000
 ```
 
 ### Running the Application
@@ -118,7 +123,7 @@ npm run dev
 Acesse: `http://localhost:5173`
 
 **Credenciais padrão**:
-- Email: `admin@restaurant.com`
+- Email: `admin@pos.com`
 - Senha: `admin123`
 
 ---

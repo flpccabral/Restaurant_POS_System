@@ -245,36 +245,54 @@
 # Backend
 cd pos-backend && npm install && cp .env.example .env
 
-# Frontend
+# Frontend (pos-frontend)
 cd pos-frontend && npm install && cp .env.example .env
 
-# MongoDB
-mongod --dbpath /data/db
+# Frontend (pos-admin)
+cd pos-admin && npm install && cp .env.example .env
 
-# Popular banco
-cd pos-backend && npm run seed
+# MongoDB (requer replica set para transações)
+# Opção 1: Docker
+docker run -d --name mongodb -p 27017:27017 mongo:7 mongod --replSet rs0
+docker exec -it mongodb mongosh --eval "rs.initiate()"
+
+# Opção 2: MongoDB local com replica set
+# Editar mongod.conf: replication: enabled: true, replSetName: rs0
+# Depois: mongosh --eval "rs.initiate()"
+
+# Popular banco com dados de teste
+cd pos-backend && node scripts/seed.js
 
 # Iniciar
-# Terminal 1: cd pos-backend && npm run dev
-# Terminal 2: cd pos-frontend && npm run dev
+# Terminal 1: cd pos-backend && npm run dev        (porta 8000)
+# Terminal 2: cd pos-frontend && npm run dev       (porta 5173)
+# Terminal 3: cd pos-admin && npm run dev          (porta 3000)
 ```
 
 ### Teste Rápido
 
 ```bash
-# Backend
-curl http://localhost:5000/api/health
+# Backend (saúde da API)
+curl http://localhost:8000/api/health
 
-# Frontend
+# Frontend PDV
 # Acesse http://localhost:5173
+
+# Frontend Admin Dashboard
+# Acesse http://localhost:3000
 ```
 
 ### Credenciais Padrão
 
 ```
-Email: admin@restaurant.com
+Email: admin@pos.com
 Senha: admin123
 ```
+
+> ⚠️ **Variáveis de ambiente corretas**:
+> - Backend: `PORT=8000`, `MONGODB_URI` apontando para a replica set `rs0`
+> - Frontend (pos-frontend): `VITE_BACKEND_URL=http://localhost:8000`
+> - Frontend (pos-admin): `NEXT_PUBLIC_API_URL=http://localhost:8000`
 
 ---
 
