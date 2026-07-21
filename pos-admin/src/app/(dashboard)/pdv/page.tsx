@@ -85,7 +85,10 @@ export default function PDVPage() {
     {
       key: "openingBalance",
       header: "Abertura",
-      cell: (row: unknown) => `R$ ${Number((row as Record<string, number>).openingBalance).toFixed(2)}`,
+      cell: (row: unknown) => {
+        const v = (row as Record<string, number>).openingBalance;
+        return v != null ? `R$ ${Number(v).toFixed(2)}` : 'R$ 0.00';
+      },
     },
     {
       key: "closingBalance",
@@ -145,7 +148,7 @@ export default function PDVPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <p className="text-sm text-zinc-400">Saldo de Abertura</p>
-                <p className="text-xl font-bold text-white">R$ {Number(session.openingBalance).toFixed(2)}</p>
+                <p className="text-xl font-bold text-white">R$ {session.openingBalance != null ? Number(session.openingBalance).toFixed(2) : '0.00'}</p>
               </div>
               <div>
                 <p className="text-sm text-zinc-400">Aberto por</p>

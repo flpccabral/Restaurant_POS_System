@@ -1,0 +1,894 @@
+[
+  {
+    "_id": "6a145ad52c28cb7be8da071d",
+    "store": "6a1101372ff5c713c1b1a147",
+    "order": "6a145ad52c28cb7be8da0711",
+    "orderNumber": "#1779718869508",
+    "table": "6a1335b587f360ebe3aea43b",
+    "tableNumber": "1",
+    "customerName": "Maria Isis",
+    "orderType": "dine-in",
+    "items": [
+      {
+        "orderItem": "6a145ad52c28cb7be8da0712",
+        "productId": "6a123a2b0824a97594d48d7a",
+        "productName": "Hambúrguer Artesanal (P)",
+        "quantity": 1,
+        "status": "served",
+        "station": "kitchen",
+        "prepTimeMinutes": 15,
+        "modifiers": [],
+        "priority": "normal",
+        "completedAt": "2026-05-25T14:21:58.542Z",
+        "servedAt": "2026-05-25T14:22:02.148Z"
+      },
+      {
+        "orderItem": "6a145ad52c28cb7be8da0713",
+        "productId": "6a123a2b0824a97594d48d7d",
+        "productName": "Pizza Margherita (Individual)",
+        "quantity": 1,
+        "status": "served",
+        "station": "kitchen",
+        "prepTimeMinutes": 15,
+        "modifiers": [],
+        "priority": "normal",
+        "completedAt": "2026-05-25T14:21:58.542Z",
+        "servedAt": "2026-05-25T14:22:02.148Z"
+      },
+      {
+        "orderItem": "6a145ad52c28cb7be8da0714",
+        "productId": "6a123a2b0824a97594d48d80",
+        "productName": "Refrigerante (Lata)",
+        "quantity": 1,
+        "status": "served",
+        "station": "kitchen",
+        "prepTimeMinutes": 15,
+        "modifiers": [],
+        "priority": "normal",
+        "completedAt": "2026-05-25T14:21:58.542Z",
+        "servedAt": "2026-05-25T14:22:02.148Z"
+      },
+      {
+        "orderItem": "6a145ad52c28cb7be8da0715",
+        "productId": "6a1343008c9807db6028fe65",
+        "productName": "Taxa de Serviço",
+        "quantity": 1,
+        "status": "served",
+        "station": "kitchen",
+        "prepTimeMinutes": 15,
+        "modifiers": [],
+        "priority": "normal",
+        "completedAt": "2026-05-25T14:21:58.542Z",
+        "servedAt": "2026-05-25T14:22:02.148Z"
+      }
+    ],
+    "status": "served",
+    "priority": "normal",
+    "estimatedReady": "2026-05-25T14:36:54.222Z",
+    "timers": {
+      "createdAt": "2026-05-25T14:21:09.858Z",
+      "acceptedAt": "2026-05-25T14:21:54.222Z",
+      "readyAt": "2026-05-25T14:21:58.541Z",
+      "servedAt": "2026-05-25T14:22:02.147Z"
+    },
+    "flags": {
+      "isRushed": false,
+      "isRefire": false,
+      "is86": false,
+      "allergyAlert": false
+    },
+    "metadata": {
+      "channel": "pos"
+    },
+    "kdsOrderId": "kds_1779718869857_g1p843jy1",
+    "stations": [],
+    "createdAt": "2026-05-25T14:21:09.860Z",
+    "updatedAt": "2026-05-25T14:22:02.149Z",
+    "__v": 0,
+    "acceptedAt": "2026-05-25T14:21:54.222Z",
+    "acceptedBy": "6a123a240824a97594d48d23",
+    "actualReady": "2026-05-25T14:21:58.541Z",
+    "servedAt": "2026-05-25T14:22:02.147Z"
+  },
+  {
+    "_id": "6a13896e2aa4de8111b1e3c7",
+    "store": "6a1101372ff5c713c1b1a147",
+    "order": "6a13896d2aa4de8111b1e3a2",
+    "orderNumber": "#1779665262",
+    "table": "6a1335b587f360ebe3aea43b",
+    "tableNumber": "1",
+    "customerName": "Cliente Piloto 9.2",
+    "orderType": "dine-in",
+    "items": [
+      {
+        "orderItem": "6a13896d2aa4de8111b1e3a3",
+        "productId": "6a123a2b0824a97594d48d7a",
+        "productName": "Hambúrguer Artesanal",
+        "quantity": 1,
+        "status": "served",
+        "station": "kitchen",
+        "prepTimeMinutes": 15,
+        "priority": "normal",
+        "modifiers": [],
+        "completedAt": "2026-05-24T23:27:45.631Z",
+        "servedAt": "2026-05-24T23:27:45.871Z"
+      },
+      {
+        "orderItem": "6a13896d2aa4de8111b1e3a4",
+        "productId": "6a123a2b0824a97594d48d80",
+        "productName": "Refrigerante",
+        "quantity": 1,
+        "status": "served",
+        "station": "kitchen",
+        "prepTimeMinutes": 5,
+        "priority": "normal",
+        "modifiers": [],
+        "completedAt": "2026-05-24T23:27:45.631Z",
+        "servedAt": "2026-05-24T23:27:45.871Z"
+      },
+      {
+        "orderItem": "6a13896d2aa4de8111b1e3a5",
+        "productId": "6a1343008c9807db6028fe65",
+        "productName": "Taxa de Serviço",
+        "quantity": 1,
+        "status": "served",
+        "station": "kitchen",
+        "prepTimeMinutes": 0,
+        "priority": "normal",
+        "modifiers": [],
+        "completedAt": "2026-05-24T23:27:45.631Z",
+        "servedAt": "2026-05-24T23:27:45.871Z"
+      }
+    ],
+    "status": "served",
+    "priority": "normal",
+    "estimatedReady": "2026-05-24T23:42:45.468Z",
+    "timers": {
+      "createdAt": "2026-05-24T23:27:42.583Z",
+      "acceptedAt": "2026-05-24T23:27:45.468Z",
+      "readyAt": "2026-05-24T23:27:45.631Z",
+      "servedAt": "2026-05-24T23:27:45.871Z"
+    },
+    "flags": {
+      "isRushed": false,
+      "isRefire": false,
+      "is86": false,
+      "allergyAlert": false
+    },
+    "metadata": {
+      "channel": "pos"
+    },
+    "kdsOrderId": "kds_1779665262583_udv6xiafw",
+    "stations": [],
+    "createdAt": "2026-05-24T23:27:42.584Z",
+    "updatedAt": "2026-05-24T23:27:45.873Z",
+    "__v": 0,
+    "acceptedAt": "2026-05-24T23:27:45.468Z",
+    "acceptedBy": "6a123a240824a97594d48d23",
+    "actualReady": "2026-05-24T23:27:45.631Z",
+    "servedAt": "2026-05-24T23:27:45.871Z"
+  },
+  {
+    "_id": "6a1384377421780bbec9dfa6",
+    "store": "6a1101372ff5c713c1b1a147",
+    "order": "6a1384367421780bbec9df78",
+    "orderNumber": "#1779663927",
+    "table": "6a1335b587f360ebe3aea43b",
+    "tableNumber": "1",
+    "customerName": "Cliente Piloto 9.2",
+    "orderType": "dine-in",
+    "items": [
+      {
+        "orderItem": "6a1384367421780bbec9df79",
+        "productId": "6a123a2b0824a97594d48d7a",
+        "productName": "Hambúrguer Artesanal",
+        "quantity": 1,
+        "status": "served",
+        "station": "kitchen",
+        "prepTimeMinutes": 15,
+        "priority": "normal",
+        "modifiers": [],
+        "completedAt": "2026-05-24T23:05:30.876Z",
+        "servedAt": "2026-05-24T23:05:31.099Z"
+      },
+      {
+        "orderItem": "6a1384367421780bbec9df7a",
+        "productId": "6a123a2b0824a97594d48d80",
+        "productName": "Refrigerante",
+        "quantity": 1,
+        "status": "served",
+        "station": "kitchen",
+        "prepTimeMinutes": 5,
+        "priority": "normal",
+        "modifiers": [],
+        "completedAt": "2026-05-24T23:05:30.876Z",
+        "servedAt": "2026-05-24T23:05:31.099Z"
+      },
+      {
+        "orderItem": "6a1384367421780bbec9df7b",
+        "productId": "6a1343008c9807db6028fe65",
+        "productName": "Taxa de Serviço",
+        "quantity": 1,
+        "status": "served",
+        "station": "kitchen",
+        "prepTimeMinutes": 0,
+        "priority": "normal",
+        "modifiers": [],
+        "completedAt": "2026-05-24T23:05:30.876Z",
+        "servedAt": "2026-05-24T23:05:31.099Z"
+      }
+    ],
+    "status": "served",
+    "priority": "normal",
+    "estimatedReady": "2026-05-24T23:20:30.723Z",
+    "timers": {
+      "createdAt": "2026-05-24T23:05:27.973Z",
+      "acceptedAt": "2026-05-24T23:05:30.723Z",
+      "readyAt": "2026-05-24T23:05:30.875Z",
+      "servedAt": "2026-05-24T23:05:31.098Z"
+    },
+    "flags": {
+      "isRushed": false,
+      "isRefire": false,
+      "is86": false,
+      "allergyAlert": false
+    },
+    "metadata": {
+      "channel": "pos"
+    },
+    "kdsOrderId": "kds_1779663927973_pu1fk0kar",
+    "stations": [],
+    "createdAt": "2026-05-24T23:05:27.975Z",
+    "updatedAt": "2026-05-24T23:05:31.100Z",
+    "__v": 0,
+    "acceptedAt": "2026-05-24T23:05:30.723Z",
+    "acceptedBy": "6a123a240824a97594d48d23",
+    "actualReady": "2026-05-24T23:05:30.875Z",
+    "servedAt": "2026-05-24T23:05:31.098Z"
+  },
+  {
+    "_id": "6a13841f6edfa9527301664b",
+    "store": "6a1101372ff5c713c1b1a147",
+    "order": "6a13841e6edfa95273016619",
+    "orderNumber": "#1779663903",
+    "table": "6a1335b587f360ebe3aea43b",
+    "tableNumber": "1",
+    "customerName": "Cliente Piloto 9.2",
+    "orderType": "dine-in",
+    "items": [
+      {
+        "orderItem": "6a13841e6edfa9527301661a",
+        "productId": "6a11b68f515e85eb24eaf426",
+        "productName": "Hamburgue",
+        "quantity": 1,
+        "status": "served",
+        "station": "kitchen",
+        "prepTimeMinutes": 15,
+        "priority": "normal",
+        "modifiers": [],
+        "completedAt": "2026-05-24T23:05:05.570Z",
+        "servedAt": "2026-05-24T23:05:05.822Z"
+      },
+      {
+        "orderItem": "6a13841e6edfa9527301661b",
+        "productId": "6a11e625f646322a50b7467d",
+        "productName": "Refrigerante Teste",
+        "quantity": 1,
+        "status": "served",
+        "station": "kitchen",
+        "prepTimeMinutes": 5,
+        "priority": "normal",
+        "modifiers": [],
+        "completedAt": "2026-05-24T23:05:05.570Z",
+        "servedAt": "2026-05-24T23:05:05.822Z"
+      },
+      {
+        "orderItem": "6a13841e6edfa9527301661c",
+        "productId": "6a132b0d21b39baba982ac7b",
+        "productName": "Taxa de Servico",
+        "quantity": 1,
+        "status": "served",
+        "station": "kitchen",
+        "prepTimeMinutes": 0,
+        "priority": "normal",
+        "modifiers": [],
+        "completedAt": "2026-05-24T23:05:05.570Z",
+        "servedAt": "2026-05-24T23:05:05.822Z"
+      }
+    ],
+    "status": "served",
+    "priority": "normal",
+    "estimatedReady": "2026-05-24T23:20:05.404Z",
+    "timers": {
+      "createdAt": "2026-05-24T23:05:03.712Z",
+      "acceptedAt": "2026-05-24T23:05:05.405Z",
+      "readyAt": "2026-05-24T23:05:05.569Z",
+      "servedAt": "2026-05-24T23:05:05.821Z"
+    },
+    "flags": {
+      "isRushed": false,
+      "isRefire": false,
+      "is86": false,
+      "allergyAlert": false
+    },
+    "metadata": {
+      "channel": "pos"
+    },
+    "kdsOrderId": "kds_1779663903712_kwslnm339",
+    "stations": [],
+    "createdAt": "2026-05-24T23:05:03.713Z",
+    "updatedAt": "2026-05-24T23:05:05.823Z",
+    "__v": 0,
+    "acceptedAt": "2026-05-24T23:05:05.404Z",
+    "acceptedBy": "6a123a240824a97594d48d23",
+    "actualReady": "2026-05-24T23:05:05.569Z",
+    "servedAt": "2026-05-24T23:05:05.821Z"
+  },
+  {
+    "_id": "6a1372dd068965c592ae8bf1",
+    "store": "6a1101372ff5c713c1b1a147",
+    "order": "6a136d23657070f069bee98a",
+    "orderNumber": "ORD-1779659485327",
+    "table": "6a1335b587f360ebe3aea43d",
+    "customerName": "Validacao Fase 9.1D v2",
+    "orderType": "dine-in",
+    "items": [
+      {
+        "orderItem": "6a136d23657070f069bee98b",
+        "productId": "6a123a2b0824a97594d48d7a",
+        "productName": "Hambúrguer Artesanal (P)",
+        "quantity": 1,
+        "status": "served",
+        "station": "kitchen",
+        "prepTimeMinutes": 15,
+        "modifiers": [],
+        "priority": "normal",
+        "completedAt": "2026-05-24T22:19:30.123Z",
+        "servedAt": "2026-05-24T22:19:32.725Z"
+      },
+      {
+        "orderItem": "6a136d23657070f069bee98c",
+        "productId": "6a123a2b0824a97594d48d80",
+        "productName": "Refrigerante (Lata)",
+        "quantity": 1,
+        "status": "served",
+        "station": "kitchen",
+        "prepTimeMinutes": 15,
+        "modifiers": [],
+        "priority": "normal",
+        "completedAt": "2026-05-24T22:19:30.123Z",
+        "servedAt": "2026-05-24T22:19:32.725Z"
+      },
+      {
+        "orderItem": "6a136d23657070f069bee98d",
+        "productId": "6a1343008c9807db6028fe65",
+        "productName": "Taxa de Serviço",
+        "quantity": 1,
+        "status": "served",
+        "station": "kitchen",
+        "prepTimeMinutes": 15,
+        "modifiers": [],
+        "priority": "normal",
+        "completedAt": "2026-05-24T22:19:30.123Z",
+        "servedAt": "2026-05-24T22:19:32.725Z"
+      }
+    ],
+    "status": "served",
+    "priority": "normal",
+    "estimatedReady": "2026-05-24T22:34:28.892Z",
+    "timers": {
+      "createdAt": "2026-05-24T21:51:25.328Z",
+      "acceptedAt": "2026-05-24T22:19:28.892Z",
+      "readyAt": "2026-05-24T22:19:30.123Z",
+      "servedAt": "2026-05-24T22:19:32.725Z"
+    },
+    "flags": {
+      "isRushed": false,
+      "isRefire": false,
+      "is86": false,
+      "allergyAlert": false
+    },
+    "metadata": {
+      "channel": "pos"
+    },
+    "kdsOrderId": "kds_1779659485328_wj6xrldqq",
+    "stations": [],
+    "createdAt": "2026-05-24T21:51:25.328Z",
+    "updatedAt": "2026-05-24T22:19:32.727Z",
+    "__v": 0,
+    "acceptedAt": "2026-05-24T22:19:28.892Z",
+    "acceptedBy": "6a123a240824a97594d48d23",
+    "tableNumber": "3",
+    "actualReady": "2026-05-24T22:19:30.123Z",
+    "servedAt": "2026-05-24T22:19:32.724Z"
+  },
+  {
+    "_id": "6a1372dc068965c592ae8be0",
+    "store": "6a1101372ff5c713c1b1a147",
+    "order": "6a136ca9df1e414b0df87f5f",
+    "orderNumber": "ORD-1779659484692",
+    "table": "6a1335b587f360ebe3aea43d",
+    "customerName": "Validacao Fase 9.1D",
+    "orderType": "dine-in",
+    "items": [
+      {
+        "orderItem": "6a136ca9df1e414b0df87f60",
+        "productId": "6a123a2b0824a97594d48d7a",
+        "productName": "Hambúrguer Artesanal (P)",
+        "quantity": 1,
+        "status": "served",
+        "station": "kitchen",
+        "prepTimeMinutes": 15,
+        "modifiers": [],
+        "priority": "normal",
+        "completedAt": "2026-05-24T22:19:26.034Z",
+        "servedAt": "2026-05-24T22:19:27.149Z"
+      },
+      {
+        "orderItem": "6a136ca9df1e414b0df87f61",
+        "productId": "6a123a2b0824a97594d48d80",
+        "productName": "Refrigerante (Lata)",
+        "quantity": 1,
+        "status": "served",
+        "station": "kitchen",
+        "prepTimeMinutes": 15,
+        "modifiers": [],
+        "priority": "normal",
+        "completedAt": "2026-05-24T22:19:26.034Z",
+        "servedAt": "2026-05-24T22:19:27.149Z"
+      },
+      {
+        "orderItem": "6a136ca9df1e414b0df87f62",
+        "productId": "6a1343008c9807db6028fe65",
+        "productName": "Taxa de Serviço",
+        "quantity": 1,
+        "status": "served",
+        "station": "kitchen",
+        "prepTimeMinutes": 15,
+        "modifiers": [],
+        "priority": "normal",
+        "completedAt": "2026-05-24T22:19:26.034Z",
+        "servedAt": "2026-05-24T22:19:27.149Z"
+      }
+    ],
+    "status": "served",
+    "priority": "normal",
+    "estimatedReady": "2026-05-24T22:34:25.048Z",
+    "timers": {
+      "createdAt": "2026-05-24T21:51:24.693Z",
+      "acceptedAt": "2026-05-24T22:19:25.048Z",
+      "readyAt": "2026-05-24T22:19:26.034Z",
+      "servedAt": "2026-05-24T22:19:27.149Z"
+    },
+    "flags": {
+      "isRushed": false,
+      "isRefire": false,
+      "is86": false,
+      "allergyAlert": false
+    },
+    "metadata": {
+      "channel": "pos"
+    },
+    "kdsOrderId": "kds_1779659484693_rwj9485zm",
+    "stations": [],
+    "createdAt": "2026-05-24T21:51:24.694Z",
+    "updatedAt": "2026-05-24T22:19:27.150Z",
+    "__v": 0,
+    "acceptedAt": "2026-05-24T22:19:25.048Z",
+    "acceptedBy": "6a123a240824a97594d48d23",
+    "tableNumber": "3",
+    "actualReady": "2026-05-24T22:19:26.034Z",
+    "servedAt": "2026-05-24T22:19:27.149Z"
+  },
+  {
+    "_id": "6a1372dc068965c592ae8bd5",
+    "store": "6a1101372ff5c713c1b1a147",
+    "order": "6a1350cdf1cdeaf49a127c80",
+    "orderNumber": "ORD-1779659484049",
+    "customerName": "Teste Final",
+    "orderType": "dine-in",
+    "items": [
+      {
+        "orderItem": "6a1350cdf1cdeaf49a127c81",
+        "productId": "6a123a2b0824a97594d48d7a",
+        "productName": "Hambúrguer Artesanal (P)",
+        "quantity": 1,
+        "status": "served",
+        "station": "kitchen",
+        "prepTimeMinutes": 15,
+        "modifiers": [],
+        "priority": "normal",
+        "completedAt": "2026-05-24T22:19:21.409Z",
+        "servedAt": "2026-05-24T22:19:22.913Z"
+      },
+      {
+        "orderItem": "6a1350cdf1cdeaf49a127c82",
+        "productId": "6a11e625f646322a50b7467d",
+        "productName": "Refrigerante Teste (Padrao)",
+        "quantity": 2,
+        "status": "served",
+        "station": "kitchen",
+        "prepTimeMinutes": 15,
+        "modifiers": [],
+        "priority": "normal",
+        "completedAt": "2026-05-24T22:19:21.409Z",
+        "servedAt": "2026-05-24T22:19:22.913Z"
+      }
+    ],
+    "status": "served",
+    "priority": "normal",
+    "estimatedReady": "2026-05-24T22:34:19.447Z",
+    "timers": {
+      "createdAt": "2026-05-24T21:51:24.050Z",
+      "acceptedAt": "2026-05-24T22:19:19.447Z",
+      "readyAt": "2026-05-24T22:19:21.409Z",
+      "servedAt": "2026-05-24T22:19:22.912Z"
+    },
+    "flags": {
+      "isRushed": false,
+      "isRefire": false,
+      "is86": false,
+      "allergyAlert": false
+    },
+    "metadata": {
+      "channel": "pos"
+    },
+    "kdsOrderId": "kds_1779659484050_vin6rjom5",
+    "stations": [],
+    "createdAt": "2026-05-24T21:51:24.051Z",
+    "updatedAt": "2026-05-24T22:19:22.914Z",
+    "__v": 0,
+    "acceptedAt": "2026-05-24T22:19:19.447Z",
+    "acceptedBy": "6a123a240824a97594d48d23",
+    "actualReady": "2026-05-24T22:19:21.409Z",
+    "servedAt": "2026-05-24T22:19:22.912Z"
+  },
+  {
+    "_id": "6a1372db068965c592ae8bcc",
+    "store": "6a1101372ff5c713c1b1a147",
+    "order": "6a134ec61e3ac0dff74389d5",
+    "orderNumber": "ORD-1779659483479",
+    "customerName": "Teste Direto",
+    "orderType": "dine-in",
+    "items": [
+      {
+        "orderItem": "6a134ec61e3ac0dff74389d6",
+        "productId": "6a11e625f646322a50b7467d",
+        "productName": "Refrigerante Teste (Padrão)",
+        "quantity": 2,
+        "status": "served",
+        "station": "kitchen",
+        "prepTimeMinutes": 15,
+        "modifiers": [],
+        "priority": "normal",
+        "completedAt": "2026-05-24T22:19:03.568Z",
+        "servedAt": "2026-05-24T22:19:05.222Z"
+      }
+    ],
+    "status": "served",
+    "priority": "normal",
+    "estimatedReady": "2026-05-24T22:34:01.227Z",
+    "timers": {
+      "createdAt": "2026-05-24T21:51:23.480Z",
+      "acceptedAt": "2026-05-24T22:19:01.227Z",
+      "readyAt": "2026-05-24T22:19:03.568Z",
+      "servedAt": "2026-05-24T22:19:05.222Z"
+    },
+    "flags": {
+      "isRushed": false,
+      "isRefire": false,
+      "is86": false,
+      "allergyAlert": false
+    },
+    "metadata": {
+      "channel": "pos"
+    },
+    "kdsOrderId": "kds_1779659483480_ar17vl6zm",
+    "stations": [],
+    "createdAt": "2026-05-24T21:51:23.481Z",
+    "updatedAt": "2026-05-24T22:19:05.223Z",
+    "__v": 0,
+    "acceptedAt": "2026-05-24T22:19:01.227Z",
+    "acceptedBy": "6a123a240824a97594d48d23",
+    "actualReady": "2026-05-24T22:19:03.568Z",
+    "servedAt": "2026-05-24T22:19:05.222Z"
+  },
+  {
+    "_id": "6a1372da068965c592ae8bc4",
+    "store": "6a1101372ff5c713c1b1a147",
+    "order": "6a134ab91ad405a6ea8ff91f",
+    "orderNumber": "ORD-1779659482903",
+    "customerName": "Felipe",
+    "orderType": "dine-in",
+    "items": [
+      {
+        "orderItem": "6a134ab91ad405a6ea8ff920",
+        "productId": "6a123a2b0824a97594d48d7a",
+        "productName": "Hambúrguer Artesanal (P)",
+        "quantity": 1,
+        "status": "served",
+        "station": "kitchen",
+        "prepTimeMinutes": 15,
+        "modifiers": [],
+        "priority": "normal",
+        "completedAt": "2026-05-24T22:19:15.532Z",
+        "servedAt": "2026-05-24T22:19:16.570Z"
+      }
+    ],
+    "status": "served",
+    "priority": "normal",
+    "estimatedReady": "2026-05-24T22:34:14.687Z",
+    "timers": {
+      "createdAt": "2026-05-24T21:51:22.904Z",
+      "acceptedAt": "2026-05-24T22:19:14.687Z",
+      "readyAt": "2026-05-24T22:19:15.532Z",
+      "servedAt": "2026-05-24T22:19:16.570Z"
+    },
+    "flags": {
+      "isRushed": false,
+      "isRefire": false,
+      "is86": false,
+      "allergyAlert": false
+    },
+    "metadata": {
+      "channel": "pos"
+    },
+    "kdsOrderId": "kds_1779659482904_341254b1n",
+    "stations": [],
+    "createdAt": "2026-05-24T21:51:22.905Z",
+    "updatedAt": "2026-05-24T22:19:16.571Z",
+    "__v": 0,
+    "acceptedAt": "2026-05-24T22:19:14.687Z",
+    "acceptedBy": "6a123a240824a97594d48d23",
+    "actualReady": "2026-05-24T22:19:15.532Z",
+    "servedAt": "2026-05-24T22:19:16.570Z"
+  },
+  {
+    "_id": "6a1372da068965c592ae8bbc",
+    "store": "6a1101372ff5c713c1b1a147",
+    "order": "6a1348ddfabf5f042e04b140",
+    "orderNumber": "ORD-1779659482324",
+    "table": "6a1335b587f360ebe3aea43c",
+    "customerName": "Teste",
+    "orderType": "dine-in",
+    "items": [
+      {
+        "orderItem": "6a1348ddfabf5f042e04b141",
+        "productId": "6a123a2b0824a97594d48d7a",
+        "productName": "Hambúrguer Artesanal (P)",
+        "quantity": 1,
+        "status": "served",
+        "station": "kitchen",
+        "prepTimeMinutes": 15,
+        "modifiers": [],
+        "priority": "normal",
+        "completedAt": "2026-05-24T22:19:10.057Z",
+        "servedAt": "2026-05-24T22:19:12.412Z"
+      }
+    ],
+    "status": "served",
+    "priority": "normal",
+    "estimatedReady": "2026-05-24T22:34:08.788Z",
+    "timers": {
+      "createdAt": "2026-05-24T21:51:22.325Z",
+      "acceptedAt": "2026-05-24T22:19:08.788Z",
+      "readyAt": "2026-05-24T22:19:10.057Z",
+      "servedAt": "2026-05-24T22:19:12.411Z"
+    },
+    "flags": {
+      "isRushed": false,
+      "isRefire": false,
+      "is86": false,
+      "allergyAlert": false
+    },
+    "metadata": {
+      "channel": "pos"
+    },
+    "kdsOrderId": "kds_1779659482324_hdyq72igy",
+    "stations": [],
+    "createdAt": "2026-05-24T21:51:22.325Z",
+    "updatedAt": "2026-05-24T22:19:12.413Z",
+    "__v": 0,
+    "acceptedAt": "2026-05-24T22:19:08.788Z",
+    "acceptedBy": "6a123a240824a97594d48d23",
+    "tableNumber": "2",
+    "actualReady": "2026-05-24T22:19:10.057Z",
+    "servedAt": "2026-05-24T22:19:12.411Z"
+  },
+  {
+    "_id": "6a1372d9068965c592ae8bb3",
+    "store": "6a1101372ff5c713c1b1a147",
+    "order": "6a11e657f646322a50b746c6",
+    "orderNumber": "ORD-1779659481668",
+    "customerName": "Cliente Teste C",
+    "orderType": "dine-in",
+    "items": [
+      {
+        "orderItem": "6a11e657f646322a50b746c7",
+        "productId": "6a11e625f646322a50b7467d",
+        "productName": "Refrigerante Teste",
+        "quantity": 3,
+        "status": "served",
+        "station": "kitchen",
+        "prepTimeMinutes": 15,
+        "modifiers": [],
+        "priority": "normal",
+        "completedAt": "2026-05-24T22:12:56.622Z",
+        "servedAt": "2026-05-24T22:13:00.204Z"
+      }
+    ],
+    "status": "served",
+    "priority": "normal",
+    "estimatedReady": "2026-05-24T22:27:55.222Z",
+    "timers": {
+      "createdAt": "2026-05-24T21:51:21.668Z",
+      "acceptedAt": "2026-05-24T22:12:55.222Z",
+      "servedAt": "2026-05-24T22:17:51.778Z"
+    },
+    "flags": {
+      "isRushed": false,
+      "isRefire": false,
+      "is86": false,
+      "allergyAlert": false
+    },
+    "metadata": {
+      "channel": "pos"
+    },
+    "kdsOrderId": "kds_1779659481668_b4n68wnx9",
+    "stations": [],
+    "createdAt": "2026-05-24T21:51:21.669Z",
+    "updatedAt": "2026-05-24T22:17:51.778Z",
+    "__v": 0,
+    "acceptedAt": "2026-05-24T22:12:55.222Z",
+    "acceptedBy": "6a123a240824a97594d48d23",
+    "servedAt": "2026-05-24T22:17:51.778Z"
+  },
+  {
+    "_id": "6a1372d9068965c592ae8baa",
+    "store": "6a1101372ff5c713c1b1a147",
+    "order": "6a11e56df646322a50b745f1",
+    "orderNumber": "ORD-1779659481108",
+    "customerName": "Cliente Teste B",
+    "orderType": "dine-in",
+    "items": [
+      {
+        "orderItem": "6a11e56df646322a50b745f2",
+        "productId": "6a11e53cf646322a50b745e6",
+        "productName": "Produto Sem Receita",
+        "quantity": 1,
+        "status": "served",
+        "station": "kitchen",
+        "prepTimeMinutes": 15,
+        "modifiers": [],
+        "priority": "normal",
+        "completedAt": "2026-05-24T22:12:51.655Z",
+        "servedAt": "2026-05-24T22:12:53.377Z"
+      }
+    ],
+    "status": "served",
+    "priority": "normal",
+    "estimatedReady": "2026-05-24T22:27:50.185Z",
+    "timers": {
+      "createdAt": "2026-05-24T21:51:21.109Z",
+      "acceptedAt": "2026-05-24T22:12:50.185Z",
+      "servedAt": "2026-05-24T22:17:51.614Z"
+    },
+    "flags": {
+      "isRushed": false,
+      "isRefire": false,
+      "is86": false,
+      "allergyAlert": false
+    },
+    "metadata": {
+      "channel": "pos"
+    },
+    "kdsOrderId": "kds_1779659481109_x3x5ucrjl",
+    "stations": [],
+    "createdAt": "2026-05-24T21:51:21.110Z",
+    "updatedAt": "2026-05-24T22:17:51.615Z",
+    "__v": 0,
+    "acceptedAt": "2026-05-24T22:12:50.185Z",
+    "acceptedBy": "6a123a240824a97594d48d23",
+    "servedAt": "2026-05-24T22:17:51.614Z"
+  },
+  {
+    "_id": "6a1372d8068965c592ae8ba2",
+    "store": "6a1101372ff5c713c1b1a147",
+    "order": "6a11e4c2f646322a50b74592",
+    "orderNumber": "ORD-1779659480544",
+    "customerName": "Cliente Teste",
+    "orderType": "dine-in",
+    "items": [
+      {
+        "orderItem": "6a11e4c2f646322a50b74593",
+        "productId": "6a11b68f515e85eb24eaf426",
+        "productName": "Hamburgue",
+        "quantity": 2,
+        "status": "served",
+        "station": "kitchen",
+        "prepTimeMinutes": 15,
+        "modifiers": [],
+        "priority": "normal",
+        "completedAt": "2026-05-24T22:12:47.356Z",
+        "servedAt": "2026-05-24T22:12:48.812Z"
+      }
+    ],
+    "status": "served",
+    "priority": "normal",
+    "estimatedReady": "2026-05-24T22:27:45.968Z",
+    "timers": {
+      "createdAt": "2026-05-24T21:51:20.545Z",
+      "acceptedAt": "2026-05-24T22:12:45.968Z",
+      "servedAt": "2026-05-24T22:17:51.444Z"
+    },
+    "flags": {
+      "isRushed": false,
+      "isRefire": false,
+      "is86": false,
+      "allergyAlert": false
+    },
+    "metadata": {
+      "channel": "pos"
+    },
+    "kdsOrderId": "kds_1779659480545_fpb2fe0n9",
+    "stations": [],
+    "createdAt": "2026-05-24T21:51:20.545Z",
+    "updatedAt": "2026-05-24T22:17:51.448Z",
+    "__v": 0,
+    "acceptedAt": "2026-05-24T22:12:45.968Z",
+    "acceptedBy": "6a123a240824a97594d48d23",
+    "servedAt": "2026-05-24T22:17:51.444Z"
+  },
+  {
+    "_id": "6a13710c068965c592ae8a36",
+    "store": "6a1101372ff5c713c1b1a147",
+    "order": "6a13710c068965c592ae8a2e",
+    "orderNumber": "#1779659020248",
+    "table": "6a1335b587f360ebe3aea43d",
+    "customerName": "Teste KDS Sync",
+    "orderType": "dine-in",
+    "items": [
+      {
+        "orderItem": "6a13710c068965c592ae8a2f",
+        "productId": "6a123a2b0824a97594d48d7a",
+        "productName": "Hambúrguer Artesanal (P)",
+        "quantity": 1,
+        "status": "served",
+        "station": "kitchen",
+        "prepTimeMinutes": 15,
+        "modifiers": [],
+        "priority": "normal",
+        "completedAt": "2026-05-24T22:27:05.774Z",
+        "servedAt": "2026-05-24T22:27:20.532Z"
+      }
+    ],
+    "status": "served",
+    "priority": "normal",
+    "estimatedReady": "2026-05-24T22:42:05.349Z",
+    "timers": {
+      "createdAt": "2026-05-24T21:43:40.494Z",
+      "acceptedAt": "2026-05-24T22:27:05.349Z",
+      "readyAt": "2026-05-24T22:27:05.773Z",
+      "servedAt": "2026-05-24T22:27:20.531Z"
+    },
+    "flags": {
+      "isRushed": false,
+      "isRefire": false,
+      "is86": false,
+      "allergyAlert": false
+    },
+    "metadata": {
+      "channel": "pos"
+    },
+    "kdsOrderId": "kds_1779659020494_mj0tejxt6",
+    "stations": [],
+    "createdAt": "2026-05-24T21:43:40.495Z",
+    "updatedAt": "2026-05-24T22:27:20.532Z",
+    "__v": 0,
+    "acceptedAt": "2026-05-24T22:27:05.349Z",
+    "acceptedBy": "6a123a240824a97594d48d23",
+    "tableNumber": "3",
+    "actualReady": "2026-05-24T22:27:05.773Z",
+    "servedAt": "2026-05-24T22:27:20.531Z"
+  }
+]

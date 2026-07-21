@@ -789,6 +789,110 @@ const getUserStats = async (req, res, next) => {
     }
 };
 
+// ─── Prompt G — Resumo de Gorjetas ────────────────────────────────────────
+
+/**
+ * GET /api/dashboard/service-charge-summary
+ * Retorna totais de gorjetas no periodo selecionado
+ * Query params: ?period=today|yesterday|7days|30days|month|custom&startDate=&endDate=
+ */
+const getServiceChargeSummary = async (req, res, next) => {
+    try {
+        const storeId = resolveStoreId(req);
+        const { period = 'today', startDate, endDate } = req.query;
+
+        let dateFilter = {};
+        if (period === 'custom' && startDate && endDate) {
+            dateFilter = {
+                createdAt: {
+                    $gte: new Date(startDate),
+                    $lte: new Date(endDate + 'T23:59:59.999Z')
+                }
+            };
+        } else {
+            const { start, end } = getDateRange(period);
+            dateFilter = { createdAt: { $gte: start, $lte: end } };
+        }
+
+        // Agregacao: soma de gorjetas, contagem de pedidos que optaram, etc.
+        const summary = await Order.aggregate([
+            {
+                $match: {
+                    store: storeId,
+                    ...dateFilter,
+                    'serviceCharge.opted': true,
+                    orderStatus: { $ne: 'cancelled' }
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    totalServiceCharge: { $sum: '$serviceCharge.amount' },
+                    orderCount: { $sum: 1 },
+                    avgRate: { $avg: '$serviceCharge.rate' },
+                    avgAmount: { $avg: '$serviceCharge.amount' }
+                }
+            }
+        ]);
+
+        // Total de pedidos no periodo (para calcular % que optaram)
+        const totalOrders = await Order.countDocuments({
+            store: storeId,
+            ...dateFilter,
+            orderStatus: { $ne: 'cancelled' }
+        });
+
+        const data = summary[0] || {
+            totalServiceCharge: 0,
+            orderCount: 0,
+            avgRate: 0,
+            avgAmount: 0
+        };
+
+        // Gorjetas por dia (para grafico)
+        const dailyBreakdown = await Order.aggregate([
+            {
+                $match: {
+                    store: storeId,
+                    ...dateFilter,
+                    'serviceCharge.opted': true,
+                    orderStatus: { $ne: 'cancelled' }
+                }
+            },
+            {
+                $group: {
+                    _id: {
+                        $dateToString: { format: '%Y-%m-%d', date: '$createdAt' }
+                    },
+                    total: { $sum: '$serviceCharge.amount' },
+                    count: { $sum: 1 }
+                }
+            },
+            { $sort: { '_id': 1 } }
+        ]);
+
+        res.status(200).json({
+            success: true,
+            data: {
+                period,
+                totalServiceCharge: data.totalServiceCharge,
+                orderCount: data.orderCount,
+                totalOrders,
+                optInRate: totalOrders > 0 ? ((data.orderCount / totalOrders) * 100).toFixed(1) : 0,
+                avgRate: data.avgRate,
+                avgAmount: data.avgAmount,
+                dailyBreakdown: dailyBreakdown.map(d => ({
+                    date: d._id,
+                    total: d.total,
+                    count: d.count
+                }))
+            }
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 // ─── Exports ────────────────────────────────────────────────────────────────
 
 module.exports = {
@@ -798,5 +902,6 @@ module.exports = {
     getCMVReport,
     getVarianceAnalysis,
     getInventoryAnalytics,
-    getUserStats
+    getUserStats,
+    getServiceChargeSummary
 };

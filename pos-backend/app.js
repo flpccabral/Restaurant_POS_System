@@ -108,6 +108,15 @@ app.use("/api/subscription", require("./routes/subscriptionRoutes"));
 // Fase 7 - Kitchen Display System (KDS)
 app.use("/api/kds", require("./routes/kdsRoutes"));
 
+// Fase 7.1 - Impressao Termica ESC/POS
+app.use("/api/print", require("./routes/printRoutes"));
+
+// Prompt D - Divisao de Conta (Split Bill)
+app.use("/api/split", require("./routes/splitBillRoutes"));
+
+// Prompt F - Vínculo Garçom/Mesa + Comissão
+app.use("/api/attendant", require("./routes/attendantRoutes"));
+
 // Fase 8 - Mobile & PDV APIs
 app.use("/api/pdv", require("./routes/pdvRoutes"));
 

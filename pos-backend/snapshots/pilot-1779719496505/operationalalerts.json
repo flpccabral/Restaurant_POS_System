@@ -1,0 +1,210 @@
+[
+  {
+    "_id": "6a1369dbf1cdeaf49a1280d3",
+    "type": "sale_without_stock_deduction",
+    "severity": "critical",
+    "store": "6a1101372ff5c713c1b1a147",
+    "status": "dismissed",
+    "message": "Falha na baixa de estoque do pedido 6a1369d8f1cdeaf49a1280a5: Order validation failed: items.2.stockDeductionStatus: `not_applicable` is not a valid enum value for path `stockDeductionStatus`.",
+    "currentValue": 1,
+    "metadata": {
+      "orderId": "6a1369d8f1cdeaf49a1280a5",
+      "reason": "transaction_abort",
+      "error": "Order validation failed: items.2.stockDeductionStatus: `not_applicable` is not a valid enum value for path `stockDeductionStatus`.",
+      "storeId": "6a1101372ff5c713c1b1a147"
+    },
+    "alertId": "5e74d786-c5b7-4c69-9ae5-5fe607a43488",
+    "createdAt": "2026-05-24T21:12:59.188Z",
+    "updatedAt": "2026-05-24T23:26:36.687Z",
+    "__v": 0,
+    "dismissedAt": "2026-05-24T23:26:36.685Z",
+    "dismissedBy": null
+  },
+  {
+    "_id": "6a1369d4f1cdeaf49a1280a2",
+    "type": "sale_without_stock_deduction",
+    "severity": "critical",
+    "store": "6a1101372ff5c713c1b1a147",
+    "status": "dismissed",
+    "message": "Falha na baixa de estoque do pedido 6a1369d1f1cdeaf49a128074: Order validation failed: items.2.stockDeductionStatus: `not_applicable` is not a valid enum value for path `stockDeductionStatus`.",
+    "currentValue": 1,
+    "metadata": {
+      "orderId": "6a1369d1f1cdeaf49a128074",
+      "reason": "transaction_abort",
+      "error": "Order validation failed: items.2.stockDeductionStatus: `not_applicable` is not a valid enum value for path `stockDeductionStatus`.",
+      "storeId": "6a1101372ff5c713c1b1a147"
+    },
+    "alertId": "02703786-7583-4fd1-b29b-f61844cf1b37",
+    "createdAt": "2026-05-24T21:12:52.088Z",
+    "updatedAt": "2026-05-24T23:26:36.950Z",
+    "__v": 0,
+    "dismissedAt": "2026-05-24T23:26:36.949Z",
+    "dismissedBy": null
+  },
+  {
+    "_id": "6a1369bff1cdeaf49a128071",
+    "type": "sale_without_stock_deduction",
+    "severity": "critical",
+    "store": "6a1101372ff5c713c1b1a147",
+    "status": "dismissed",
+    "message": "Falha na baixa de estoque do pedido 6a1369bdf1cdeaf49a128043: Order validation failed: items.2.stockDeductionStatus: `not_applicable` is not a valid enum value for path `stockDeductionStatus`.",
+    "currentValue": 1,
+    "metadata": {
+      "orderId": "6a1369bdf1cdeaf49a128043",
+      "reason": "transaction_abort",
+      "error": "Order validation failed: items.2.stockDeductionStatus: `not_applicable` is not a valid enum value for path `stockDeductionStatus`.",
+      "storeId": "6a1101372ff5c713c1b1a147"
+    },
+    "alertId": "36abc706-1b33-40b0-aa2a-73575b9028f7",
+    "createdAt": "2026-05-24T21:12:31.996Z",
+    "updatedAt": "2026-05-24T23:26:37.141Z",
+    "__v": 0,
+    "dismissedAt": "2026-05-24T23:26:37.141Z",
+    "dismissedBy": null
+  },
+  {
+    "_id": "6a1369a0f1cdeaf49a128040",
+    "type": "sale_without_stock_deduction",
+    "severity": "critical",
+    "store": "6a1101372ff5c713c1b1a147",
+    "status": "dismissed",
+    "message": "Falha na baixa de estoque do pedido 6a13699ef1cdeaf49a128012: Order validation failed: items.2.stockDeductionStatus: `not_applicable` is not a valid enum value for path `stockDeductionStatus`.",
+    "currentValue": 1,
+    "metadata": {
+      "orderId": "6a13699ef1cdeaf49a128012",
+      "reason": "transaction_abort",
+      "error": "Order validation failed: items.2.stockDeductionStatus: `not_applicable` is not a valid enum value for path `stockDeductionStatus`.",
+      "storeId": "6a1101372ff5c713c1b1a147"
+    },
+    "alertId": "c3c9d376-fd43-46ac-a7b9-037efb71bfa1",
+    "createdAt": "2026-05-24T21:12:00.796Z",
+    "updatedAt": "2026-05-24T23:26:37.302Z",
+    "__v": 0,
+    "dismissedAt": "2026-05-24T23:26:37.301Z",
+    "dismissedBy": null
+  },
+  {
+    "_id": "6a134da81ad405a6ea8ff9a6",
+    "type": "sale_without_stock_deduction",
+    "severity": "critical",
+    "store": "6a1101372ff5c713c1b1a147",
+    "status": "dismissed",
+    "message": "Falha na baixa de estoque do pedido 6a134da61ad405a6ea8ff978: Stock deduction failed for order: Refrigerante Teste (Padrao): StockMovement validation failed: type: `direct_sale_deduction` is not a valid enum value for path `type`.",
+    "currentValue": 1,
+    "metadata": {
+      "orderId": "6a134da61ad405a6ea8ff978",
+      "reason": "transaction_abort",
+      "error": "Stock deduction failed for order: Refrigerante Teste (Padrao): StockMovement validation failed: type: `direct_sale_deduction` is not a valid enum value for path `type`.",
+      "storeId": "6a1101372ff5c713c1b1a147"
+    },
+    "alertId": "a286f852-b3f4-4283-858d-337f7fc6a792",
+    "createdAt": "2026-05-24T19:12:40.693Z",
+    "updatedAt": "2026-05-24T23:26:37.465Z",
+    "__v": 0,
+    "dismissedAt": "2026-05-24T23:26:37.465Z",
+    "dismissedBy": null
+  },
+  {
+    "_id": "6a11e5aef646322a50b7465b",
+    "type": "product_without_recipe",
+    "severity": "high",
+    "store": "6a1101372ff5c713c1b1a147",
+    "status": "dismissed",
+    "message": "Produto 'Produto Sem Receita' (variação: Padrao) não possui ficha técnica ativa em Loja Demo - Matriz. Vendas deste produto não geram baixa de estoque nem CMV.",
+    "currentValue": 1,
+    "metadata": {
+      "productId": "6a11e53cf646322a50b745e6",
+      "productName": "Produto Sem Receita",
+      "variationName": "Padrao",
+      "sku": "produto-sem-receita-padrao",
+      "missingRecipe": true
+    },
+    "alertId": "3b5bf64c-54fb-46b0-b2dd-2d9bed37e3e0",
+    "createdAt": "2026-05-23T17:36:46.879Z",
+    "updatedAt": "2026-05-24T23:26:37.715Z",
+    "__v": 0,
+    "dismissedAt": "2026-05-24T23:26:37.714Z",
+    "dismissedBy": null
+  },
+  {
+    "_id": "6a11e56ef646322a50b745fc",
+    "type": "sale_without_stock_deduction",
+    "severity": "critical",
+    "store": "6a1101372ff5c713c1b1a147",
+    "status": "dismissed",
+    "message": "Venda realizada sem baixa de estoque — Produto 'Produto Sem Receita' (Pedido: 6a11e56df646322a50b745f1) não possui ficha técnica ativa. CMV e saldo de estoque podem estar incorretos.",
+    "currentValue": 1,
+    "metadata": {
+      "orderId": "6a11e56df646322a50b745f1",
+      "productId": "6a11e53cf646322a50b745e6",
+      "productName": "Produto Sem Receita",
+      "quantity": 1,
+      "reason": "no_active_recipe",
+      "stockDeductionStatus": "no_recipe"
+    },
+    "alertId": "88f8909c-17fe-4acb-98f9-ca53b41339ba",
+    "createdAt": "2026-05-23T17:35:42.292Z",
+    "updatedAt": "2026-05-24T23:26:37.878Z",
+    "__v": 0,
+    "dismissedAt": "2026-05-24T23:26:37.878Z",
+    "dismissedBy": null
+  },
+  {
+    "_id": "6a1102e4adf391e49e12da11",
+    "type": "low_stock",
+    "severity": "medium",
+    "store": "6a1101372ff5c713c1b1a147",
+    "location": "6a1101527a7bf001d8117a4c",
+    "status": "dismissed",
+    "message": "Alface atingiu 50% do estoque minimo",
+    "currentValue": 50,
+    "alertId": "d22ff057-3b23-4d51-a464-30aa3f77939a",
+    "__v": 0,
+    "createdAt": "2026-05-23T01:29:08.986Z",
+    "updatedAt": "2026-05-24T23:26:38.034Z",
+    "metadata": {
+      "resolutionNotes": "Resolvido via checkpoint runtime"
+    },
+    "resolvedAt": "2026-05-23T23:06:11.656Z",
+    "resolvedBy": "6a0f85f6d2278c1824dcb52b",
+    "dismissedAt": "2026-05-24T23:26:38.033Z",
+    "dismissedBy": null
+  },
+  {
+    "_id": "6a1102e4adf391e49e12da0f",
+    "type": "stockout",
+    "severity": "critical",
+    "store": "6a1101372ff5c713c1b1a147",
+    "location": "6a1101527a7bf001d8117a4c",
+    "status": "dismissed",
+    "message": "Carne Bovina em ruptura - estoque zerado",
+    "currentValue": 0,
+    "alertId": "0257f6cf-56f7-4fb9-8225-d072a52c6d28",
+    "__v": 0,
+    "createdAt": "2026-05-23T01:29:08.985Z",
+    "updatedAt": "2026-05-24T23:26:38.199Z",
+    "dismissedAt": "2026-05-24T23:26:38.199Z",
+    "dismissedBy": null
+  },
+  {
+    "_id": "6a1102e4adf391e49e12da10",
+    "type": "low_stock",
+    "severity": "high",
+    "store": "6a1101372ff5c713c1b1a147",
+    "location": "6a1101527a7bf001d8117a4c",
+    "status": "dismissed",
+    "message": "Queijo Mussarela abaixo do estoque minimo",
+    "currentValue": 5000,
+    "alertId": "77238fbc-4b5f-426f-b24f-7f1f07794bda",
+    "__v": 0,
+    "createdAt": "2026-05-23T01:29:08.985Z",
+    "updatedAt": "2026-05-24T23:26:38.363Z",
+    "metadata": {
+      "resolutionNotes": "Teste resolve por ObjectId"
+    },
+    "resolvedAt": "2026-05-23T23:11:25.346Z",
+    "resolvedBy": "6a0f85f6d2278c1824dcb52b",
+    "dismissedAt": "2026-05-24T23:26:38.362Z",
+    "dismissedBy": null
+  }
+]

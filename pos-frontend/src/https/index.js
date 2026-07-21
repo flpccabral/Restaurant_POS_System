@@ -63,6 +63,12 @@ export const getIngredients = (params = {}) =>
   axiosWrapper.get("/api/ingredient", { params });
 export const getStores = () =>
   axiosWrapper.get("/api/store");
+export const getCurrentStoreSettings = () =>
+  axiosWrapper.get("/api/store/current");
+export const updateServiceChargeConfig = (data) =>
+  axiosWrapper.put("/api/store/current/service-charge", data);
+export const getServiceChargeSummary = (params = {}) =>
+  axiosWrapper.get("/api/dashboard/service-charge-summary", { params });
 export const getLocations = (params = {}) =>
   axiosWrapper.get("/api/stock/locations", { params });
 
@@ -91,3 +97,95 @@ export const executeInterStoreTransfer = (data) =>
   axiosWrapper.post("/api/stock/transfer/inter-store", data);
 export const markPurchaseNeeded = (data) =>
   axiosWrapper.post("/api/observability/purchase/register", data);
+
+// ============================================
+// Fase 7.1 — Impressao Termica ESC/POS
+// ============================================
+
+// Impressoras
+export const listPrinters = (params = {}) =>
+  axiosWrapper.get("/api/print/printers", { params });
+export const createPrinter = (data) =>
+  axiosWrapper.post("/api/print/printers", data);
+export const updatePrinter = (printerId, data) =>
+  axiosWrapper.put(`/api/print/printers/${printerId}`, data);
+export const deletePrinter = (printerId) =>
+  axiosWrapper.delete(`/api/print/printers/${printerId}`);
+export const testPrinter = (printerId) =>
+  axiosWrapper.post(`/api/print/printers/${printerId}/test`);
+
+// Impressao de cupom/comanda
+export const printReceipt = (data) =>
+  axiosWrapper.post("/api/print/receipt", data);
+
+// ============================================
+// Fase 7 — KDS (Kitchen Display System)
+// ============================================
+export const getKDSOrders = (params = {}) =>
+  axiosWrapper.get("/api/kds/orders", { params });
+export const getKDSOrderById = (id) =>
+  axiosWrapper.get(`/api/kds/orders/${id}`);
+export const acceptKDSOrder = (id) =>
+  axiosWrapper.post(`/api/kds/orders/${id}/accept`);
+export const markKDSReady = (id) =>
+  axiosWrapper.post(`/api/kds/orders/${id}/ready`);
+export const markKDSServed = (id) =>
+  axiosWrapper.post(`/api/kds/orders/${id}/served`);
+export const rushKDSOrder = (id) =>
+  axiosWrapper.post(`/api/kds/orders/${id}/rush`);
+export const cancelKDSOrder = (id, data = {}) =>
+  axiosWrapper.post(`/api/kds/orders/${id}/cancel`, data);
+export const getKDSConfig = () =>
+  axiosWrapper.get("/api/kds/config");
+export const getKDSStationStats = (params = {}) =>
+  axiosWrapper.get("/api/kds/stats/station", { params });
+
+// ============================================
+// Prompt D — Divisao de Conta (Split Bill)
+// ============================================
+export const calculateSplit = (tableId, data) =>
+  axiosWrapper.post(`/api/split/table/${tableId}/calculate`, data);
+export const createSplitBill = (tableId, data) =>
+  axiosWrapper.post(`/api/split/table/${tableId}/split`, data);
+export const processSplitPayment = (splitId, paymentId) =>
+  axiosWrapper.post(`/api/split/${splitId}/payments/${paymentId}`);
+export const closeSplitBill = (splitId) =>
+  axiosWrapper.post(`/api/split/${splitId}/close`);
+export const getSplits = (params = {}) =>
+  axiosWrapper.get("/api/split", { params });
+
+// ============================================
+// Prompt F — Vínculo Garçom/Mesa + Comissão
+// ============================================
+export const getAttendants = (params = {}) =>
+  axiosWrapper.get("/api/attendant", { params });
+export const getAttendantCommission = (attendantId, params = {}) =>
+  axiosWrapper.get(`/api/attendant/${attendantId}/commission`, { params });
+export const transferAttendant = (orderId, data) =>
+  axiosWrapper.post(`/api/attendant/order/${orderId}/transfer-attendant`, data);
+export const updateCommissionConfig = (attendantId, data) =>
+  axiosWrapper.put(`/api/attendant/${attendantId}/commission-config`, data);
+
+// ============================================
+// Prompt E — Fluxo de Caixa (Abertura/Fechamento/Sangria/Suprimento)
+// ============================================
+export const getCashSession = () =>
+  axiosWrapper.get("/api/pdv/session/active");
+export const openCashSession = (data) =>
+  axiosWrapper.post("/api/pdv/session/open", data);
+export const closeCashSession = (data) =>
+  axiosWrapper.post("/api/pdv/session/close", data);
+export const performSangria = (data) =>
+  axiosWrapper.post("/api/pdv/sangria", data);
+export const performSuprimento = (data) =>
+  axiosWrapper.post("/api/pdv/suprimento", data);
+
+// ============================================
+// Pagamentos
+// ============================================
+export const getPayments = (params = {}) =>
+  axiosWrapper.get("/api/payment", { params });
+
+// Processar pagamento de pedido (PDV)
+export const processPayment = (data) =>
+  axiosWrapper.post("/api/pdv/payment", data);

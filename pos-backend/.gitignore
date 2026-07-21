@@ -1,2 +1,7 @@
 node_modules
 .env
+
+# iFood Scraper - dados sensíveis
+ifood-scraper/output/
+ifood-scraper/auth-state/
+ifood-scraper/node_modules/

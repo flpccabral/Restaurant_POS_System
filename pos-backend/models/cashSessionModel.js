@@ -109,7 +109,9 @@ const cashSessionSchema = new mongoose.Schema({
         voucher: { type: Number, default: 0 },
         total: { type: Number, default: 0 },
         refunds: { type: Number, default: 0 },
-        cancellations: { type: Number, default: 0 }
+        cancellations: { type: Number, default: 0 },
+        sangrias: { type: Number, default: 0 },
+        supplies: { type: Number, default: 0 }
     },
     observations: {
         opening: String,
@@ -118,7 +120,106 @@ const cashSessionSchema = new mongoose.Schema({
     signed: {
         cashier: Boolean,
         manager: Boolean
-    }
+    },
+    // Transações unificadas (substitui movements e payments)
+    transactions: [{
+        type: {
+            type: String,
+            enum: [
+                'opening',        // Abertura (saldo inicial)
+                'closing',        // Fechamento (conferência)
+                'sale_cash',      // Venda em dinheiro
+                'sale_pix',       // Venda em PIX
+                'sale_credit',    // Venda em crédito
+                'sale_debit',     // Venda em débito
+                'sale_voucher',   // Venda em voucher
+                'sangria',        // Retirada de dinheiro
+                'supply',         // Reforço de dinheiro
+                'adjustment',     // Ajuste manual (supervisor)
+            ],
+            required: true
+        },
+        value: {
+            type: Number,
+            required: true
+        },
+        paymentMethod: {
+            type: String,
+            enum: ['cash', 'pix', 'credit_card', 'debit_card', 'voucher']
+        },
+        orderId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Order'
+        },
+        orderNumber: String,
+        description: String,
+        reason: String,
+        operatorId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        },
+        createdAt: {
+            type: Date,
+            default: Date.now
+        },
+        metadata: mongoose.Schema.Types.Mixed
+    }],
+    // Resumo do fechamento (preenchido no ato)
+    closingSummary: {
+        expectedCash: { type: Number },
+        actualCash: { type: Number },
+        difference: { type: Number },
+        differenceReason: { type: String },
+        confirmedBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+            comment: 'Supervisor que aprovou (para diferenças > R$50)'
+        },
+        confirmedAt: { type: Date },
+        approved: { type: Boolean, default: false },
+        notes: { type: String }
+    },
+    forced: {
+        type: Boolean,
+        default: false,
+        comment: 'Fechamento forçado pelo sistema (cron meia-noite)'
+    },
+    // Manter movements e payments para compatibilidade (deprecated)
+    movements: [{
+        type: {
+            type: String,
+            enum: ['sangria', 'suprimento', 'abertura', 'fechamento', 'pagamento', 'cancelamento'],
+            required: true
+        },
+        amount: {
+            type: Number,
+            required: true
+        },
+        method: {
+            type: String,
+            enum: ['cash', 'credit_card', 'debit_card', 'pix', 'voucher']
+        },
+        description: String,
+        user: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        },
+        createdAt: {
+            type: Date,
+            default: Date.now
+        },
+        metadata: mongoose.Schema.Types.Mixed
+    }],
+    payments: [{
+        payment: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Payment'
+        },
+        orderNumber: String,
+        amount: Number,
+        method: String,
+        createdAt: Date
+    }]
 }, { timestamps: true });
 
 // Índices
@@ -128,7 +229,7 @@ cashSessionSchema.index({ sessionNumber: 1 }, { unique: true });
 
 // Hook para atualizar totals ao salvar
 cashSessionSchema.pre('save', async function(next) {
-    if (this.isModified('movements') || this.isModified('payments')) {
+    if (this.isModified('transactions') || this.isModified('movements') || this.isModified('payments')) {
         // Recalcular totais
         const totals = {
             cash: 0,
@@ -138,33 +239,61 @@ cashSessionSchema.pre('save', async function(next) {
             voucher: 0,
             total: 0,
             refunds: 0,
-            cancellations: 0
+            cancellations: 0,
+            sangrias: 0,
+            supplies: 0
         };
 
-        // Somar pagamentos
-        this.payments.forEach(p => {
-            if (p.method === 'cash') totals.cash += p.amount;
-            else if (p.method === 'credit_card') totals.credit_card += p.amount;
-            else if (p.method === 'debit_card') totals.debit_card += p.amount;
-            else if (p.method === 'pix') totals.pix += p.amount;
-            else if (p.method === 'voucher') totals.voucher += p.amount;
-            totals.total += p.amount;
-        });
+        // Processar transactions unificadas
+        if (this.transactions && this.transactions.length > 0) {
+            this.transactions.forEach(t => {
+                if (t.type.startsWith('sale_')) {
+                    // Vendas
+                    const method = t.paymentMethod || t.type.replace('sale_', '');
+                    if (method === 'cash') totals.cash += t.value;
+                    else if (method === 'credit' || method === 'credit_card') totals.credit_card += t.value;
+                    else if (method === 'debit' || method === 'debit_card') totals.debit_card += t.value;
+                    else if (method === 'pix') totals.pix += t.value;
+                    else if (method === 'voucher') totals.voucher += t.value;
+                    totals.total += t.value;
+                } else if (t.type === 'sangria') {
+                    totals.sangrias += t.value;
+                    // Não afeta totals.cash - sangria é contabilizada separadamente
+                } else if (t.type === 'supply') {
+                    totals.supplies += t.value;
+                    // Não afeta totals.cash - supply é contabilizado separadamente
+                }
+            });
+        }
 
-        // Subtrair sangrias
-        this.movements.forEach(m => {
-            if (m.type === 'sangria') {
-                if (m.method === 'cash') totals.cash -= m.amount;
-                totals.total -= m.amount;
-            }
-            if (m.type === 'suprimento') {
-                if (m.method === 'cash') totals.cash += m.amount;
-                totals.total += m.amount;
-            }
-        });
+        // Manter compatibilidade com movements e payments (deprecated)
+        if (this.payments && this.payments.length > 0) {
+            this.payments.forEach(p => {
+                if (p.method === 'cash') totals.cash += p.amount;
+                else if (p.method === 'credit_card') totals.credit_card += p.amount;
+                else if (p.method === 'debit_card') totals.debit_card += p.amount;
+                else if (p.method === 'pix') totals.pix += p.amount;
+                else if (p.method === 'voucher') totals.voucher += p.amount;
+                totals.total += p.amount;
+            });
+        }
+
+        if (this.movements && this.movements.length > 0) {
+            this.movements.forEach(m => {
+                if (m.type === 'sangria') {
+                    totals.sangrias += m.amount;
+                    if (m.method === 'cash') totals.cash -= m.amount;
+                }
+                if (m.type === 'suprimento') {
+                    totals.supplies += m.amount;
+                    if (m.method === 'cash') totals.cash += m.amount;
+                }
+            });
+        }
 
         this.totals = totals;
-        this.expectedBalance = this.initialBalance + totals.total;
+        // FLUXO_CAIXA: expectedBalance inclui TODAS as vendas (não apenas cash)
+        this.expectedBalance = this.initialBalance + totals.total + totals.supplies - totals.sangrias;
     }
     next();
 });
@@ -178,7 +307,16 @@ cashSessionSchema.methods.open = async function(initialBalance = 0) {
     this.initialBalance = initialBalance;
     this.openedAt = new Date();
 
-    // Registrar movimento de abertura
+    // Registrar transação de abertura
+    this.transactions.push({
+        type: 'opening',
+        value: initialBalance,
+        paymentMethod: 'cash',
+        description: 'Fundo de troco inicial',
+        operatorId: this.cashier
+    });
+
+    // Manter compatibilidade
     this.movements.push({
         type: 'abertura',
         amount: initialBalance,
@@ -186,6 +324,40 @@ cashSessionSchema.methods.open = async function(initialBalance = 0) {
         description: 'Fundo de troco inicial',
         user: this.cashier
     });
+
+    await this.save();
+    return this;
+};
+
+// Método unificado para registrar qualquer tipo de transação
+cashSessionSchema.methods.registerTransaction = async function(transactionData) {
+    if (this.status !== 'open') {
+        throw new Error('Session is not open');
+    }
+
+    // Validar sangria
+    if (transactionData.type === 'sangria') {
+        const availableCash = this.initialBalance + this.totals.cash + this.totals.supplies - this.totals.sangrias;
+        if (transactionData.value > availableCash) {
+            throw new Error(`Insufficient cash for sangria. Available: R$ ${availableCash.toFixed(2)}, Requested: R$ ${transactionData.value.toFixed(2)}`);
+        }
+    }
+
+    // Adicionar transação (apenas em transactions, sem duplicar em movements/payments)
+    this.transactions.push({
+        type: transactionData.type,
+        value: transactionData.value,
+        paymentMethod: transactionData.paymentMethod,
+        orderId: transactionData.orderId,
+        orderNumber: transactionData.orderNumber,
+        description: transactionData.description,
+        reason: transactionData.reason,
+        operatorId: transactionData.operatorId,
+        metadata: transactionData.metadata
+    });
+
+    // Forçar Mongoose a detectar modificação no array
+    this.markModified('transactions');
 
     await this.save();
     return this;
@@ -249,11 +421,18 @@ cashSessionSchema.methods.addPayment = async function(paymentData) {
     return this;
 };
 
+// Método para obter saldo disponível em dinheiro
+cashSessionSchema.methods.getAvailableCash = function() {
+    return this.initialBalance + this.totals.cash + this.totals.supplies - this.totals.sangrias;
+};
+
 // Método para fechar sessão
-cashSessionSchema.methods.close = async function(finalBalance, observations, userId) {
+cashSessionSchema.methods.close = async function(closingData) {
     if (this.status !== 'open') {
         throw new Error('Session is not open');
     }
+
+    const { finalBalance, observations, userId, confirmedBy, differenceReason } = closingData;
 
     this.finalBalance = finalBalance;
     this.difference = finalBalance - this.expectedBalance;
@@ -262,7 +441,33 @@ cashSessionSchema.methods.close = async function(finalBalance, observations, use
     this.closedBy = userId;
     this.status = 'closed';
 
-    // Registrar movimento de fechamento
+    // Preencher closingSummary
+    this.closingSummary = {
+        expectedCash: this.expectedBalance,
+        actualCash: finalBalance,
+        difference: this.difference,
+        differenceReason: differenceReason,
+        confirmedBy: confirmedBy,
+        confirmedAt: confirmedBy ? new Date() : null,
+        approved: !confirmedBy || Math.abs(this.difference) <= 50,
+        notes: observations
+    };
+
+    // Registrar transação de fechamento
+    this.transactions.push({
+        type: 'closing',
+        value: finalBalance,
+        paymentMethod: 'cash',
+        description: observations || 'Fechamento de caixa',
+        operatorId: userId,
+        metadata: {
+            expectedCash: this.expectedBalance,
+            difference: this.difference,
+            confirmedBy: confirmedBy
+        }
+    });
+
+    // Manter compatibilidade
     this.movements.push({
         type: 'fechamento',
         amount: finalBalance,
@@ -291,13 +496,17 @@ cashSessionSchema.methods.getSummary = function() {
         duration: this.closedAt ?
             Math.round((this.closedAt - this.openedAt) / 60000) : // minutos
             Math.round((new Date() - this.openedAt) / 60000),
-        initialBalance: this.initialBalance,
+        openingBalance: this.initialBalance,
         expectedBalance: this.expectedBalance,
         finalBalance: this.finalBalance,
         difference: this.difference,
         totals: this.totals,
+        transactionsCount: this.transactions.length,
         movementsCount: this.movements.length,
-        paymentsCount: this.payments.length
+        paymentsCount: this.payments.length,
+        closingSummary: this.closingSummary,
+        forced: this.forced,
+        availableCash: this.getAvailableCash()
     };
 };
 
@@ -307,7 +516,10 @@ cashSessionSchema.statics.getActiveSession = async function(storeId, cashierId) 
         store: new mongoose.Types.ObjectId(storeId),
         cashier: new mongoose.Types.ObjectId(cashierId),
         status: 'open'
-    }).sort({ openedAt: -1 });
+    })
+    .populate('cashier', 'name email')
+    .populate('closedBy', 'name')
+    .sort({ openedAt: -1 });
 };
 
 // Método estático para gerar número de sessão

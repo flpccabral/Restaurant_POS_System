@@ -1,0 +1,1218 @@
+[
+  {
+    "_id": "6a14640e67c31deb7d4f2125",
+    "store": "6a1101372ff5c713c1b1a147",
+    "customerDetails": {
+      "name": "Matheus Felipe",
+      "phone": "819282719240",
+      "guests": 2
+    },
+    "orderStatus": "completed",
+    "bills": {
+      "total": 86.9,
+      "tax": 4.562250000000001,
+      "totalWithTax": 91.46225000000001
+    },
+    "items": [
+      {
+        "product": "6a123a2b0824a97594d48d7a",
+        "name": "Hambúrguer Artesanal (P)",
+        "quantity": 1,
+        "price": 25.9,
+        "status": "pending",
+        "sellableType": "prepared_product",
+        "stockImpactRule": "recipe_composition",
+        "variation": "hambúrguer-artesanal-p",
+        "sku": "hambúrguer-artesanal-p",
+        "pricePerQuantity": 25.9,
+        "cogs": 16.38,
+        "stockDeductionStatus": "deducted",
+        "stockMovements": [
+          "6a14641067c31deb7d4f2145",
+          "6a14641067c31deb7d4f2149",
+          "6a14641067c31deb7d4f214d",
+          "6a14641067c31deb7d4f2151",
+          "6a14641167c31deb7d4f2155"
+        ],
+        "productReadinessStatus": "ready_for_sale",
+        "stockReversalStatus": "not_applicable",
+        "stockReversalMovements": [],
+        "_id": "6a14640e67c31deb7d4f2126",
+        "ingredientCosts": [
+          {
+            "ingredientName": "Carne Bovina",
+            "quantity": 198,
+            "unit": "g",
+            "cost": 8.91,
+            "balanceBefore": 8416,
+            "balanceAfter": 8218,
+            "_id": "6a14641367c31deb7d4f2175"
+          },
+          {
+            "ingredientName": "Pão de Hambúrguer",
+            "quantity": 1,
+            "unit": "unidade",
+            "cost": 1.2,
+            "balanceBefore": 92,
+            "balanceAfter": 91,
+            "_id": "6a14641367c31deb7d4f2176"
+          },
+          {
+            "ingredientName": "Queijo Mussarela",
+            "quantity": 52.5,
+            "unit": "g",
+            "cost": 2.89,
+            "balanceBefore": 4475,
+            "balanceAfter": 4422.5,
+            "_id": "6a14641367c31deb7d4f2177"
+          },
+          {
+            "ingredientName": "Alface",
+            "quantity": 1.1,
+            "unit": "unidade",
+            "cost": 2.75,
+            "balanceBefore": 41.19999999999999,
+            "balanceAfter": 40.09999999999999,
+            "_id": "6a14641367c31deb7d4f2178"
+          },
+          {
+            "ingredientName": "Tomate",
+            "quantity": 42,
+            "unit": "g",
+            "cost": 0.63,
+            "balanceBefore": 7554,
+            "balanceAfter": 7512,
+            "_id": "6a14641367c31deb7d4f2179"
+          }
+        ],
+        "recipe": "6a123a2c0824a97594d48d91",
+        "recipeVersion": 2
+      },
+      {
+        "product": "6a123a2b0824a97594d48d7d",
+        "name": "Pizza Margherita (Individual)",
+        "quantity": 1,
+        "price": 45,
+        "status": "pending",
+        "sellableType": "prepared_product",
+        "stockImpactRule": "recipe_composition",
+        "variation": "pizza-margherita-individual",
+        "sku": "pizza-margherita-individual",
+        "pricePerQuantity": 45,
+        "cogs": 10.23,
+        "stockDeductionStatus": "deducted",
+        "stockMovements": [
+          "6a14641167c31deb7d4f2160",
+          "6a14641267c31deb7d4f2164",
+          "6a14641267c31deb7d4f2168",
+          "6a14641267c31deb7d4f216c"
+        ],
+        "productReadinessStatus": "ready_for_sale",
+        "stockReversalStatus": "not_applicable",
+        "stockReversalMovements": [],
+        "_id": "6a14640e67c31deb7d4f2127",
+        "ingredientCosts": [
+          {
+            "ingredientName": "Farinha de Trigo",
+            "quantity": 200,
+            "unit": "g",
+            "cost": 1,
+            "balanceBefore": 24800,
+            "balanceAfter": 24600,
+            "_id": "6a14641367c31deb7d4f217a"
+          },
+          {
+            "ingredientName": "Queijo Mussarela",
+            "quantity": 105,
+            "unit": "g",
+            "cost": 5.78,
+            "balanceBefore": 4422.5,
+            "balanceAfter": 4317.5,
+            "_id": "6a14641367c31deb7d4f217b"
+          },
+          {
+            "ingredientName": "Tomate",
+            "quantity": 110,
+            "unit": "g",
+            "cost": 1.65,
+            "balanceBefore": 7512,
+            "balanceAfter": 7402,
+            "_id": "6a14641367c31deb7d4f217c"
+          },
+          {
+            "ingredientName": "Azeite de Oliva",
+            "quantity": 15,
+            "unit": "ml",
+            "cost": 1.8,
+            "balanceBefore": 2985,
+            "balanceAfter": 2970,
+            "_id": "6a14641367c31deb7d4f217d"
+          }
+        ],
+        "recipe": "6a123a2d0824a97594d48d98",
+        "recipeVersion": 1
+      },
+      {
+        "product": "6a123a2b0824a97594d48d80",
+        "name": "Refrigerante (Lata)",
+        "quantity": 1,
+        "price": 6,
+        "status": "pending",
+        "sellableType": "industrialized_resale",
+        "stockImpactRule": "stock_item_direct",
+        "variation": "refrigerante-lata",
+        "sku": "refrigerante-lata",
+        "pricePerQuantity": 6,
+        "cogs": 3.5,
+        "stockDeductionStatus": "deducted",
+        "stockMovements": [
+          "6a14641367c31deb7d4f2172"
+        ],
+        "productReadinessStatus": "ready_direct_ok",
+        "stockReversalStatus": "not_applicable",
+        "stockReversalMovements": [],
+        "_id": "6a14640e67c31deb7d4f2128",
+        "ingredientCosts": [
+          {
+            "ingredientName": "Refrigerante",
+            "quantity": 1,
+            "unit": "unidade",
+            "cost": 3.5,
+            "balanceBefore": 98,
+            "balanceAfter": 97,
+            "_id": "6a14641367c31deb7d4f217e"
+          }
+        ]
+      },
+      {
+        "product": "6a1343008c9807db6028fe65",
+        "name": "Taxa de Serviço",
+        "quantity": 1,
+        "price": 10,
+        "status": "pending",
+        "sellableType": "service_fee",
+        "stockImpactRule": "no_stock_impact",
+        "variation": "taxa-de-servico-padrao",
+        "sku": "taxa-de-servico-padrao",
+        "pricePerQuantity": 10,
+        "cogs": 0,
+        "stockDeductionStatus": "not_applicable",
+        "stockMovements": [],
+        "productReadinessStatus": "ready_no_stock_impact",
+        "stockReversalStatus": "not_applicable",
+        "stockReversalMovements": [],
+        "_id": "6a14640e67c31deb7d4f2129",
+        "ingredientCosts": []
+      }
+    ],
+    "table": "6a1335b587f360ebe3aea43b",
+    "paymentMethod": "Cash",
+    "totalCOGS": 30.11,
+    "stockDeductionStatus": "completed",
+    "stockReversalStatus": "not_applicable",
+    "stockReversalMovements": [],
+    "orderDate": "2026-05-25T15:00:30.693Z",
+    "createdAt": "2026-05-25T15:00:30.696Z",
+    "updatedAt": "2026-05-25T15:51:55.471Z",
+    "__v": 1
+  },
+  {
+    "_id": "6a145ad52c28cb7be8da0711",
+    "store": "6a1101372ff5c713c1b1a147",
+    "customerDetails": {
+      "name": "Maria Isis",
+      "phone": "81979150187",
+      "guests": 2
+    },
+    "orderStatus": "completed",
+    "bills": {
+      "total": 86.9,
+      "tax": 4.562250000000001,
+      "totalWithTax": 91.46225000000001
+    },
+    "items": [
+      {
+        "product": "6a123a2b0824a97594d48d7a",
+        "name": "Hambúrguer Artesanal (P)",
+        "quantity": 1,
+        "price": 25.9,
+        "status": "pending",
+        "sellableType": "prepared_product",
+        "stockImpactRule": "recipe_composition",
+        "variation": "hambúrguer-artesanal-p",
+        "sku": "hambúrguer-artesanal-p",
+        "pricePerQuantity": 25.9,
+        "cogs": 16.38,
+        "stockDeductionStatus": "deducted",
+        "stockMovements": [
+          "6a145ad62c28cb7be8da0731",
+          "6a145ad72c28cb7be8da0735",
+          "6a145ad72c28cb7be8da0739",
+          "6a145ad72c28cb7be8da073d",
+          "6a145ad72c28cb7be8da0741"
+        ],
+        "productReadinessStatus": "ready_for_sale",
+        "stockReversalStatus": "not_applicable",
+        "stockReversalMovements": [],
+        "_id": "6a145ad52c28cb7be8da0712",
+        "ingredientCosts": [
+          {
+            "ingredientName": "Carne Bovina",
+            "quantity": 198,
+            "unit": "g",
+            "cost": 8.91,
+            "balanceBefore": 8614,
+            "balanceAfter": 8416,
+            "_id": "6a145ad92c28cb7be8da0761"
+          },
+          {
+            "ingredientName": "Pão de Hambúrguer",
+            "quantity": 1,
+            "unit": "unidade",
+            "cost": 1.2,
+            "balanceBefore": 93,
+            "balanceAfter": 92,
+            "_id": "6a145ad92c28cb7be8da0762"
+          },
+          {
+            "ingredientName": "Queijo Mussarela",
+            "quantity": 52.5,
+            "unit": "g",
+            "cost": 2.89,
+            "balanceBefore": 4632.5,
+            "balanceAfter": 4580,
+            "_id": "6a145ad92c28cb7be8da0763"
+          },
+          {
+            "ingredientName": "Alface",
+            "quantity": 1.1,
+            "unit": "unidade",
+            "cost": 2.75,
+            "balanceBefore": 42.29999999999999,
+            "balanceAfter": 41.19999999999999,
+            "_id": "6a145ad92c28cb7be8da0764"
+          },
+          {
+            "ingredientName": "Tomate",
+            "quantity": 42,
+            "unit": "g",
+            "cost": 0.63,
+            "balanceBefore": 7706,
+            "balanceAfter": 7664,
+            "_id": "6a145ad92c28cb7be8da0765"
+          }
+        ],
+        "recipe": "6a123a2c0824a97594d48d91",
+        "recipeVersion": 2
+      },
+      {
+        "product": "6a123a2b0824a97594d48d7d",
+        "name": "Pizza Margherita (Individual)",
+        "quantity": 1,
+        "price": 45,
+        "status": "pending",
+        "sellableType": "prepared_product",
+        "stockImpactRule": "recipe_composition",
+        "variation": "pizza-margherita-individual",
+        "sku": "pizza-margherita-individual",
+        "pricePerQuantity": 45,
+        "cogs": 10.23,
+        "stockDeductionStatus": "deducted",
+        "stockMovements": [
+          "6a145ad82c28cb7be8da074c",
+          "6a145ad82c28cb7be8da0750",
+          "6a145ad92c28cb7be8da0754",
+          "6a145ad92c28cb7be8da0758"
+        ],
+        "productReadinessStatus": "ready_for_sale",
+        "stockReversalStatus": "not_applicable",
+        "stockReversalMovements": [],
+        "_id": "6a145ad52c28cb7be8da0713",
+        "ingredientCosts": [
+          {
+            "ingredientName": "Farinha de Trigo",
+            "quantity": 200,
+            "unit": "g",
+            "cost": 1,
+            "balanceBefore": 25000,
+            "balanceAfter": 24800,
+            "_id": "6a145ad92c28cb7be8da0766"
+          },
+          {
+            "ingredientName": "Queijo Mussarela",
+            "quantity": 105,
+            "unit": "g",
+            "cost": 5.78,
+            "balanceBefore": 4580,
+            "balanceAfter": 4475,
+            "_id": "6a145ad92c28cb7be8da0767"
+          },
+          {
+            "ingredientName": "Tomate",
+            "quantity": 110,
+            "unit": "g",
+            "cost": 1.65,
+            "balanceBefore": 7664,
+            "balanceAfter": 7554,
+            "_id": "6a145ad92c28cb7be8da0768"
+          },
+          {
+            "ingredientName": "Azeite de Oliva",
+            "quantity": 15,
+            "unit": "ml",
+            "cost": 1.8,
+            "balanceBefore": 3000,
+            "balanceAfter": 2985,
+            "_id": "6a145ad92c28cb7be8da0769"
+          }
+        ],
+        "recipe": "6a123a2d0824a97594d48d98",
+        "recipeVersion": 1
+      },
+      {
+        "product": "6a123a2b0824a97594d48d80",
+        "name": "Refrigerante (Lata)",
+        "quantity": 1,
+        "price": 6,
+        "status": "pending",
+        "sellableType": "industrialized_resale",
+        "stockImpactRule": "stock_item_direct",
+        "variation": "refrigerante-lata",
+        "sku": "refrigerante-lata",
+        "pricePerQuantity": 6,
+        "cogs": 3.5,
+        "stockDeductionStatus": "deducted",
+        "stockMovements": [
+          "6a145ad92c28cb7be8da075e"
+        ],
+        "productReadinessStatus": "ready_direct_ok",
+        "stockReversalStatus": "not_applicable",
+        "stockReversalMovements": [],
+        "_id": "6a145ad52c28cb7be8da0714",
+        "ingredientCosts": [
+          {
+            "ingredientName": "Refrigerante",
+            "quantity": 1,
+            "unit": "unidade",
+            "cost": 3.5,
+            "balanceBefore": 99,
+            "balanceAfter": 98,
+            "_id": "6a145ad92c28cb7be8da076a"
+          }
+        ]
+      },
+      {
+        "product": "6a1343008c9807db6028fe65",
+        "name": "Taxa de Serviço",
+        "quantity": 1,
+        "price": 10,
+        "status": "pending",
+        "sellableType": "service_fee",
+        "stockImpactRule": "no_stock_impact",
+        "variation": "taxa-de-servico-padrao",
+        "sku": "taxa-de-servico-padrao",
+        "pricePerQuantity": 10,
+        "cogs": 0,
+        "stockDeductionStatus": "not_applicable",
+        "stockMovements": [],
+        "productReadinessStatus": "ready_no_stock_impact",
+        "stockReversalStatus": "not_applicable",
+        "stockReversalMovements": [],
+        "_id": "6a145ad52c28cb7be8da0715",
+        "ingredientCosts": []
+      }
+    ],
+    "table": "6a1335b587f360ebe3aea43b",
+    "paymentMethod": "Cash",
+    "totalCOGS": 30.11,
+    "stockDeductionStatus": "completed",
+    "stockReversalStatus": "not_applicable",
+    "stockReversalMovements": [],
+    "orderDate": "2026-05-25T14:21:09.508Z",
+    "createdAt": "2026-05-25T14:21:09.511Z",
+    "updatedAt": "2026-05-25T14:22:02.232Z",
+    "__v": 1
+  },
+  {
+    "_id": "6a13896d2aa4de8111b1e3a2",
+    "store": "6a1101372ff5c713c1b1a147",
+    "customerDetails": {
+      "name": "Cliente Piloto 9.2",
+      "phone": "11999999999",
+      "guests": 2
+    },
+    "orderStatus": "completed",
+    "bills": {
+      "total": 41.9,
+      "tax": 0,
+      "totalWithTax": 41.9
+    },
+    "items": [
+      {
+        "product": "6a123a2b0824a97594d48d7a",
+        "name": "Hambúrguer Artesanal",
+        "quantity": 1,
+        "price": 25.9,
+        "status": "pending",
+        "stockImpactRule": "recipe_composition",
+        "cogs": 16.38,
+        "stockDeductionStatus": "deducted",
+        "stockMovements": [
+          "6a13896f2aa4de8111b1e3d4",
+          "6a13896f2aa4de8111b1e3d8",
+          "6a13896f2aa4de8111b1e3dc",
+          "6a1389702aa4de8111b1e3e0",
+          "6a1389702aa4de8111b1e3e4"
+        ],
+        "stockReversalStatus": "not_applicable",
+        "stockReversalMovements": [],
+        "_id": "6a13896d2aa4de8111b1e3a3",
+        "ingredientCosts": [
+          {
+            "ingredientName": "Carne Bovina",
+            "quantity": 198,
+            "unit": "g",
+            "cost": 8.91,
+            "balanceBefore": 8812,
+            "balanceAfter": 8614,
+            "_id": "6a1389702aa4de8111b1e3ed"
+          },
+          {
+            "ingredientName": "Pão de Hambúrguer",
+            "quantity": 1,
+            "unit": "unidade",
+            "cost": 1.2,
+            "balanceBefore": 94,
+            "balanceAfter": 93,
+            "_id": "6a1389702aa4de8111b1e3ee"
+          },
+          {
+            "ingredientName": "Queijo Mussarela",
+            "quantity": 52.5,
+            "unit": "g",
+            "cost": 2.89,
+            "balanceBefore": 4685,
+            "balanceAfter": 4632.5,
+            "_id": "6a1389702aa4de8111b1e3ef"
+          },
+          {
+            "ingredientName": "Alface",
+            "quantity": 1.1,
+            "unit": "unidade",
+            "cost": 2.75,
+            "balanceBefore": 43.39999999999999,
+            "balanceAfter": 42.29999999999999,
+            "_id": "6a1389702aa4de8111b1e3f0"
+          },
+          {
+            "ingredientName": "Tomate",
+            "quantity": 42,
+            "unit": "g",
+            "cost": 0.63,
+            "balanceBefore": 7748,
+            "balanceAfter": 7706,
+            "_id": "6a1389702aa4de8111b1e3f1"
+          }
+        ],
+        "recipe": "6a123a2c0824a97594d48d91",
+        "recipeVersion": 2,
+        "sellableType": "prepared_product"
+      },
+      {
+        "product": "6a123a2b0824a97594d48d80",
+        "name": "Refrigerante",
+        "quantity": 1,
+        "price": 6,
+        "status": "pending",
+        "stockImpactRule": "stock_item_direct",
+        "cogs": 3.5,
+        "stockDeductionStatus": "deducted",
+        "stockMovements": [
+          "6a1389702aa4de8111b1e3ea"
+        ],
+        "stockReversalStatus": "not_applicable",
+        "stockReversalMovements": [],
+        "_id": "6a13896d2aa4de8111b1e3a4",
+        "ingredientCosts": [
+          {
+            "ingredientName": "Refrigerante",
+            "quantity": 1,
+            "unit": "unidade",
+            "cost": 3.5,
+            "balanceBefore": 100,
+            "balanceAfter": 99,
+            "_id": "6a1389702aa4de8111b1e3f2"
+          }
+        ],
+        "sellableType": "industrialized_resale"
+      },
+      {
+        "product": "6a1343008c9807db6028fe65",
+        "name": "Taxa de Serviço",
+        "quantity": 1,
+        "price": 10,
+        "status": "pending",
+        "stockImpactRule": "no_stock_impact",
+        "cogs": 0,
+        "stockDeductionStatus": "not_applicable",
+        "stockMovements": [],
+        "stockReversalStatus": "not_applicable",
+        "stockReversalMovements": [],
+        "_id": "6a13896d2aa4de8111b1e3a5",
+        "ingredientCosts": [],
+        "sellableType": "service_fee"
+      }
+    ],
+    "table": "6a1335b587f360ebe3aea43b",
+    "totalCOGS": 19.88,
+    "stockDeductionStatus": "completed",
+    "stockReversalStatus": "not_applicable",
+    "stockReversalMovements": [],
+    "orderDate": "2026-05-24T23:27:41.267Z",
+    "createdAt": "2026-05-24T23:27:41.270Z",
+    "updatedAt": "2026-05-24T23:27:45.951Z",
+    "__v": 1
+  },
+  {
+    "_id": "6a1384367421780bbec9df78",
+    "store": "6a1101372ff5c713c1b1a147",
+    "customerDetails": {
+      "name": "Cliente Piloto 9.2",
+      "phone": "11999999999",
+      "guests": 2
+    },
+    "orderStatus": "completed",
+    "bills": {
+      "total": 40.9,
+      "tax": 0,
+      "totalWithTax": 40.9
+    },
+    "items": [
+      {
+        "product": "6a123a2b0824a97594d48d7a",
+        "name": "Hambúrguer Artesanal",
+        "quantity": 1,
+        "price": 29.9,
+        "status": "pending",
+        "stockImpactRule": "recipe_composition",
+        "cogs": 16.38,
+        "stockDeductionStatus": "deducted",
+        "stockMovements": [
+          "6a1384387421780bbec9dfb6",
+          "6a1384397421780bbec9dfba",
+          "6a1384397421780bbec9dfbe",
+          "6a1384397421780bbec9dfc2",
+          "6a1384397421780bbec9dfc6"
+        ],
+        "stockReversalStatus": "not_applicable",
+        "stockReversalMovements": [],
+        "_id": "6a1384367421780bbec9df79",
+        "ingredientCosts": [
+          {
+            "ingredientName": "Carne Bovina",
+            "quantity": 198,
+            "unit": "g",
+            "cost": 8.91,
+            "balanceBefore": 9010,
+            "balanceAfter": 8812,
+            "_id": "6a13843a7421780bbec9dfcf"
+          },
+          {
+            "ingredientName": "Pão de Hambúrguer",
+            "quantity": 1,
+            "unit": "unidade",
+            "cost": 1.2,
+            "balanceBefore": 95,
+            "balanceAfter": 94,
+            "_id": "6a13843a7421780bbec9dfd0"
+          },
+          {
+            "ingredientName": "Queijo Mussarela",
+            "quantity": 52.5,
+            "unit": "g",
+            "cost": 2.89,
+            "balanceBefore": 4737.5,
+            "balanceAfter": 4685,
+            "_id": "6a13843a7421780bbec9dfd1"
+          },
+          {
+            "ingredientName": "Alface",
+            "quantity": 1.1,
+            "unit": "unidade",
+            "cost": 2.75,
+            "balanceBefore": 44.49999999999999,
+            "balanceAfter": 43.39999999999999,
+            "_id": "6a13843a7421780bbec9dfd2"
+          },
+          {
+            "ingredientName": "Tomate",
+            "quantity": 42,
+            "unit": "g",
+            "cost": 0.63,
+            "balanceBefore": 7790,
+            "balanceAfter": 7748,
+            "_id": "6a13843a7421780bbec9dfd3"
+          }
+        ],
+        "recipe": "6a123a2c0824a97594d48d91",
+        "recipeVersion": 2,
+        "sellableType": "prepared_product"
+      },
+      {
+        "product": "6a123a2b0824a97594d48d80",
+        "name": "Refrigerante",
+        "quantity": 1,
+        "price": 8,
+        "status": "pending",
+        "stockImpactRule": "stock_item_direct",
+        "cogs": 3.5,
+        "stockDeductionStatus": "deducted",
+        "stockMovements": [
+          "6a13843a7421780bbec9dfcc"
+        ],
+        "stockReversalStatus": "not_applicable",
+        "stockReversalMovements": [],
+        "_id": "6a1384367421780bbec9df7a",
+        "ingredientCosts": [
+          {
+            "ingredientName": "Refrigerante Lata",
+            "quantity": 1,
+            "unit": "unidade",
+            "cost": 3.5,
+            "balanceBefore": 94,
+            "balanceAfter": 93,
+            "_id": "6a13843a7421780bbec9dfd4"
+          }
+        ],
+        "sellableType": "industrialized_resale"
+      },
+      {
+        "product": "6a1343008c9807db6028fe65",
+        "name": "Taxa de Serviço",
+        "quantity": 1,
+        "price": 3,
+        "status": "pending",
+        "stockImpactRule": "no_stock_impact",
+        "cogs": 0,
+        "stockDeductionStatus": "not_applicable",
+        "stockMovements": [],
+        "stockReversalStatus": "not_applicable",
+        "stockReversalMovements": [],
+        "_id": "6a1384367421780bbec9df7b",
+        "ingredientCosts": [],
+        "sellableType": "service_fee"
+      }
+    ],
+    "table": "6a1335b587f360ebe3aea43b",
+    "totalCOGS": 19.88,
+    "stockDeductionStatus": "completed",
+    "stockReversalStatus": "not_applicable",
+    "stockReversalMovements": [],
+    "orderDate": "2026-05-24T23:05:26.637Z",
+    "createdAt": "2026-05-24T23:05:26.641Z",
+    "updatedAt": "2026-05-24T23:05:31.177Z",
+    "__v": 1
+  },
+  {
+    "_id": "6a13841e6edfa95273016619",
+    "store": "6a1101372ff5c713c1b1a147",
+    "customerDetails": {
+      "name": "Cliente Piloto 9.2",
+      "phone": "11999999999",
+      "guests": 2
+    },
+    "orderStatus": "completed",
+    "bills": {
+      "total": 40.9,
+      "tax": 0,
+      "totalWithTax": 40.9
+    },
+    "items": [
+      {
+        "product": "6a11b68f515e85eb24eaf426",
+        "name": "Hamburgue",
+        "quantity": 1,
+        "price": 29.9,
+        "status": "pending",
+        "stockImpactRule": "recipe_composition",
+        "cogs": 0,
+        "stockDeductionStatus": "pending",
+        "stockMovements": [],
+        "stockReversalStatus": "not_applicable",
+        "stockReversalMovements": [],
+        "_id": "6a13841e6edfa9527301661a",
+        "ingredientCosts": []
+      },
+      {
+        "product": "6a11e625f646322a50b7467d",
+        "name": "Refrigerante Teste",
+        "quantity": 1,
+        "price": 8,
+        "status": "pending",
+        "stockImpactRule": "recipe_composition",
+        "cogs": 0,
+        "stockDeductionStatus": "pending",
+        "stockMovements": [],
+        "stockReversalStatus": "not_applicable",
+        "stockReversalMovements": [],
+        "_id": "6a13841e6edfa9527301661b",
+        "ingredientCosts": []
+      },
+      {
+        "product": "6a132b0d21b39baba982ac7b",
+        "name": "Taxa de Servico",
+        "quantity": 1,
+        "price": 3,
+        "status": "pending",
+        "stockImpactRule": "recipe_composition",
+        "cogs": 0,
+        "stockDeductionStatus": "pending",
+        "stockMovements": [],
+        "stockReversalStatus": "not_applicable",
+        "stockReversalMovements": [],
+        "_id": "6a13841e6edfa9527301661c",
+        "ingredientCosts": []
+      }
+    ],
+    "table": "6a1335b587f360ebe3aea43b",
+    "totalCOGS": 0,
+    "stockDeductionStatus": "failed",
+    "stockReversalStatus": "not_applicable",
+    "stockReversalMovements": [],
+    "orderDate": "2026-05-24T23:05:02.371Z",
+    "createdAt": "2026-05-24T23:05:02.375Z",
+    "updatedAt": "2026-05-24T23:05:05.905Z",
+    "__v": 0,
+    "stockDeductionError": "Stock deduction failed for order: Hamburgue: Insufficient stock"
+  },
+  {
+    "_id": "6a136d23657070f069bee98a",
+    "store": "6a1101372ff5c713c1b1a147",
+    "customerDetails": {
+      "name": "Validacao Fase 9.1D v2",
+      "phone": "11988888888",
+      "guests": 1
+    },
+    "orderStatus": "completed",
+    "bills": {
+      "total": 41.9,
+      "tax": 2.2,
+      "totalWithTax": 44.1
+    },
+    "items": [
+      {
+        "product": "6a123a2b0824a97594d48d7a",
+        "name": "Hambúrguer Artesanal (P)",
+        "quantity": 1,
+        "price": 25.9,
+        "status": "pending",
+        "stockImpactRule": "recipe_composition",
+        "variation": "P",
+        "sku": "hambúrguer-artesanal-p",
+        "pricePerQuantity": 25.9,
+        "cogs": 16.38,
+        "stockDeductionStatus": "deducted",
+        "stockMovements": [
+          "6a136d25657070f069bee9a5",
+          "6a136d25657070f069bee9a9",
+          "6a136d25657070f069bee9ad",
+          "6a136d26657070f069bee9b1",
+          "6a136d26657070f069bee9b5"
+        ],
+        "stockReversalStatus": "not_applicable",
+        "stockReversalMovements": [],
+        "_id": "6a136d23657070f069bee98b",
+        "ingredientCosts": [
+          {
+            "ingredientName": "Carne Bovina",
+            "quantity": 198,
+            "unit": "g",
+            "cost": 8.91,
+            "balanceBefore": 9208,
+            "balanceAfter": 9010,
+            "_id": "6a136d26657070f069bee9be"
+          },
+          {
+            "ingredientName": "Pão de Hambúrguer",
+            "quantity": 1,
+            "unit": "unidade",
+            "cost": 1.2,
+            "balanceBefore": 96,
+            "balanceAfter": 95,
+            "_id": "6a136d26657070f069bee9bf"
+          },
+          {
+            "ingredientName": "Queijo Mussarela",
+            "quantity": 52.5,
+            "unit": "g",
+            "cost": 2.89,
+            "balanceBefore": 4790,
+            "balanceAfter": 4737.5,
+            "_id": "6a136d26657070f069bee9c0"
+          },
+          {
+            "ingredientName": "Alface",
+            "quantity": 1.1,
+            "unit": "unidade",
+            "cost": 2.75,
+            "balanceBefore": 45.599999999999994,
+            "balanceAfter": 44.49999999999999,
+            "_id": "6a136d26657070f069bee9c1"
+          },
+          {
+            "ingredientName": "Tomate",
+            "quantity": 42,
+            "unit": "g",
+            "cost": 0.63,
+            "balanceBefore": 7832,
+            "balanceAfter": 7790,
+            "_id": "6a136d26657070f069bee9c2"
+          }
+        ],
+        "recipe": "6a123a2c0824a97594d48d91",
+        "recipeVersion": 2,
+        "sellableType": "prepared_product"
+      },
+      {
+        "product": "6a123a2b0824a97594d48d80",
+        "name": "Refrigerante (Lata)",
+        "quantity": 1,
+        "price": 6,
+        "status": "pending",
+        "stockImpactRule": "stock_item_direct",
+        "variation": "Lata",
+        "sku": "refrigerante-lata",
+        "pricePerQuantity": 6,
+        "cogs": 3.5,
+        "stockDeductionStatus": "deducted",
+        "stockMovements": [
+          "6a136d26657070f069bee9bb"
+        ],
+        "stockReversalStatus": "not_applicable",
+        "stockReversalMovements": [],
+        "_id": "6a136d23657070f069bee98c",
+        "ingredientCosts": [
+          {
+            "ingredientName": "Refrigerante Lata",
+            "quantity": 1,
+            "unit": "unidade",
+            "cost": 3.5,
+            "balanceBefore": 95,
+            "balanceAfter": 94,
+            "_id": "6a136d26657070f069bee9c3"
+          }
+        ],
+        "sellableType": "industrialized_resale"
+      },
+      {
+        "product": "6a1343008c9807db6028fe65",
+        "name": "Taxa de Serviço",
+        "quantity": 1,
+        "price": 10,
+        "status": "pending",
+        "stockImpactRule": "no_stock_impact",
+        "variation": "Padrão",
+        "sku": "taxa-de-servico-padrao",
+        "pricePerQuantity": 10,
+        "cogs": 0,
+        "stockDeductionStatus": "not_applicable",
+        "stockMovements": [],
+        "stockReversalStatus": "not_applicable",
+        "stockReversalMovements": [],
+        "_id": "6a136d23657070f069bee98d",
+        "ingredientCosts": [],
+        "sellableType": "service_fee"
+      }
+    ],
+    "table": "6a1335b587f360ebe3aea43d",
+    "paymentMethod": "Dinheiro",
+    "totalCOGS": 19.88,
+    "stockDeductionStatus": "completed",
+    "stockReversalStatus": "not_applicable",
+    "stockReversalMovements": [],
+    "orderDate": "2026-05-24T21:26:59.764Z",
+    "createdAt": "2026-05-24T21:26:59.765Z",
+    "updatedAt": "2026-05-24T22:25:51.896Z",
+    "__v": 1
+  },
+  {
+    "_id": "6a136ca9df1e414b0df87f5f",
+    "store": "6a1101372ff5c713c1b1a147",
+    "customerDetails": {
+      "name": "Validacao Fase 9.1D",
+      "phone": "11999999999",
+      "guests": 1
+    },
+    "orderStatus": "completed",
+    "bills": {
+      "total": 41.9,
+      "tax": 2.2,
+      "totalWithTax": 44.1
+    },
+    "items": [
+      {
+        "product": "6a123a2b0824a97594d48d7a",
+        "name": "Hambúrguer Artesanal (P)",
+        "quantity": 1,
+        "price": 25.9,
+        "status": "pending",
+        "stockImpactRule": "recipe_composition",
+        "variation": "P",
+        "sku": "hambúrguer-artesanal-p",
+        "pricePerQuantity": 25.9,
+        "cogs": 0,
+        "stockDeductionStatus": "pending",
+        "stockMovements": [],
+        "stockReversalStatus": "not_applicable",
+        "stockReversalMovements": [],
+        "_id": "6a136ca9df1e414b0df87f60",
+        "ingredientCosts": []
+      },
+      {
+        "product": "6a123a2b0824a97594d48d80",
+        "name": "Refrigerante (Lata)",
+        "quantity": 1,
+        "price": 6,
+        "status": "pending",
+        "stockImpactRule": "recipe_composition",
+        "variation": "Lata",
+        "sku": "refrigerante-lata",
+        "pricePerQuantity": 6,
+        "cogs": 0,
+        "stockDeductionStatus": "pending",
+        "stockMovements": [],
+        "stockReversalStatus": "not_applicable",
+        "stockReversalMovements": [],
+        "_id": "6a136ca9df1e414b0df87f61",
+        "ingredientCosts": []
+      },
+      {
+        "product": "6a1343008c9807db6028fe65",
+        "name": "Taxa de Serviço",
+        "quantity": 1,
+        "price": 10,
+        "status": "pending",
+        "stockImpactRule": "no_stock_impact",
+        "variation": "Padrão",
+        "sku": "taxa-de-servico-padrao",
+        "pricePerQuantity": 10,
+        "cogs": 0,
+        "stockDeductionStatus": "not_applicable",
+        "stockMovements": [],
+        "stockReversalStatus": "not_applicable",
+        "stockReversalMovements": [],
+        "_id": "6a136ca9df1e414b0df87f62",
+        "ingredientCosts": [],
+        "sellableType": "service_fee"
+      }
+    ],
+    "table": "6a1335b587f360ebe3aea43d",
+    "paymentMethod": "Dinheiro",
+    "totalCOGS": 19.88,
+    "stockDeductionStatus": "completed",
+    "stockReversalStatus": "not_applicable",
+    "stockReversalMovements": [],
+    "orderDate": "2026-05-24T21:24:57.456Z",
+    "createdAt": "2026-05-24T21:24:57.458Z",
+    "updatedAt": "2026-05-24T22:25:51.738Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a134ab91ad405a6ea8ff91f",
+    "store": "6a1101372ff5c713c1b1a147",
+    "customerDetails": {
+      "name": "Felipe",
+      "phone": "81982719240",
+      "guests": 2
+    },
+    "orderStatus": "completed",
+    "bills": {
+      "total": 25.9,
+      "tax": 1.36,
+      "totalWithTax": 27.26
+    },
+    "items": [
+      {
+        "product": "6a123a2b0824a97594d48d7a",
+        "name": "Hambúrguer Artesanal (P)",
+        "quantity": 1,
+        "price": 25.9,
+        "status": "pending",
+        "cogs": 0,
+        "stockDeductionStatus": "pending",
+        "stockMovements": [],
+        "stockReversalStatus": "not_applicable",
+        "stockReversalMovements": [],
+        "_id": "6a134ab91ad405a6ea8ff920",
+        "ingredientCosts": []
+      }
+    ],
+    "paymentMethod": "Cash",
+    "totalCOGS": 16.38,
+    "stockDeductionStatus": "completed",
+    "stockReversalStatus": "not_applicable",
+    "stockReversalMovements": [],
+    "orderDate": "2026-05-24T19:00:09.197Z",
+    "createdAt": "2026-05-24T19:00:09.198Z",
+    "updatedAt": "2026-05-24T22:25:51.262Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11e657f646322a50b746c6",
+    "store": "6a1101372ff5c713c1b1a147",
+    "customerDetails": {
+      "name": "Cliente Teste C",
+      "phone": "11977777777",
+      "guests": 2
+    },
+    "orderStatus": "completed",
+    "bills": {
+      "total": 24,
+      "tax": 1.26,
+      "totalWithTax": 25.26
+    },
+    "items": [
+      {
+        "product": "6a11e625f646322a50b7467d",
+        "name": "Refrigerante Teste",
+        "quantity": 3,
+        "price": 8,
+        "status": "pending",
+        "cogs": 10.5,
+        "stockDeductionStatus": "deducted",
+        "stockMovements": [
+          "6a11e658f646322a50b746d3"
+        ],
+        "stockReversalStatus": "not_applicable",
+        "stockReversalMovements": [],
+        "_id": "6a11e657f646322a50b746c7",
+        "ingredientCosts": [
+          {
+            "ingredientName": "Refrigerante Lata",
+            "quantity": 3,
+            "unit": "unidade",
+            "cost": 10.5,
+            "balanceBefore": 100,
+            "balanceAfter": 97,
+            "_id": "6a11e658f646322a50b746d5"
+          }
+        ],
+        "recipe": "6a11e640f646322a50b746ba",
+        "recipeVersion": 1
+      }
+    ],
+    "paymentMethod": "credit",
+    "totalCOGS": 10.5,
+    "stockDeductionStatus": "completed",
+    "stockReversalStatus": "not_applicable",
+    "stockReversalMovements": [],
+    "orderDate": "2026-05-23T17:39:35.882Z",
+    "createdAt": "2026-05-23T17:39:35.883Z",
+    "updatedAt": "2026-05-23T17:39:36.791Z",
+    "__v": 1
+  },
+  {
+    "_id": "6a11e56df646322a50b745f1",
+    "store": "6a1101372ff5c713c1b1a147",
+    "customerDetails": {
+      "name": "Cliente Teste B",
+      "phone": "11988888888",
+      "guests": 1
+    },
+    "orderStatus": "completed",
+    "bills": {
+      "total": 15,
+      "tax": 0.79,
+      "totalWithTax": 15.79
+    },
+    "items": [
+      {
+        "product": "6a11e53cf646322a50b745e6",
+        "name": "Produto Sem Receita",
+        "quantity": 1,
+        "price": 15,
+        "status": "pending",
+        "cogs": 0,
+        "stockDeductionStatus": "no_recipe",
+        "stockMovements": [],
+        "stockReversalStatus": "not_applicable",
+        "stockReversalMovements": [],
+        "_id": "6a11e56df646322a50b745f2",
+        "ingredientCosts": []
+      }
+    ],
+    "paymentMethod": "credit",
+    "totalCOGS": 0,
+    "stockDeductionStatus": "no_recipes",
+    "stockReversalStatus": "not_applicable",
+    "stockReversalMovements": [],
+    "orderDate": "2026-05-23T17:35:41.701Z",
+    "createdAt": "2026-05-23T17:35:41.702Z",
+    "updatedAt": "2026-05-23T17:35:42.207Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11e4c2f646322a50b74592",
+    "store": "6a1101372ff5c713c1b1a147",
+    "customerDetails": {
+      "name": "Cliente Teste",
+      "phone": "11999999999",
+      "guests": 1
+    },
+    "orderStatus": "completed",
+    "bills": {
+      "total": 50,
+      "tax": 2.63,
+      "totalWithTax": 52.63
+    },
+    "items": [
+      {
+        "product": "6a11b68f515e85eb24eaf426",
+        "name": "Hamburgue",
+        "quantity": 2,
+        "price": 25,
+        "status": "pending",
+        "cogs": 17.2,
+        "stockDeductionStatus": "deducted",
+        "stockMovements": [
+          "6a11e4c3f646322a50b745a0",
+          "6a11e4c3f646322a50b745a4"
+        ],
+        "stockReversalStatus": "not_applicable",
+        "stockReversalMovements": [],
+        "_id": "6a11e4c2f646322a50b74593",
+        "ingredientCosts": [
+          {
+            "ingredientName": "Carne Bovina",
+            "quantity": 360,
+            "unit": "g",
+            "cost": 16.2,
+            "balanceBefore": 10000,
+            "balanceAfter": 9640,
+            "_id": "6a11e4c3f646322a50b745a6"
+          },
+          {
+            "ingredientName": "Pao de hamburguer PHASE7B",
+            "quantity": 2,
+            "unit": "unidade",
+            "cost": 1,
+            "balanceBefore": 50,
+            "balanceAfter": 48,
+            "_id": "6a11e4c3f646322a50b745a7"
+          }
+        ],
+        "recipe": "6a11bae4f646322a50b74438",
+        "recipeVersion": 1
+      }
+    ],
+    "paymentMethod": "credit",
+    "totalCOGS": 17.2,
+    "stockDeductionStatus": "completed",
+    "stockReversalStatus": "not_applicable",
+    "stockReversalMovements": [],
+    "orderDate": "2026-05-23T17:32:50.229Z",
+    "createdAt": "2026-05-23T17:32:50.230Z",
+    "updatedAt": "2026-05-23T17:32:51.480Z",
+    "__v": 1
+  }
+]

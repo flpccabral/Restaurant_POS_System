@@ -1,5 +1,7 @@
 const createHttpError = require("http-errors");
 const Order = require("../models/orderModel");
+const Payment = require("../models/paymentModel");
+const CashSession = require("../models/cashSessionModel");
 const { default: mongoose } = require("mongoose");
 const ws = require("../services/websocketService");
 const orderCheckoutService = require("../services/orderCheckoutService");
@@ -7,6 +9,8 @@ const OperationalAlert = require("../models/operationalAlertModel");
 const KDSOrder = require("../models/kdsOrderModel");
 const KDSConfig = require("../models/kdsConfigModel");
 const Table = require("../models/tableModel");
+const Printer = require("../models/printerModel");
+const thermalPrinterService = require("../services/thermalPrinterService");
 
 /**
  * MULTI-TENANCY FIX: Helper to build store-scoped filter
@@ -115,16 +119,132 @@ const syncOrderToKds = async (order, storeRef, io) => {
     });
 
     if (io) {
-      io.to(`store:${storeRef}`).emit('kds:order-synced', {
+      const eventData = {
         kdsOrderId: kdsOrder.kdsOrderId,
         orderNumber: kdsOrder.orderNumber,
         tableNumber: kdsOrder.tableNumber,
         itemsCount: kdsItems.length,
         timestamp: new Date().toISOString()
-      });
+      };
+      io.to(`store:${storeRef}`).emit('kds:order-synced', eventData);
+      console.log(`[orderController] ✅ kds:order-synced emitted for order ${order._id}`, eventData);
+    } else {
+      console.warn(`[orderController] ⚠️ io is undefined, cannot emit kds:order-synced for order ${order._id}`);
     }
   } catch (err) {
     console.error(`[orderController] KDS sync failed for order ${order._id}: ${err.message}`);
+  }
+};
+
+/**
+ * Impressao automatica de comanda de cozinha ao criar pedido.
+ * Fire-and-forget — falhas aqui nao bloqueiam a venda.
+ */
+const autoPrintKitchen = async (order, storeRef) => {
+  try {
+    const printer = await Printer.getActivePrinter(storeRef, 'kitchen');
+    if (!printer) {
+      console.log(`[orderController] Kitchen print skipped for order ${order._id}: no kitchen printer configured`);
+      return;
+    }
+
+    // Popular table number para impressao
+    let populatedOrder = order;
+    if (order.table && !order.table.tableNo) {
+      const tableDoc = await Table.findById(order.table).select('tableNo').lean();
+      if (tableDoc) {
+        populatedOrder = { ...order.toObject ? order.toObject() : order, tableNumber: tableDoc.tableNo };
+      }
+    }
+
+    const result = await thermalPrinterService.printOrder({
+      order: populatedOrder,
+      printer,
+      printType: 'kitchen'
+    });
+
+    if (result.success) {
+      console.log(`[orderController] Kitchen print successful for order ${order._id}`);
+    } else {
+      console.warn(`[orderController] Kitchen print failed for order ${order._id}: ${result.message}`);
+    }
+  } catch (err) {
+    console.error(`[orderController] Kitchen auto-print failed for order ${order._id}: ${err.message}`);
+  }
+};
+
+/**
+ * FLUXO_CAIXA: Mapeia paymentMethod do Order (português) para formato do Payment model (inglês)
+ */
+const mapPaymentMethodForPayment = (paymentMethod) => {
+  const methodMap = {
+    'Dinheiro': 'cash',
+    'dinheiro': 'cash',
+    'cash': 'cash',
+    'Pix': 'pix',
+    'pix': 'pix',
+    'Credito': 'credit_card',
+    'credito': 'credit_card',
+    'credit_card': 'credit_card',
+    'Debito': 'debit_card',
+    'debito': 'debit_card',
+    'debit_card': 'debit_card',
+    'Voucher': 'voucher',
+    'voucher': 'voucher'
+  };
+  return methodMap[paymentMethod] || 'cash';
+};
+
+/**
+ * Registra transação no caixa aberto (FLUXO_CAIXA.md).
+ * Para vendas em dinheiro: registra sale_cash no caixa.
+ * Para outros métodos: registra sale_pix, sale_credit, etc (apenas contábil).
+ * Fire-and-forget — falhas aqui não bloqueiam a venda.
+ */
+const registerTransactionInCashSession = async (order, storeRef, userId) => {
+  try {
+    // Buscar caixa aberto da loja
+    const cashSession = await CashSession.getActiveSession(storeRef, userId);
+
+    if (!cashSession) {
+      console.warn(`[orderController] No open cash session for order ${order._id}. Transaction not registered.`);
+      return;
+    }
+
+    // Mapear paymentMethod do Order para type de transaction
+    const methodMap = {
+      'Dinheiro': 'sale_cash',
+      'dinheiro': 'sale_cash',
+      'cash': 'sale_cash',
+      'Pix': 'sale_pix',
+      'pix': 'sale_pix',
+      'Credito': 'sale_credit',
+      'credito': 'sale_credit',
+      'credit_card': 'sale_credit',
+      'Debito': 'sale_debit',
+      'debito': 'sale_debit',
+      'debit_card': 'sale_debit',
+      'Voucher': 'sale_voucher',
+      'voucher': 'sale_voucher'
+    };
+
+    const transactionType = methodMap[order.paymentMethod] || 'sale_cash';
+    const paymentMethod = transactionType.replace('sale_', '');
+
+    // Registrar transação no caixa
+    await cashSession.registerTransaction({
+      type: transactionType,
+      value: order.bills?.totalWithTax || 0,
+      paymentMethod: paymentMethod,
+      orderId: order._id,
+      orderNumber: order.orderNumber || `ORD-${Date.now()}`,
+      description: `Venda ${order.orderType || 'counter'} - ${order.customerDetails?.name || 'Cliente'}`,
+      operatorId: userId
+    });
+
+    console.log(`[orderController] Transaction registered in cash session for order ${order._id}: ${transactionType} R$ ${(order.bills?.totalWithTax || 0).toFixed(2)}`);
+  } catch (err) {
+    console.error(`[orderController] Failed to register transaction in cash session for order ${order._id}: ${err.message}`);
   }
 };
 
@@ -138,6 +258,83 @@ const addOrder = async (req, res, next) => {
     if (!orderData.orderType) orderData.orderType = 'dine_in';
     if (!orderData.paymentStatus) orderData.paymentStatus = 'unpaid';
     if (!orderData.closeStatus) orderData.closeStatus = 'open';
+
+    // Garantir que pedidos counter tenham paymentMethod definido
+    if (orderData.orderType === 'counter' && orderData.paymentStatus === 'paid') {
+      if (!orderData.paymentMethod) {
+        const error = createHttpError(400, "paymentMethod é obrigatório para pedidos counter pagos!");
+        return next(error);
+      }
+    }
+
+    // Prompt G — Validar gorjeta/servico opcional (lei brasileira)
+    if (orderData.serviceCharge) {
+      const sc = orderData.serviceCharge;
+      // opted pode ser true/false (default false no schema)
+      if (sc.opted === true) {
+        // Validar rate entre 0 e 100
+        if (sc.rate === undefined || sc.rate < 0 || sc.rate > 100) {
+          const error = createHttpError(400, "Taxa de servico deve estar entre 0 e 100!");
+          return next(error);
+        }
+        // Validar amount positivo
+        if (sc.amount === undefined || sc.amount < 0) {
+          const error = createHttpError(400, "Valor da gorjeta deve ser positivo!");
+          return next(error);
+        }
+        // Validar consistencia: amount = subtotal * rate / 100 (tolerancia de 1 centavo p/ arredondamento)
+        const subtotal = orderData.bills?.total || 0;
+        const expectedAmount = (subtotal * sc.rate) / 100;
+        if (Math.abs(sc.amount - expectedAmount) > 0.01) {
+          const error = createHttpError(400, `Valor da gorjeta inconsistente! Esperado: R$ ${expectedAmount.toFixed(2)}, recebido: R$ ${sc.amount.toFixed(2)}`);
+          return next(error);
+        }
+      }
+      // Garantir que o campo seja salvo com estrutura correta
+      orderData.serviceCharge = {
+        opted: Boolean(sc.opted),
+        rate: Number(sc.rate) || 0,
+        amount: Number(sc.amount) || 0
+      };
+    }
+
+    // Prompt F — Registrar garçom logado como attendant automaticamente
+    // Se já houver attendant no body, manter. Senão, usar o usuário logado se for garçom
+    if (!orderData.attendant) {
+      const User = require('../models/userModel');
+      const Role = require('../models/roleModel');
+      const loggedUser = await User.findById(req.user._id || req.user.id).select('role roleConfig');
+      if (loggedUser) {
+        // Buscar o nome do role
+        let roleName = null;
+        if (loggedUser.role && mongoose.Types.ObjectId.isValid(loggedUser.role)) {
+          const roleDoc = await Role.findById(loggedUser.role).select('name');
+          roleName = roleDoc?.name;
+        } else if (typeof loggedUser.role === 'string') {
+          roleName = loggedUser.role;
+        }
+
+        if (roleName) {
+          const lowerName = roleName.toLowerCase();
+          if (lowerName.includes('garçom') || lowerName.includes('waiter')) {
+            orderData.attendant = req.user._id || req.user.id;
+          }
+        }
+      }
+    }
+
+    // FLUXO_CAIXA: Validar que vendas em dinheiro exigem caixa aberto
+    if (orderData.paymentStatus === 'paid' && orderData.paymentMethod) {
+      const isCashPayment = ['Dinheiro', 'dinheiro', 'cash'].includes(orderData.paymentMethod);
+      if (isCashPayment) {
+        const userId = req.user._id || req.user.id;
+        const cashSession = await CashSession.getActiveSession(storeRef, userId);
+        if (!cashSession) {
+          const error = createHttpError(400, "Venda em dinheiro exige caixa aberto! Abra o caixa antes de finalizar a venda.");
+          return next(error);
+        }
+      }
+    }
 
     const order = new Order(orderData);
     await order.save();
@@ -184,9 +381,35 @@ const addOrder = async (req, res, next) => {
     if (!needsPrep) {
       // Drink-only or resale-only — no kitchen prep needed
       if (isCounter) {
-        // Counter: paid already, transaction complete
-        order.orderStatus = 'completed';
-        order.closeStatus = 'closed';
+        // Counter: only mark as completed if payment is already processed
+        if (order.paymentStatus === 'paid' && order.paymentMethod) {
+          order.orderStatus = 'completed';
+          order.closeStatus = 'closed';
+
+          // Criar registro de pagamento se ainda não existe
+          try {
+            await Payment.create({
+              store: storeRef,
+              order: order._id,
+              orderNumber: order.orderNumber || `ORD-${Date.now()}`,
+              amount: order.bills?.totalWithTax || 0,
+              method: mapPaymentMethodForPayment(order.paymentMethod),
+              paidAmount: order.bills?.totalWithTax || 0,
+              status: 'approved',
+              user: req.user._id,
+              cashier: req.user._id
+            });
+            console.log(`[orderController] Payment created for counter order ${order._id}`);
+
+            // FLUXO_CAIXA: Registrar transação no caixa aberto
+            registerTransactionInCashSession(order, storeRef, req.user._id);
+          } catch (paymentError) {
+            console.error(`[orderController] Failed to create payment for order ${order._id}:`, paymentError.message);
+          }
+        } else {
+          // Counter order without payment - keep as Ready for later payment
+          order.orderStatus = 'Ready';
+        }
       } else {
         // Dine-in: ready to serve, but table still open
         order.orderStatus = 'Ready';
@@ -196,6 +419,12 @@ const addOrder = async (req, res, next) => {
     } else {
       // Sync to KDS (fire-and-forget) for food items
       syncOrderToKds(order, storeRef, io);
+      // Auto-print kitchen ticket (fire-and-forget)
+      autoPrintKitchen(order, storeRef);
+      // FLUXO_CAIXA: Registrar transação no caixa aberto (se houver pagamento)
+      if (order.paymentStatus === 'paid') {
+        registerTransactionInCashSession(order, storeRef, req.user._id);
+      }
     }
 
     res

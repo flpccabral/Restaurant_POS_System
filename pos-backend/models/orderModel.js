@@ -81,7 +81,22 @@ const orderSchema = new mongoose.Schema({
     orderType: { type: String, enum: ['dine_in', 'counter', 'pickup', 'delivery'], default: 'dine_in', comment: 'Tipo de pedido (dine_in, counter, pickup, delivery)' },
     paymentStatus: { type: String, enum: ['unpaid', 'partially_paid', 'paid', 'refunded'], default: 'unpaid', comment: 'Status financeiro do pedido' },
     closeStatus: { type: String, enum: ['open', 'closing', 'closed'], default: 'open', comment: 'Status de fechamento da conta' },
-    observations: { type: String, maxlength: 500, default: '', comment: 'Observações gerais do pedido' }
+    observations: { type: String, maxlength: 500, default: '', comment: 'Observações gerais do pedido' },
+    // Prompt G — Gorjeta/Servico opcional (lei brasileira)
+    serviceCharge: {
+        opted: { type: Boolean, default: false, comment: 'Cliente optou por pagar gorjeta?' },
+        rate: { type: Number, default: 0, min: 0, max: 100, comment: 'Percentual aplicado no momento da venda' },
+        amount: { type: Number, default: 0, min: 0, comment: 'Valor em reais da gorjeta' }
+    },
+    // Prompt F — Vínculo Garçom/Mesa
+    attendant: { type: mongoose.Schema.Types.ObjectId, ref: 'User', comment: 'Garçom responsável pelo pedido' },
+    attendantHistory: [{
+        attendant: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        from: Date,
+        to: Date,
+        transferredBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        reason: String
+    }]
 }, { timestamps: true });
 
 // Compound index for efficient store-scoped order queries

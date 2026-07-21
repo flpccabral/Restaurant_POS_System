@@ -1,0 +1,94 @@
+{
+  "scenario": "Fase 9.1C — Venda Real Loja Demo - Matriz",
+  "description": "Cenário de teste para validar baixa automática de estoque (all-or-nothing transactional) com 3 tipos de produto: recipe_composition (hambúrguer), stock_item_direct (refrigerante), no_stock_impact (taxa de serviço)",
+  "store": "Loja Demo - Matriz",
+  "storeId": "6a1101372ff5c713c1b1a147",
+  "stockLocationId": "6a1101527a7bf001d8117a4c",
+  "items": [
+    {
+      "name": "Hambúrguer Artesanal (P)",
+      "productId": "6a123a2b0824a97594d48d7a",
+      "variation": "hambúrguer-artesanal-p",
+      "sku": "hambúrguer-artesanal-p",
+      "quantity": 1,
+      "sellableType": "prepared_product",
+      "stockImpactRule": "recipe_composition",
+      "productReadinessStatus": "ready_for_sale",
+      "pricePerQuantity": 25.90
+    },
+    {
+      "name": "Refrigerante Teste (Padrao)",
+      "productId": "6a11e625f646322a50b7467d",
+      "variation": "refrigerante-teste-padrao",
+      "sku": "refrigerante-teste-padrao",
+      "quantity": 2,
+      "sellableType": "industrialized_resale",
+      "stockImpactRule": "stock_item_direct",
+      "productReadinessStatus": "ready_direct_ok",
+      "pricePerQuantity": 8.00
+    },
+    {
+      "name": "Taxa de Serviço",
+      "productId": "6a132b0d21b39baba982ac7b",
+      "variation": "TAXA-SERVICO-001",
+      "sku": "TAXA-SERVICO-001",
+      "quantity": 1,
+      "sellableType": "service_fee",
+      "stockImpactRule": "no_stock_impact",
+      "productReadinessStatus": "ready_no_stock_impact",
+      "pricePerQuantity": 10.00
+    }
+  ],
+  "expectedStockDeductions": {
+    "Hambúrguer Artesanal (P)": {
+      "stockDeductionStatus": "deducted",
+      "operation": "recipe_composition -> findRecipe -> simulateConsumption -> executeDeduction",
+      "recipeId": "6a123a2c0824a97594d48d91",
+      "ingredientsExpected": [
+        { "name": "Carne Bovina", "consumption": 198, "unit": "g", "cost": 8.91, "note": "180g * 1.10 (10% loss)" },
+        { "name": "Pão de Hambúrguer", "consumption": 1, "unit": "unidade", "cost": 1.20, "note": "1 un * 1.0 (0% loss)" },
+        { "name": "Queijo Mussarela", "consumption": 52.5, "unit": "g", "cost": 2.89, "note": "50g * 1.05 (5% loss)" },
+        { "name": "Alface", "consumption": 1.1, "unit": "unidade", "cost": 2.75, "note": "1 un * 1.10 (10% loss)" },
+        { "name": "Tomate", "consumption": 42, "unit": "g", "cost": 0.63, "note": "40g * 1.05 (5% loss)" }
+      ],
+      "expectedItemCOGS": 16.38
+    },
+    "Refrigerante Teste (x2)": {
+      "stockDeductionStatus": "deducted",
+      "operation": "stock_item_direct -> deductStockBalance(directStockItem=RefrigeranteLata, qtyPerUnit=1, qty=2)",
+      "ingredient": "Refrigerante Lata",
+      "consumption": 2,
+      "unit": "unidade",
+      "cost": 7.00,
+      "balanceBefore": 100,
+      "balanceAfter": 98
+    },
+    "Taxa de Serviço": {
+      "stockDeductionStatus": "not_applicable",
+      "operation": "no_stock_impact -> CMV = 0, no deduction",
+      "cogs": 0
+    }
+  },
+  "expectedCMV": {
+    "totalCOGS": 23.38,
+    "breakdown": {
+      "hamburguer": 16.38,
+      "refrigerante": 7.00,
+      "taxaServico": 0.00
+    },
+    "note": "A soma pode ter diferença de centavos devido a arredondamento. 16.38 + 7.00 = 23.38"
+  },
+  "stockBalancesAfter_deduction": {
+    "Carne Bovina": "será 10000 - 198 = 9802 g",
+    "Pão de Hambúrguer": "será 100 - 1 = 99 un",
+    "Queijo Mussarela": "será 5000 - 52.5 = 4947.5 g",
+    "Alface": "será 50 - 1.1 = 48.9 un",
+    "Tomate": "será 8000 - 42 = 7958 g",
+    "Refrigerante Lata": "será 100 - 2 = 98 un"
+  },
+  "expectedStockMovements": 6,
+  "expectedAlerts": 0,
+  "orderStatus": "In Progress",
+  "stockDeductionStatus": "completed",
+  "testInstructions": "Criar pedido via PDV com os 3 itens acima. Verificar:\n1. stockDeductionStatus = 'completed' \n2. totalCOGS ≈ 23.38\n3. 6 StockMovements criados (5 do recipe + 1 direct)\n4. 0 OperationalAlerts\n5. Saldos de estoque reduzidos conforme expectedStockBalancesAfter_deduction\n6. Variações P e Padrão de cada produto"
+}

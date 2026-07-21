@@ -5,7 +5,7 @@ import {
   useLocation,
   Navigate,
 } from "react-router-dom";
-import { Home, Auth, Orders, Tables, Menu, Dashboard, TableBill } from "./pages";
+import { Home, Auth, Orders, Tables, Menu, Dashboard, TableBill, Kitchen, Commissions } from "./pages";
 import Header from "./components/shared/Header";
 import { useSelector } from "react-redux";
 import useLoadData from "./hooks/useLoadData";
@@ -14,10 +14,28 @@ import FullScreenLoader from "./components/shared/FullScreenLoader"
 function Layout() {
   const isLoading = useLoadData();
   const location = useLocation();
-  const hideHeaderRoutes = ["/auth"];
+  // Esconder header em rotas fullscreen (auth e KDS/cozinha)
+  const hideHeaderRoutes = ["/auth", "/kitchen"];
   const { isAuth } = useSelector(state => state.user);
 
   if(isLoading) return <FullScreenLoader />
+
+  // Rota /kitchen tem layout proprio (fullscreen, sem header)
+  // Renderizar diretamente sem passar pelo layout com Header
+  if (location.pathname === "/kitchen") {
+    return (
+      <Routes>
+        <Route
+          path="/kitchen"
+          element={
+            <ProtectedRoutes>
+              <Kitchen />
+            </ProtectedRoutes>
+          }
+        />
+      </Routes>
+    );
+  }
 
   return (
     <>
@@ -69,6 +87,14 @@ function Layout() {
           element={
             <ProtectedRoutes>
               <TableBill />
+            </ProtectedRoutes>
+          }
+        />
+        <Route
+          path="/commissions"
+          element={
+            <ProtectedRoutes>
+              <Commissions />
             </ProtectedRoutes>
           }
         />

@@ -1,0 +1,3 @@
+- [Product-Recipe Gap](product_recipe_gap.md) — Phase 8.4.2 COMPLETE: governance implemented, MVP recipe UI, POS pipeline, alerts wired
+- [Phase 8.4.2 Complete](phase-842-complete.md) — Full report: all 13 tasks, builds pass, Notion report at page `369457fd-4753-81e8-8b68-c5c709fc6a36`
+- [Phase 9.3D-FIX Complete](phase-932-fix-complete.md) — PDV redirect, Home launcher, unified PdvFooterActions across all pages

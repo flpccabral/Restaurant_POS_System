@@ -4,11 +4,14 @@ import { getTotalPrice } from '../../redux/slices/cartSlice';
 import {
   addOrder,
   processOrderStockDeduction,
+  printReceipt,
+  getCurrentStoreSettings,
 } from '../../https/index';
 import { enqueueSnackbar } from 'notistack';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { removeAllItems } from '../../redux/slices/cartSlice';
 import { removeCustomer, setCustomer } from '../../redux/slices/customerSlice';
+import { FiInfo } from 'react-icons/fi';
 import Invoice from '../invoice/Invoice';
 
 const STOCK_STATUS_MESSAGES = {
@@ -25,9 +28,34 @@ const Bill = () => {
   const customerData = useSelector((state) => state.customer);
   const cartData = useSelector((state) => state.cart);
   const total = useSelector(getTotalPrice);
-  const taxRate = 5.25;
-  const tax = (total * taxRate) / 100;
-  const totalPriceWithTax = total + tax;
+
+  // Prompt G — Buscar configuracao de gorjeta da loja
+  const { data: storeData } = useQuery({
+    queryKey: ['currentStoreSettings'],
+    queryFn: getCurrentStoreSettings,
+    staleTime: 5 * 60 * 1000, // 5 min
+  });
+  const serviceChargeConfig = storeData?.data?.data?.settings?.serviceCharge || {
+    enabled: true,
+    rate: 10,
+    mode: 'optional'
+  };
+  const serviceChargeRate = serviceChargeConfig.rate || 10;
+  const serviceChargeMode = serviceChargeConfig.mode || 'optional';
+  const serviceChargeEnabled = serviceChargeConfig.enabled !== false && serviceChargeMode !== 'disabled';
+
+  // Estado da gorjeta — IMPORTANTE: default SEMPRE false (lei brasileira: nao pode ser pre-selecionada!)
+  const [serviceChargeOpted, setServiceChargeOpted] = useState(false);
+
+  // Calcular gorjeta (apenas se optada ou modo mandatory)
+  const showServiceChargeToggle = serviceChargeEnabled && serviceChargeMode === 'optional';
+  const isServiceChargeMandatory = serviceChargeEnabled && serviceChargeMode === 'mandatory';
+  const applyServiceCharge = isServiceChargeMandatory || serviceChargeOpted;
+  const serviceChargeAmount = applyServiceCharge ? (total * serviceChargeRate) / 100 : 0;
+
+  // Taxa padrao removida (era 5.25% fixa) — substituida pela gorjeta opcional
+  const tax = 0;
+  const totalPriceWithTax = total + tax + serviceChargeAmount;
 
   const [paymentMethod, setPaymentMethod] = useState();
   const [showInvoice, setShowInvoice] = useState(false);
@@ -42,6 +70,32 @@ const Bill = () => {
   const [customerPhone, setCustomerPhone] = useState('');
 
   const isCounter = customerData.orderType === 'counter';
+
+  // Mutation de impressao termica
+  const printMutation = useMutation({
+    mutationFn: (data) => printReceipt(data),
+    onSuccess: (res) => {
+      if (res.data?.success) {
+        enqueueSnackbar(res.data.message || 'Impressao enviada!', { variant: 'success' });
+      } else {
+        // Nao e erro — apenas informa que nao ha impressora
+        enqueueSnackbar(res.data?.message || 'Nenhuma impressora configurada', { variant: 'info' });
+      }
+    },
+    onError: (err) => {
+      console.warn('[Bill] Print error:', err);
+      enqueueSnackbar('Falha na impressao (pedido nao foi afetado)', { variant: 'warning' });
+    }
+  });
+
+  // Handler do botao Imprimir (imprime cupom do ultimo pedido)
+  const handlePrint = () => {
+    if (!orderInfo?._id) {
+      enqueueSnackbar('Nenhum pedido para imprimir!', { variant: 'warning' });
+      return;
+    }
+    printMutation.mutate({ orderId: orderInfo._id, printerType: 'receipt' });
+  };
 
   const executeOrder = () => {
     if (isPlacingOrder) return;
@@ -121,6 +175,15 @@ const Bill = () => {
       observations: observations || '',
     };
 
+    // Prompt G — Incluir gorjeta/servico opcional (lei brasileira)
+    if (applyServiceCharge && serviceChargeEnabled) {
+      orderData.serviceCharge = {
+        opted: applyServiceCharge,
+        rate: serviceChargeRate,
+        amount: serviceChargeAmount,
+      };
+    }
+
     if (isCounter) {
       // Counter: payment is immediate, but orderStatus follows normal KDS lifecycle
       orderData.paymentStatus = 'paid';
@@ -193,6 +256,19 @@ const Bill = () => {
       enqueueSnackbar('Pedido criado!', { variant: 'success' });
       setShowInvoice(true);
       setIsPlacingOrder(false);
+
+      // Auto-impressao de comanda de cozinha (fire-and-forget)
+      if (data._id) {
+        printReceipt({ orderId: data._id, printerType: 'kitchen' })
+          .then((res) => {
+            if (!res.data?.success) {
+              console.log('[Bill] Kitchen print:', res.data?.message);
+            }
+          })
+          .catch((err) => {
+            console.warn('[Bill] Auto kitchen print failed:', err.message);
+          });
+      }
     },
     onError: (error) => {
       console.error('[Bill] Order creation error:', error);
@@ -253,12 +329,57 @@ const Bill = () => {
               R$ {total.toFixed(2)}
             </span>
           </div>
-          <div className="flex items-center justify-between">
-            <span className="text-gray-500 text-sm">Taxa ({taxRate}%)</span>
-            <span className="text-gray-800 text-sm font-semibold">
-              R$ {tax.toFixed(2)}
-            </span>
-          </div>
+
+          {/* Prompt G — Toggle de gorjeta opcional (lei brasileira) */}
+          {showServiceChargeToggle && (
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-2.5 mt-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5 flex-1">
+                  <span className="text-amber-800 text-sm font-semibold">
+                    Servico ({serviceChargeRate}%)
+                  </span>
+                  <div className="relative group/tip">
+                    <FiInfo size={12} className="text-amber-600 cursor-help" />
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 w-56 bg-gray-900 text-white text-[10px] px-2 py-1.5 rounded opacity-0 group-hover/tip:opacity-100 transition-opacity pointer-events-none z-50 shadow-lg">
+                      A gorjeta e opcional e va para os garçons. Voce pode aceitar ou recusar.
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-amber-800 text-sm font-semibold">
+                    R$ {serviceChargeAmount.toFixed(2)}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setServiceChargeOpted(!serviceChargeOpted)}
+                    className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                      serviceChargeOpted ? 'bg-emerald-500' : 'bg-gray-300'
+                    }`}
+                    aria-label="Aceitar gorjeta opcional"
+                  >
+                    <span
+                      className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform ${
+                        serviceChargeOpted ? 'translate-x-4.5' : 'translate-x-0.5'
+                      }`}
+                    />
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Modo mandatory — sempre incluido, sem toggle */}
+          {isServiceChargeMandatory && (
+            <div className="flex items-center justify-between">
+              <span className="text-gray-500 text-sm">
+                Servico ({serviceChargeRate}%)
+              </span>
+              <span className="text-gray-800 text-sm font-semibold">
+                R$ {serviceChargeAmount.toFixed(2)}
+              </span>
+            </div>
+          )}
+
           <div className="flex items-center justify-between pt-2 border-t border-gray-200">
             <span className="text-gray-900 text-sm font-bold">Total</span>
             <span className="text-gray-900 text-xl font-extrabold tracking-tight">
@@ -316,8 +437,9 @@ const Bill = () => {
       {/* ===== ACOES ===== */}
       <div className="flex items-center gap-2 pt-1">
         <button
-          disabled={isPlacingOrder}
-          className="bg-white border border-gray-200 px-4 py-3 w-full rounded-lg text-gray-500 font-semibold text-sm hover:bg-gray-50 transition-colors disabled:opacity-50"
+          onClick={handlePrint}
+          disabled={isPlacingOrder || !orderInfo?._id}
+          className="bg-white border border-gray-200 px-4 py-3 w-full rounded-lg text-gray-500 font-semibold text-sm hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Imprimir
         </button>

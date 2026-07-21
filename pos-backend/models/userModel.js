@@ -82,7 +82,23 @@ const userSchema = new mongoose.Schema({
     // Metadados
     avatar: String,
     department: String,
-    notes: String
+    notes: String,
+
+    // Prompt F — Configuração de comissão para garçons
+    roleConfig: {
+        commissionRate: {
+            type: Number,
+            default: 0,
+            min: 0,
+            max: 100,
+            comment: 'Percentual de comissão sobre vendas (apenas para cargo Garçom)'
+        },
+        commissionEnabled: {
+            type: Boolean,
+            default: false,
+            comment: 'Se garçom tem comissão habilitada'
+        }
+    }
 }, { timestamps: true });
 
 // Index composto para queries comuns

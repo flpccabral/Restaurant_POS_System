@@ -5,3 +5,5 @@ export { default as Tables } from './Tables.jsx'
 export { default as Menu } from './Menu.jsx'
 export { default as Dashboard } from "./Dashboard.jsx"
 export { default as TableBill } from "./TableBill.jsx"
+export { default as Kitchen } from "./Kitchen.jsx"
+export { default as Commissions } from "./Commissions.jsx"

@@ -1,0 +1,1916 @@
+[
+  {
+    "_id": "6a1101392ff5c713c1b1a17c",
+    "name": "Frango (Peito)",
+    "category": "proteina",
+    "baseUnit": "g",
+    "conversionToBase": {
+      "kg": 1000,
+      "g": 1,
+      "xícara": 120,
+      "colher_sopa": 15,
+      "colher_chá": 5
+    },
+    "averageCost": 0.025,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "geral"
+    ],
+    "ingredientId": "1dd47f3d-8c96-452b-ab6f-444859d6350a",
+    "createdAt": "2026-05-23T01:22:01.311Z",
+    "updatedAt": "2026-05-23T01:22:01.311Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a1101392ff5c713c1b1a17f",
+    "name": "Carne Bovina",
+    "category": "proteina",
+    "baseUnit": "g",
+    "conversionToBase": {
+      "kg": 1000,
+      "g": 1,
+      "xícara": 120,
+      "colher_sopa": 15,
+      "colher_chá": 5
+    },
+    "averageCost": 0.045,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "geral"
+    ],
+    "ingredientId": "d4a7a366-ccdc-438a-ba27-7ae53abcc71d",
+    "createdAt": "2026-05-23T01:22:01.471Z",
+    "updatedAt": "2026-05-23T01:22:01.471Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a1101392ff5c713c1b1a182",
+    "name": "Porco",
+    "category": "proteina",
+    "baseUnit": "g",
+    "conversionToBase": {
+      "kg": 1000,
+      "g": 1,
+      "xícara": 120,
+      "colher_sopa": 15,
+      "colher_chá": 5
+    },
+    "averageCost": 0.035,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "geral"
+    ],
+    "ingredientId": "5b3917c7-cbb5-4734-9f1d-abba69b68e35",
+    "createdAt": "2026-05-23T01:22:01.641Z",
+    "updatedAt": "2026-05-23T01:22:01.641Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a1101392ff5c713c1b1a185",
+    "name": "Peixe (Tilápia)",
+    "category": "proteina",
+    "baseUnit": "g",
+    "conversionToBase": {
+      "kg": 1000,
+      "g": 1,
+      "xícara": 120,
+      "colher_sopa": 15,
+      "colher_chá": 5
+    },
+    "averageCost": 0.04,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "geral"
+    ],
+    "ingredientId": "9f713eb4-a028-4605-bdd4-4c510237b5ec",
+    "createdAt": "2026-05-23T01:22:01.807Z",
+    "updatedAt": "2026-05-23T01:22:01.807Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a1101392ff5c713c1b1a188",
+    "name": "Ovo",
+    "category": "proteina",
+    "baseUnit": "unidade",
+    "averageCost": 0.8,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "geral"
+    ],
+    "ingredientId": "43c10b61-aae1-43f8-98df-2e4f942137c2",
+    "createdAt": "2026-05-23T01:22:01.968Z",
+    "updatedAt": "2026-05-23T01:22:01.968Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11013a2ff5c713c1b1a18b",
+    "name": "Arroz Branco",
+    "category": "carboidrato",
+    "baseUnit": "g",
+    "conversionToBase": {
+      "kg": 1000,
+      "g": 1,
+      "xícara": 120,
+      "colher_sopa": 15,
+      "colher_chá": 5
+    },
+    "averageCost": 0.008,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "geral"
+    ],
+    "ingredientId": "ab864865-ae41-4312-83bb-c1780d5d7333",
+    "createdAt": "2026-05-23T01:22:02.133Z",
+    "updatedAt": "2026-05-23T01:22:02.133Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11013a2ff5c713c1b1a18e",
+    "name": "Feijão",
+    "category": "carboidrato",
+    "baseUnit": "g",
+    "conversionToBase": {
+      "kg": 1000,
+      "g": 1,
+      "xícara": 120,
+      "colher_sopa": 15,
+      "colher_chá": 5
+    },
+    "averageCost": 0.012,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "geral"
+    ],
+    "ingredientId": "fde950cc-74af-4e54-a299-8aea34ef7199",
+    "createdAt": "2026-05-23T01:22:02.293Z",
+    "updatedAt": "2026-05-23T01:22:02.293Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11013a2ff5c713c1b1a191",
+    "name": "Macarrão",
+    "category": "carboidrato",
+    "baseUnit": "g",
+    "conversionToBase": {
+      "kg": 1000,
+      "g": 1,
+      "xícara": 120,
+      "colher_sopa": 15,
+      "colher_chá": 5
+    },
+    "averageCost": 0.01,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "geral"
+    ],
+    "ingredientId": "2ea03a4b-6e71-418d-b40c-447eb9f90e81",
+    "createdAt": "2026-05-23T01:22:02.452Z",
+    "updatedAt": "2026-05-23T01:22:02.452Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11013a2ff5c713c1b1a194",
+    "name": "Batata",
+    "category": "carboidrato",
+    "baseUnit": "g",
+    "conversionToBase": {
+      "kg": 1000,
+      "g": 1,
+      "xícara": 120,
+      "colher_sopa": 15,
+      "colher_chá": 5
+    },
+    "averageCost": 0.006,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "geral"
+    ],
+    "ingredientId": "cd31a8da-2a1f-41bb-8d24-32a9898b654c",
+    "createdAt": "2026-05-23T01:22:02.609Z",
+    "updatedAt": "2026-05-23T01:22:02.609Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11013a2ff5c713c1b1a197",
+    "name": "Farinha de Trigo",
+    "category": "carboidrato",
+    "baseUnit": "g",
+    "conversionToBase": {
+      "kg": 1000,
+      "g": 1,
+      "xícara": 120,
+      "colher_sopa": 15,
+      "colher_chá": 5
+    },
+    "averageCost": 0.005,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "geral"
+    ],
+    "ingredientId": "55502bce-58a5-405b-8940-0e630d750bf6",
+    "createdAt": "2026-05-23T01:22:02.773Z",
+    "updatedAt": "2026-05-23T01:22:02.773Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11013a2ff5c713c1b1a19a",
+    "name": "Pão",
+    "category": "carboidrato",
+    "baseUnit": "unidade",
+    "averageCost": 0.5,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "geral"
+    ],
+    "ingredientId": "55d39a0c-c568-497d-91bc-4cb0144905c3",
+    "createdAt": "2026-05-23T01:22:02.936Z",
+    "updatedAt": "2026-05-23T01:22:02.936Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11013b2ff5c713c1b1a19d",
+    "name": "Tomate",
+    "category": "vegetal",
+    "baseUnit": "g",
+    "conversionToBase": {
+      "kg": 1000,
+      "g": 1,
+      "xícara": 120,
+      "colher_sopa": 15,
+      "colher_chá": 5
+    },
+    "averageCost": 0.015,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "geral"
+    ],
+    "ingredientId": "0ed790e4-c5aa-49cc-a3c5-2646cb114abe",
+    "createdAt": "2026-05-23T01:22:03.100Z",
+    "updatedAt": "2026-05-23T01:22:03.100Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11013b2ff5c713c1b1a1a0",
+    "name": "Cebola",
+    "category": "vegetal",
+    "baseUnit": "g",
+    "conversionToBase": {
+      "kg": 1000,
+      "g": 1,
+      "xícara": 120,
+      "colher_sopa": 15,
+      "colher_chá": 5
+    },
+    "averageCost": 0.01,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "geral"
+    ],
+    "ingredientId": "73018921-fb3b-4c3e-94fe-21d96b14fecb",
+    "createdAt": "2026-05-23T01:22:03.266Z",
+    "updatedAt": "2026-05-23T01:22:03.266Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11013b2ff5c713c1b1a1a3",
+    "name": "Alface",
+    "category": "vegetal",
+    "baseUnit": "unidade",
+    "averageCost": 2.5,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "geral"
+    ],
+    "ingredientId": "082bdf6e-2872-45b7-b7ef-d4b159ccfbcc",
+    "createdAt": "2026-05-23T01:22:03.430Z",
+    "updatedAt": "2026-05-23T01:22:03.430Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11013b2ff5c713c1b1a1a6",
+    "name": "Cenoura",
+    "category": "vegetal",
+    "baseUnit": "g",
+    "conversionToBase": {
+      "kg": 1000,
+      "g": 1,
+      "xícara": 120,
+      "colher_sopa": 15,
+      "colher_chá": 5
+    },
+    "averageCost": 0.012,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "geral"
+    ],
+    "ingredientId": "22da1729-0a78-4aa1-ba47-34599ce6a820",
+    "createdAt": "2026-05-23T01:22:03.596Z",
+    "updatedAt": "2026-05-23T01:22:03.596Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11013b2ff5c713c1b1a1a9",
+    "name": "Brócolis",
+    "category": "vegetal",
+    "baseUnit": "g",
+    "conversionToBase": {
+      "kg": 1000,
+      "g": 1,
+      "xícara": 120,
+      "colher_sopa": 15,
+      "colher_chá": 5
+    },
+    "averageCost": 0.025,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "geral"
+    ],
+    "ingredientId": "e63f826f-b881-442c-908a-1e3228de16cb",
+    "createdAt": "2026-05-23T01:22:03.759Z",
+    "updatedAt": "2026-05-23T01:22:03.759Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11013b2ff5c713c1b1a1ac",
+    "name": "Queijo Mussarela",
+    "category": "laticinio",
+    "baseUnit": "g",
+    "conversionToBase": {
+      "kg": 1000,
+      "g": 1,
+      "xícara": 120,
+      "colher_sopa": 15,
+      "colher_chá": 5
+    },
+    "averageCost": 0.055,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "geral"
+    ],
+    "ingredientId": "e75fdd33-d382-4759-8629-e44eda2c6873",
+    "createdAt": "2026-05-23T01:22:03.924Z",
+    "updatedAt": "2026-05-23T01:22:03.924Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11013c2ff5c713c1b1a1af",
+    "name": "Queijo Parmesão",
+    "category": "laticinio",
+    "baseUnit": "g",
+    "conversionToBase": {
+      "kg": 1000,
+      "g": 1,
+      "xícara": 120,
+      "colher_sopa": 15,
+      "colher_chá": 5
+    },
+    "averageCost": 0.065,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "geral"
+    ],
+    "ingredientId": "b2c08354-b294-43b8-a40e-2c3a2d47393c",
+    "createdAt": "2026-05-23T01:22:04.089Z",
+    "updatedAt": "2026-05-23T01:22:04.089Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11013c2ff5c713c1b1a1b2",
+    "name": "Leite",
+    "category": "laticinio",
+    "baseUnit": "ml",
+    "conversionToBase": {
+      "L": 1000,
+      "ml": 1,
+      "xícara": 240,
+      "colher_sopa": 15,
+      "colher_chá": 5
+    },
+    "averageCost": 0.004,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "geral"
+    ],
+    "ingredientId": "97446bc5-06ac-41cd-833a-84b56beb0b24",
+    "createdAt": "2026-05-23T01:22:04.259Z",
+    "updatedAt": "2026-05-23T01:22:04.259Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11013c2ff5c713c1b1a1b5",
+    "name": "Manteiga",
+    "category": "laticinio",
+    "baseUnit": "g",
+    "conversionToBase": {
+      "kg": 1000,
+      "g": 1,
+      "xícara": 120,
+      "colher_sopa": 15,
+      "colher_chá": 5
+    },
+    "averageCost": 0.04,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "geral"
+    ],
+    "ingredientId": "3c92088a-117b-4a7c-8bfc-ab343896b53a",
+    "createdAt": "2026-05-23T01:22:04.422Z",
+    "updatedAt": "2026-05-23T01:22:04.422Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11013c2ff5c713c1b1a1b8",
+    "name": "Creme de Leite",
+    "category": "laticinio",
+    "baseUnit": "g",
+    "conversionToBase": {
+      "kg": 1000,
+      "g": 1,
+      "xícara": 120,
+      "colher_sopa": 15,
+      "colher_chá": 5
+    },
+    "averageCost": 0.03,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "geral"
+    ],
+    "ingredientId": "9c875fd5-61dd-47f3-a6a2-d1beb52aa082",
+    "createdAt": "2026-05-23T01:22:04.584Z",
+    "updatedAt": "2026-05-23T01:22:04.584Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11013c2ff5c713c1b1a1bb",
+    "name": "Sal",
+    "category": "tempero",
+    "baseUnit": "g",
+    "conversionToBase": {
+      "kg": 1000,
+      "g": 1,
+      "xícara": 120,
+      "colher_sopa": 15,
+      "colher_chá": 5
+    },
+    "averageCost": 0.002,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "geral"
+    ],
+    "ingredientId": "e4afaf54-1a0d-486c-ac18-2e412a7925fc",
+    "createdAt": "2026-05-23T01:22:04.748Z",
+    "updatedAt": "2026-05-23T01:22:04.748Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11013c2ff5c713c1b1a1be",
+    "name": "Pimenta",
+    "category": "tempero",
+    "baseUnit": "g",
+    "conversionToBase": {
+      "kg": 1000,
+      "g": 1,
+      "xícara": 120,
+      "colher_sopa": 15,
+      "colher_chá": 5
+    },
+    "averageCost": 0.15,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "geral"
+    ],
+    "ingredientId": "55be8609-9275-41fe-b359-8f03bb3645a1",
+    "createdAt": "2026-05-23T01:22:04.912Z",
+    "updatedAt": "2026-05-23T01:22:04.912Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11013d2ff5c713c1b1a1c1",
+    "name": "Alho",
+    "category": "tempero",
+    "baseUnit": "g",
+    "conversionToBase": {
+      "kg": 1000,
+      "g": 1,
+      "xícara": 120,
+      "colher_sopa": 15,
+      "colher_chá": 5
+    },
+    "averageCost": 0.08,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "geral"
+    ],
+    "ingredientId": "e40a2f2f-9ebd-409c-9237-5a4dc42bc294",
+    "createdAt": "2026-05-23T01:22:05.073Z",
+    "updatedAt": "2026-05-23T01:22:05.073Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11013d2ff5c713c1b1a1c4",
+    "name": "Azeite de Oliva",
+    "category": "tempero",
+    "baseUnit": "ml",
+    "conversionToBase": {
+      "L": 1000,
+      "ml": 1,
+      "xícara": 240,
+      "colher_sopa": 15,
+      "colher_chá": 5
+    },
+    "averageCost": 0.12,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "geral"
+    ],
+    "ingredientId": "543130b0-2931-4855-8bf9-a5df57963ae1",
+    "createdAt": "2026-05-23T01:22:05.235Z",
+    "updatedAt": "2026-05-23T01:22:05.235Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11013d2ff5c713c1b1a1c7",
+    "name": "Óleo",
+    "category": "tempero",
+    "baseUnit": "ml",
+    "conversionToBase": {
+      "L": 1000,
+      "ml": 1,
+      "xícara": 240,
+      "colher_sopa": 15,
+      "colher_chá": 5
+    },
+    "averageCost": 0.02,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "geral"
+    ],
+    "ingredientId": "7f4185e0-215f-4aa1-9396-dc640d03be98",
+    "createdAt": "2026-05-23T01:22:05.400Z",
+    "updatedAt": "2026-05-23T01:22:05.400Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11013d2ff5c713c1b1a1ca",
+    "name": "Vinagre",
+    "category": "tempero",
+    "baseUnit": "ml",
+    "conversionToBase": {
+      "L": 1000,
+      "ml": 1,
+      "xícara": 240,
+      "colher_sopa": 15,
+      "colher_chá": 5
+    },
+    "averageCost": 0.01,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "geral"
+    ],
+    "ingredientId": "3a6b94a7-4f94-49ba-a3d7-c101f9a69b23",
+    "createdAt": "2026-05-23T01:22:05.561Z",
+    "updatedAt": "2026-05-23T01:22:05.561Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11013d2ff5c713c1b1a1cd",
+    "name": "Molho de Soja (Shoyu)",
+    "category": "tempero",
+    "baseUnit": "ml",
+    "conversionToBase": {
+      "L": 1000,
+      "ml": 1,
+      "xícara": 240,
+      "colher_sopa": 15,
+      "colher_chá": 5
+    },
+    "averageCost": 0.05,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "geral"
+    ],
+    "ingredientId": "3995756c-eb8d-4727-a560-19b869b22fb2",
+    "createdAt": "2026-05-23T01:22:05.727Z",
+    "updatedAt": "2026-05-23T01:22:05.727Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11013d2ff5c713c1b1a1d0",
+    "name": "Extrato de Tomate",
+    "category": "tempero",
+    "baseUnit": "g",
+    "conversionToBase": {
+      "kg": 1000,
+      "g": 1,
+      "xícara": 120,
+      "colher_sopa": 15,
+      "colher_chá": 5
+    },
+    "averageCost": 0.03,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "geral"
+    ],
+    "ingredientId": "a85dfadc-f761-4348-9921-f69d5b7a5d7d",
+    "createdAt": "2026-05-23T01:22:05.887Z",
+    "updatedAt": "2026-05-23T01:22:05.887Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11013e2ff5c713c1b1a1d3",
+    "name": "Água",
+    "category": "bebida",
+    "baseUnit": "ml",
+    "conversionToBase": {
+      "L": 1000,
+      "ml": 1,
+      "xícara": 240,
+      "colher_sopa": 15,
+      "colher_chá": 5
+    },
+    "averageCost": 0.005,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "geral"
+    ],
+    "ingredientId": "3e177c93-c9fd-408b-816c-3ace8970ce13",
+    "createdAt": "2026-05-23T01:22:06.045Z",
+    "updatedAt": "2026-05-23T01:22:06.045Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11013e2ff5c713c1b1a1d6",
+    "name": "Refrigerante",
+    "category": "bebida",
+    "baseUnit": "ml",
+    "conversionToBase": {
+      "L": 1000,
+      "ml": 1,
+      "xícara": 240,
+      "colher_sopa": 15,
+      "colher_chá": 5
+    },
+    "averageCost": 0.01,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "geral"
+    ],
+    "ingredientId": "a6588ab4-db7b-4c66-964c-946cade34f85",
+    "createdAt": "2026-05-23T01:22:06.205Z",
+    "updatedAt": "2026-05-23T01:22:06.205Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11013e2ff5c713c1b1a1d9",
+    "name": "Suco Natural",
+    "category": "bebida",
+    "baseUnit": "ml",
+    "conversionToBase": {
+      "L": 1000,
+      "ml": 1,
+      "xícara": 240,
+      "colher_sopa": 15,
+      "colher_chá": 5
+    },
+    "averageCost": 0.03,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "geral"
+    ],
+    "ingredientId": "fe7d55bc-a7de-4fce-a65a-e5c5a2654eec",
+    "createdAt": "2026-05-23T01:22:06.368Z",
+    "updatedAt": "2026-05-23T01:22:06.368Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11013e2ff5c713c1b1a1dc",
+    "name": "Cerveja",
+    "category": "bebida",
+    "baseUnit": "ml",
+    "conversionToBase": {
+      "L": 1000,
+      "ml": 1,
+      "xícara": 240,
+      "colher_sopa": 15,
+      "colher_chá": 5
+    },
+    "averageCost": 0.02,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "geral"
+    ],
+    "ingredientId": "d54aa9a4-6b40-49d2-9a8f-98e39c87f489",
+    "createdAt": "2026-05-23T01:22:06.529Z",
+    "updatedAt": "2026-05-23T01:22:06.529Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11013e2ff5c713c1b1a1df",
+    "name": "Vinho",
+    "category": "bebida",
+    "baseUnit": "ml",
+    "conversionToBase": {
+      "L": 1000,
+      "ml": 1,
+      "xícara": 240,
+      "colher_sopa": 15,
+      "colher_chá": 5
+    },
+    "averageCost": 0.08,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "geral"
+    ],
+    "ingredientId": "d140511c-d281-4dc0-bbcd-d04e7b64e379",
+    "createdAt": "2026-05-23T01:22:06.685Z",
+    "updatedAt": "2026-05-23T01:22:06.685Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11013e2ff5c713c1b1a1e2",
+    "name": "Café",
+    "category": "bebida",
+    "baseUnit": "ml",
+    "conversionToBase": {
+      "L": 1000,
+      "ml": 1,
+      "xícara": 240,
+      "colher_sopa": 15,
+      "colher_chá": 5
+    },
+    "averageCost": 0.02,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "geral"
+    ],
+    "ingredientId": "18af116a-9e0f-40e0-821f-24306aeea0fc",
+    "createdAt": "2026-05-23T01:22:06.854Z",
+    "updatedAt": "2026-05-23T01:22:06.854Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11013f2ff5c713c1b1a1e5",
+    "name": "Açúcar",
+    "category": "outro",
+    "baseUnit": "g",
+    "conversionToBase": {
+      "kg": 1000,
+      "g": 1,
+      "xícara": 120,
+      "colher_sopa": 15,
+      "colher_chá": 5
+    },
+    "averageCost": 0.004,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "geral"
+    ],
+    "ingredientId": "a9e740f7-4cb6-4777-9369-22b31c54b281",
+    "createdAt": "2026-05-23T01:22:07.010Z",
+    "updatedAt": "2026-05-23T01:22:07.010Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11013f2ff5c713c1b1a1e8",
+    "name": "Mel",
+    "category": "outro",
+    "baseUnit": "g",
+    "conversionToBase": {
+      "kg": 1000,
+      "g": 1,
+      "xícara": 120,
+      "colher_sopa": 15,
+      "colher_chá": 5
+    },
+    "averageCost": 0.05,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "geral"
+    ],
+    "ingredientId": "c5650071-ef5c-4f96-a973-214732cfc3cf",
+    "createdAt": "2026-05-23T01:22:07.169Z",
+    "updatedAt": "2026-05-23T01:22:07.169Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11013f2ff5c713c1b1a1eb",
+    "name": "Chocolate",
+    "category": "outro",
+    "baseUnit": "g",
+    "conversionToBase": {
+      "kg": 1000,
+      "g": 1,
+      "xícara": 120,
+      "colher_sopa": 15,
+      "colher_chá": 5
+    },
+    "averageCost": 0.06,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "geral"
+    ],
+    "ingredientId": "38ab3203-3490-447b-9092-51ff67be303f",
+    "createdAt": "2026-05-23T01:22:07.335Z",
+    "updatedAt": "2026-05-23T01:22:07.335Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11013f2ff5c713c1b1a1ee",
+    "name": "Baunilha",
+    "category": "outro",
+    "baseUnit": "ml",
+    "conversionToBase": {
+      "L": 1000,
+      "ml": 1,
+      "xícara": 240,
+      "colher_sopa": 15,
+      "colher_chá": 5
+    },
+    "averageCost": 0.2,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "geral"
+    ],
+    "ingredientId": "cd11d535-982b-47df-a6af-1c6e2f1b9b12",
+    "createdAt": "2026-05-23T01:22:07.497Z",
+    "updatedAt": "2026-05-23T01:22:07.497Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a1114842444bd644f20e829",
+    "name": "Pao de hamburguer PHASE7B",
+    "category": "carboidrato",
+    "baseUnit": "unidade",
+    "averageCost": 0.5,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "geral",
+      "hamburgueria"
+    ],
+    "ingredientId": "e8db8045-f0a7-44d7-a36c-7dcbad52a9e1",
+    "createdAt": "2026-05-23T02:44:20.535Z",
+    "updatedAt": "2026-05-23T02:44:20.535Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a1114842444bd644f20e82b",
+    "name": "Carne bovina PHASE7B",
+    "category": "proteina",
+    "baseUnit": "kg",
+    "averageCost": 45,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "geral",
+      "hamburgueria"
+    ],
+    "ingredientId": "6579c89c-6ea4-4d68-8f0a-f95a5bf55739",
+    "createdAt": "2026-05-23T02:44:20.629Z",
+    "updatedAt": "2026-05-23T02:44:20.629Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a1114842444bd644f20e82d",
+    "name": "Cerveja PHASE7B",
+    "category": "bebida",
+    "baseUnit": "unidade",
+    "averageCost": 6,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "geral",
+      "bar"
+    ],
+    "ingredientId": "6c915b73-29ea-4c18-bcb6-35e1b3ca1f5e",
+    "createdAt": "2026-05-23T02:44:20.713Z",
+    "updatedAt": "2026-05-23T02:44:20.713Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a1114842444bd644f20e82f",
+    "name": "Tempero especial PHASE7B",
+    "category": "tempero",
+    "baseUnit": "kg",
+    "averageCost": 30,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "geral"
+    ],
+    "ingredientId": "d7720976-87ed-4e26-a223-2b29b7f6c24b",
+    "createdAt": "2026-05-23T02:44:20.796Z",
+    "updatedAt": "2026-05-23T02:44:20.796Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11273bad56cebe48a24bf6",
+    "name": "Carne Bovina (Acém)",
+    "category": "proteina",
+    "baseUnit": "g",
+    "conversionToBase": {
+      "kg": 1000,
+      "g": 1
+    },
+    "averageCost": 0.032,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "hamburgueria",
+      "arabe",
+      "geral"
+    ],
+    "ingredientId": "3116b4c2-6497-4a05-98b8-4d0c71def15d",
+    "createdAt": "2026-05-23T04:04:11.024Z",
+    "updatedAt": "2026-05-23T04:04:11.024Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11273bad56cebe48a24bf9",
+    "name": "Carne Bovina (Fraldinha)",
+    "category": "proteina",
+    "baseUnit": "g",
+    "conversionToBase": {
+      "kg": 1000,
+      "g": 1
+    },
+    "averageCost": 0.045,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "hamburgueria",
+      "geral"
+    ],
+    "ingredientId": "46db138e-e4c2-422a-9452-4c2a080a94e9",
+    "createdAt": "2026-05-23T04:04:11.179Z",
+    "updatedAt": "2026-05-23T04:04:11.179Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11273bad56cebe48a24bfc",
+    "name": "Carne Bovina Moída",
+    "category": "proteina",
+    "baseUnit": "g",
+    "conversionToBase": {
+      "kg": 1000,
+      "g": 1
+    },
+    "averageCost": 0.038,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "prepared",
+    "productionState": "ground",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "hamburgueria",
+      "arabe",
+      "geral"
+    ],
+    "ingredientId": "c7356f14-a188-4cbd-a7b4-84fa2fa42e5c",
+    "createdAt": "2026-05-23T04:04:11.336Z",
+    "updatedAt": "2026-05-23T04:04:11.336Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11273bad56cebe48a24c01",
+    "name": "Carne de Cordeiro",
+    "category": "proteina",
+    "baseUnit": "g",
+    "conversionToBase": {
+      "kg": 1000,
+      "g": 1
+    },
+    "averageCost": 0.055,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "arabe",
+      "geral"
+    ],
+    "ingredientId": "f68ef772-c3ff-494c-8960-317d7b632e27",
+    "createdAt": "2026-05-23T04:04:11.644Z",
+    "updatedAt": "2026-05-23T04:04:11.644Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11273bad56cebe48a24c04",
+    "name": "Calabresa",
+    "category": "proteina",
+    "baseUnit": "g",
+    "conversionToBase": {
+      "kg": 1000,
+      "g": 1
+    },
+    "averageCost": 0.03,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "pizzaria",
+      "geral"
+    ],
+    "ingredientId": "9c7d6725-15c9-43a7-bd29-47c35dbfac29",
+    "createdAt": "2026-05-23T04:04:11.797Z",
+    "updatedAt": "2026-05-23T04:04:11.797Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11273bad56cebe48a24c07",
+    "name": "Bacon",
+    "category": "proteina",
+    "baseUnit": "g",
+    "conversionToBase": {
+      "kg": 1000,
+      "g": 1
+    },
+    "averageCost": 0.05,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "hamburgueria",
+      "geral"
+    ],
+    "ingredientId": "3aed2edf-38c7-4c76-9842-b28a74ea499e",
+    "createdAt": "2026-05-23T04:04:11.955Z",
+    "updatedAt": "2026-05-23T04:04:11.955Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11273cad56cebe48a24c0b",
+    "name": "Pão de Hambúrguer",
+    "category": "carboidrato",
+    "baseUnit": "unidade",
+    "averageCost": 1.2,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "hamburgueria",
+      "geral"
+    ],
+    "ingredientId": "234431b9-501c-462f-bd70-c3233a85abc5",
+    "createdAt": "2026-05-23T04:04:12.181Z",
+    "updatedAt": "2026-05-23T04:04:12.181Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11273cad56cebe48a24c0e",
+    "name": "Pão Sírio",
+    "category": "carboidrato",
+    "baseUnit": "unidade",
+    "averageCost": 0.9,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "arabe",
+      "geral"
+    ],
+    "ingredientId": "670e6028-4a82-498c-8e60-bb60579d6e9e",
+    "createdAt": "2026-05-23T04:04:12.337Z",
+    "updatedAt": "2026-05-23T04:04:12.337Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11273cad56cebe48a24c12",
+    "name": "Massa de Pizza (Pronta)",
+    "category": "carboidrato",
+    "baseUnit": "unidade",
+    "averageCost": 3.5,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "prepared",
+    "productionState": "ready_to_use",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "pizzaria",
+      "geral"
+    ],
+    "ingredientId": "59289084-c53a-4b56-af99-4ad28ff5da3e",
+    "createdAt": "2026-05-23T04:04:12.568Z",
+    "updatedAt": "2026-05-23T04:04:12.568Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11273cad56cebe48a24c17",
+    "name": "Batata Pré-Frita",
+    "category": "carboidrato",
+    "baseUnit": "g",
+    "conversionToBase": {
+      "kg": 1000,
+      "g": 1
+    },
+    "averageCost": 0.015,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "prepared",
+    "productionState": "portioned",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "hamburgueria",
+      "bar",
+      "geral"
+    ],
+    "ingredientId": "0fefa973-803b-4ec7-836e-42cdf0f20a61",
+    "createdAt": "2026-05-23T04:04:12.875Z",
+    "updatedAt": "2026-05-23T04:04:12.875Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11273dad56cebe48a24c1d",
+    "name": "Pimentão",
+    "category": "vegetal",
+    "baseUnit": "g",
+    "conversionToBase": {
+      "kg": 1000,
+      "g": 1
+    },
+    "averageCost": 0.015,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "pizzaria",
+      "arabe",
+      "geral"
+    ],
+    "ingredientId": "9bac321c-4e92-4a1f-99d7-e8013eba15f2",
+    "createdAt": "2026-05-23T04:04:13.257Z",
+    "updatedAt": "2026-05-23T04:04:13.257Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11273dad56cebe48a24c20",
+    "name": "Pepino",
+    "category": "vegetal",
+    "baseUnit": "g",
+    "conversionToBase": {
+      "kg": 1000,
+      "g": 1
+    },
+    "averageCost": 0.01,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "arabe",
+      "geral"
+    ],
+    "ingredientId": "0d63b8d4-6f3c-4583-bf1c-d322da1c2ed9",
+    "createdAt": "2026-05-23T04:04:13.411Z",
+    "updatedAt": "2026-05-23T04:04:13.411Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11273dad56cebe48a24c24",
+    "name": "Rúcula",
+    "category": "vegetal",
+    "baseUnit": "unidade",
+    "averageCost": 3,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "pizzaria",
+      "hamburgueria",
+      "geral"
+    ],
+    "ingredientId": "ce5ff94f-cce2-4d4f-b9a6-69aabaf875d4",
+    "createdAt": "2026-05-23T04:04:13.645Z",
+    "updatedAt": "2026-05-23T04:04:13.645Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11273dad56cebe48a24c29",
+    "name": "Queijo Provolone",
+    "category": "laticinio",
+    "baseUnit": "g",
+    "conversionToBase": {
+      "kg": 1000,
+      "g": 1
+    },
+    "averageCost": 0.06,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "pizzaria",
+      "hamburgueria",
+      "geral"
+    ],
+    "ingredientId": "efd25359-a76e-4381-abb5-951ca9d89eee",
+    "createdAt": "2026-05-23T04:04:13.944Z",
+    "updatedAt": "2026-05-23T04:04:13.944Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11273ead56cebe48a24c2e",
+    "name": "Iogurte Natural",
+    "category": "laticinio",
+    "baseUnit": "g",
+    "conversionToBase": {
+      "kg": 1000,
+      "g": 1
+    },
+    "averageCost": 0.025,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "arabe",
+      "bar",
+      "geral"
+    ],
+    "ingredientId": "3eb810d1-000d-4ae5-9929-6fc391ab8a8a",
+    "createdAt": "2026-05-23T04:04:14.246Z",
+    "updatedAt": "2026-05-23T04:04:14.246Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11273ead56cebe48a24c32",
+    "name": "Pimenta do Reino",
+    "category": "tempero",
+    "baseUnit": "g",
+    "conversionToBase": {
+      "kg": 1000,
+      "g": 1
+    },
+    "averageCost": 0.12,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "hamburgueria",
+      "pizzaria",
+      "arabe",
+      "bar",
+      "geral"
+    ],
+    "ingredientId": "c13ee9b3-cbf8-4d23-b9a5-75586f23fc75",
+    "createdAt": "2026-05-23T04:04:14.478Z",
+    "updatedAt": "2026-05-23T04:04:14.478Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11273ead56cebe48a24c37",
+    "name": "Óleo de Soja",
+    "category": "tempero",
+    "baseUnit": "ml",
+    "conversionToBase": {
+      "L": 1000,
+      "ml": 1
+    },
+    "averageCost": 0.008,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "hamburgueria",
+      "pizzaria",
+      "arabe",
+      "bar",
+      "geral"
+    ],
+    "ingredientId": "5243bffe-659a-4975-aa63-3cbb37c2aea8",
+    "createdAt": "2026-05-23T04:04:14.780Z",
+    "updatedAt": "2026-05-23T04:04:14.780Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11273fad56cebe48a24c3b",
+    "name": "Molho de Soja",
+    "category": "tempero",
+    "baseUnit": "ml",
+    "conversionToBase": {
+      "L": 1000,
+      "ml": 1
+    },
+    "averageCost": 0.05,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "arabe",
+      "geral"
+    ],
+    "ingredientId": "a130e57a-6c9e-48ff-9cf8-1ab5e4712bb9",
+    "createdAt": "2026-05-23T04:04:15.013Z",
+    "updatedAt": "2026-05-23T04:04:15.013Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11273fad56cebe48a24c3e",
+    "name": "Orégano",
+    "category": "tempero",
+    "baseUnit": "g",
+    "conversionToBase": {
+      "kg": 1000,
+      "g": 1
+    },
+    "averageCost": 0.1,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "pizzaria",
+      "geral"
+    ],
+    "ingredientId": "226433fb-7b8c-410b-beae-c050dda996e0",
+    "createdAt": "2026-05-23T04:04:15.168Z",
+    "updatedAt": "2026-05-23T04:04:15.168Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11273fad56cebe48a24c41",
+    "name": "Cominho",
+    "category": "tempero",
+    "baseUnit": "g",
+    "conversionToBase": {
+      "kg": 1000,
+      "g": 1
+    },
+    "averageCost": 0.08,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "arabe",
+      "geral"
+    ],
+    "ingredientId": "afc3364c-9c04-4a02-9c9d-216dcac01f6c",
+    "createdAt": "2026-05-23T04:04:15.319Z",
+    "updatedAt": "2026-05-23T04:04:15.319Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11273fad56cebe48a24c44",
+    "name": "Hortelã",
+    "category": "tempero",
+    "baseUnit": "g",
+    "conversionToBase": {
+      "kg": 1000,
+      "g": 1
+    },
+    "averageCost": 0.15,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "arabe",
+      "bar",
+      "geral"
+    ],
+    "ingredientId": "67950034-2e13-4c36-a936-b9c83f5b5f13",
+    "createdAt": "2026-05-23T04:04:15.476Z",
+    "updatedAt": "2026-05-23T04:04:15.476Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11273fad56cebe48a24c47",
+    "name": "Limão",
+    "category": "tempero",
+    "baseUnit": "unidade",
+    "averageCost": 1.2,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "bar",
+      "arabe",
+      "hamburgueria",
+      "geral"
+    ],
+    "ingredientId": "aa5c8e94-4151-4ea0-ab30-786e9cae80b2",
+    "createdAt": "2026-05-23T04:04:15.633Z",
+    "updatedAt": "2026-05-23T04:04:15.633Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11273fad56cebe48a24c4b",
+    "name": "Água Mineral (500ml)",
+    "category": "bebida",
+    "baseUnit": "unidade",
+    "averageCost": 2,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "packaging",
+    "productionState": "ready_to_sell",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "hamburgueria",
+      "pizzaria",
+      "arabe",
+      "bar",
+      "geral"
+    ],
+    "ingredientId": "4115f9f7-2c03-4142-9c9f-16feb3607e31",
+    "createdAt": "2026-05-23T04:04:15.862Z",
+    "updatedAt": "2026-05-23T04:04:15.862Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a112740ad56cebe48a24c4e",
+    "name": "Refrigerante Lata",
+    "category": "bebida",
+    "baseUnit": "unidade",
+    "averageCost": 3.5,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "industrialized",
+    "productionState": "ready_to_sell",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "hamburgueria",
+      "pizzaria",
+      "arabe",
+      "bar",
+      "geral"
+    ],
+    "ingredientId": "4c05ba9e-15e8-44a1-8d65-aa06b654916d",
+    "createdAt": "2026-05-23T04:04:16.017Z",
+    "updatedAt": "2026-05-24T14:41:22.508Z",
+    "__v": 0,
+    "isSellableDirectly": true
+  },
+  {
+    "_id": "6a112740ad56cebe48a24c51",
+    "name": "Cerveja Lata",
+    "category": "bebida",
+    "baseUnit": "unidade",
+    "averageCost": 4,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "packaging",
+    "productionState": "ready_to_sell",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "hamburgueria",
+      "pizzaria",
+      "bar",
+      "geral"
+    ],
+    "ingredientId": "a24e05b1-c9af-45a2-82f2-64cb1d296fe7",
+    "createdAt": "2026-05-23T04:04:16.165Z",
+    "updatedAt": "2026-05-23T04:04:16.165Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a112740ad56cebe48a24c54",
+    "name": "Cerveja Long Neck",
+    "category": "bebida",
+    "baseUnit": "unidade",
+    "averageCost": 5.5,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "packaging",
+    "productionState": "ready_to_sell",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "bar",
+      "geral"
+    ],
+    "ingredientId": "0b5c6a83-2bc7-4cad-9f7e-7c141dbc4776",
+    "createdAt": "2026-05-23T04:04:16.320Z",
+    "updatedAt": "2026-05-23T04:04:16.320Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a112740ad56cebe48a24c57",
+    "name": "Suco Natural (Litro)",
+    "category": "bebida",
+    "baseUnit": "ml",
+    "conversionToBase": {
+      "L": 1000,
+      "ml": 1
+    },
+    "averageCost": 0.025,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "raw_material",
+    "productionState": "raw",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "bar",
+      "hamburgueria",
+      "geral"
+    ],
+    "ingredientId": "5b088479-def1-4755-aa25-f1a6d1a2eeda",
+    "createdAt": "2026-05-23T04:04:16.475Z",
+    "updatedAt": "2026-05-23T04:04:16.475Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a112740ad56cebe48a24c5b",
+    "name": "Água de Coco",
+    "category": "bebida",
+    "baseUnit": "unidade",
+    "averageCost": 3,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "packaging",
+    "productionState": "ready_to_sell",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "bar",
+      "hamburgueria",
+      "geral"
+    ],
+    "ingredientId": "8d6ebb30-f51a-4904-96de-5e9b1c3f5419",
+    "createdAt": "2026-05-23T04:04:16.708Z",
+    "updatedAt": "2026-05-23T04:04:16.708Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a112740ad56cebe48a24c5e",
+    "name": "Hamburger Paper",
+    "category": "outro",
+    "baseUnit": "unidade",
+    "averageCost": 0.15,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "packaging",
+    "productionState": "ready_to_use",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "hamburgueria",
+      "geral"
+    ],
+    "ingredientId": "19b17328-0ab3-4dfa-85eb-ab02cd7d67c7",
+    "createdAt": "2026-05-23T04:04:16.862Z",
+    "updatedAt": "2026-05-23T04:04:16.862Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a112741ad56cebe48a24c61",
+    "name": "Caixa de Pizza (Grande)",
+    "category": "outro",
+    "baseUnit": "unidade",
+    "averageCost": 1.8,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "packaging",
+    "productionState": "ready_to_use",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "pizzaria",
+      "geral"
+    ],
+    "ingredientId": "7954d6bc-0c59-4d0f-abe2-7d2781f0eca6",
+    "createdAt": "2026-05-23T04:04:17.021Z",
+    "updatedAt": "2026-05-23T04:04:17.021Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a112741ad56cebe48a24c64",
+    "name": "Caixa de Pizza (Média)",
+    "category": "outro",
+    "baseUnit": "unidade",
+    "averageCost": 1.5,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "packaging",
+    "productionState": "ready_to_use",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "pizzaria",
+      "geral"
+    ],
+    "ingredientId": "fe2d9351-8ab2-42f3-89a9-9818b8ad8611",
+    "createdAt": "2026-05-23T04:04:17.179Z",
+    "updatedAt": "2026-05-23T04:04:17.179Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a112741ad56cebe48a24c67",
+    "name": "Saco de Papel",
+    "category": "outro",
+    "baseUnit": "unidade",
+    "averageCost": 0.1,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "packaging",
+    "productionState": "ready_to_use",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "hamburgueria",
+      "pizzaria",
+      "arabe",
+      "bar",
+      "geral"
+    ],
+    "ingredientId": "a2ec5b3b-50f0-4f17-8650-dcfaf15911c8",
+    "createdAt": "2026-05-23T04:04:17.338Z",
+    "updatedAt": "2026-05-23T04:04:17.338Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a112741ad56cebe48a24c6a",
+    "name": "Luva Descartável",
+    "category": "outro",
+    "baseUnit": "pacote",
+    "averageCost": 5,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "consumable",
+    "productionState": "ready_to_use",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "hamburgueria",
+      "pizzaria",
+      "arabe",
+      "bar",
+      "geral"
+    ],
+    "ingredientId": "09f8beb2-9720-4b95-be15-4e3f7dadd97f",
+    "createdAt": "2026-05-23T04:04:17.494Z",
+    "updatedAt": "2026-05-23T04:04:17.494Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a112741ad56cebe48a24c6d",
+    "name": "Papel Toalha",
+    "category": "outro",
+    "baseUnit": "pacote",
+    "averageCost": 3,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "consumable",
+    "productionState": "ready_to_use",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "hamburgueria",
+      "pizzaria",
+      "arabe",
+      "bar",
+      "geral"
+    ],
+    "ingredientId": "a5b0347c-5b2b-4206-8ef0-03825392ae39",
+    "createdAt": "2026-05-23T04:04:17.651Z",
+    "updatedAt": "2026-05-23T04:04:17.651Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a112741ad56cebe48a24c70",
+    "name": "Detergente",
+    "category": "outro",
+    "baseUnit": "ml",
+    "conversionToBase": {
+      "L": 1000,
+      "ml": 1
+    },
+    "averageCost": 0.01,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "consumable",
+    "productionState": "ready_to_use",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "hamburgueria",
+      "pizzaria",
+      "arabe",
+      "bar",
+      "geral"
+    ],
+    "ingredientId": "383525e0-cd5c-4769-9b5d-825cbea11c4b",
+    "createdAt": "2026-05-23T04:04:17.807Z",
+    "updatedAt": "2026-05-23T04:04:17.807Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a112741ad56cebe48a24c73",
+    "name": "Álcool Gel",
+    "category": "outro",
+    "baseUnit": "ml",
+    "conversionToBase": {
+      "L": 1000,
+      "ml": 1
+    },
+    "averageCost": 0.02,
+    "minimumStock": 0,
+    "isActive": true,
+    "itemType": "consumable",
+    "productionState": "ready_to_use",
+    "isByproduct": false,
+    "compatibleOperations": [
+      "hamburgueria",
+      "pizzaria",
+      "arabe",
+      "bar",
+      "geral"
+    ],
+    "ingredientId": "256fb48e-cbac-4792-bba9-1c9b96ec4e5f",
+    "createdAt": "2026-05-23T04:04:17.959Z",
+    "updatedAt": "2026-05-23T04:04:17.959Z",
+    "__v": 0
+  }
+]

@@ -1,0 +1,42 @@
+{
+  "timestamp": "2026-05-25T14:31:37.352Z",
+  "storeId": "6a1101372ff5c713c1b1a147",
+  "collections": {
+    "orders": {
+      "count": 10,
+      "file": "orders.json"
+    },
+    "kds_orders": {
+      "count": 14,
+      "file": "kds_orders.json"
+    },
+    "stockbalances": {
+      "count": 429,
+      "file": "stockbalances.json"
+    },
+    "stockmovements": {
+      "count": 54,
+      "file": "stockmovements.json"
+    },
+    "operationalalerts": {
+      "count": 10,
+      "file": "operationalalerts.json"
+    },
+    "products": {
+      "count": 8,
+      "file": "products.json"
+    },
+    "recipes": {
+      "count": 4,
+      "file": "recipes.json"
+    },
+    "ingredients": {
+      "count": 79,
+      "file": "ingredients.json"
+    },
+    "users": {
+      "count": 4,
+      "file": "users.json"
+    }
+  }
+}

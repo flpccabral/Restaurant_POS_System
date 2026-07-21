@@ -5,10 +5,11 @@ import { enqueueSnackbar } from 'notistack';
 import { getTableBill, closeTable } from '../https';
 import BackButton from '../components/shared/BackButton';
 import PdvFooterActions from '../components/pdv/PdvFooterActions';
+import SplitBillModal from '../components/split/SplitBillModal';
 import { useDispatch } from 'react-redux';
 import { updateTable, setCustomer, setOrderType } from '../redux/slices/customerSlice';
 import { formatDateAndTime } from '../utils';
-import { FiPlus, FiDollarSign, FiArrowLeft } from 'react-icons/fi';
+import { FiPlus, FiDollarSign, FiArrowLeft, FiUsers } from 'react-icons/fi';
 
 const PAYMENT_METHODS = [
   { value: 'cash', label: 'Dinheiro', icon: '💵' },
@@ -40,6 +41,7 @@ const TableBill = () => {
   const queryClient = useQueryClient();
   const [selectedPayment, setSelectedPayment] = React.useState('cash');
   const [showCloseConfirm, setShowCloseConfirm] = React.useState(false);
+  const [showSplitModal, setShowSplitModal] = React.useState(false);
 
   const { data: resData, isLoading, isError } = useQuery({
     queryKey: ['tableBill', id],
@@ -246,13 +248,22 @@ const TableBill = () => {
                 </p>
               )}
             </div>
-            <button
-              onClick={() => setShowCloseConfirm(true)}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-lg font-bold text-base shadow-sm transition-all active:scale-[0.98] flex items-center gap-2"
-            >
-              <FiDollarSign size={18} />
-              Fechar Mesa
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowSplitModal(true)}
+                className="bg-amber-500 hover:bg-amber-600 text-white px-5 py-3 rounded-lg font-bold text-sm shadow-sm transition-all active:scale-[0.98] flex items-center gap-2"
+              >
+                <FiUsers size={16} />
+                Dividir Conta
+              </button>
+              <button
+                onClick={() => setShowCloseConfirm(true)}
+                className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-lg font-bold text-base shadow-sm transition-all active:scale-[0.98] flex items-center gap-2"
+              >
+                <FiDollarSign size={18} />
+                Fechar Mesa
+              </button>
+            </div>
           </div>
         ) : (
           <div>
@@ -299,6 +310,17 @@ const TableBill = () => {
       </div>
 
       <PdvFooterActions />
+
+      {/* Modal de Divisao de Conta (Prompt D) */}
+      <SplitBillModal
+        isOpen={showSplitModal}
+        onClose={() => setShowSplitModal(false)}
+        tableId={id}
+        tableNumber={table.tableNo}
+        orders={orders}
+        totalAmount={summary.total}
+        onSplitComplete={() => navigate('/tables')}
+      />
     </section>
   );
 };

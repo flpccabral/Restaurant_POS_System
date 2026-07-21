@@ -196,11 +196,79 @@ const getCurrentStoreSettings = async (req, res, next) => {
     }
 };
 
+/**
+ * Obter configuracao de gorjeta/servico da loja atual
+ */
+const getServiceChargeConfig = async (req, res, next) => {
+    try {
+        const storeRef = req.user.isMasterAdmin && req.storeId ? req.storeId : req.user.store;
+        const store = await Store.findById(storeRef);
+
+        if (!store) {
+            throw createHttpError(404, "Loja nao encontrada!");
+        }
+
+        res.status(200).json({
+            success: true,
+            data: store.settings?.serviceCharge || {
+                enabled: true,
+                rate: 10,
+                mode: 'optional'
+            }
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
+ * Atualizar configuracao de gorjeta/servico da loja atual
+ */
+const updateServiceChargeConfig = async (req, res, next) => {
+    try {
+        const storeRef = req.user.isMasterAdmin && req.storeId ? req.storeId : req.user.store;
+        const { enabled, rate, mode } = req.body;
+
+        const store = await Store.findById(storeRef);
+        if (!store) {
+            throw createHttpError(404, "Loja nao encontrada!");
+        }
+
+        // Validacoes
+        if (rate !== undefined && (rate < 0 || rate > 100)) {
+            throw createHttpError(400, "Taxa de servico deve estar entre 0 e 100!");
+        }
+        if (mode !== undefined && !['optional', 'mandatory', 'disabled'].includes(mode)) {
+            throw createHttpError(400, "Modo invalido! Use: optional, mandatory ou disabled");
+        }
+
+        // Atualizar configuracao
+        if (!store.settings) store.settings = {};
+        if (!store.settings.serviceCharge) store.settings.serviceCharge = {};
+
+        if (enabled !== undefined) store.settings.serviceCharge.enabled = enabled;
+        if (rate !== undefined) store.settings.serviceCharge.rate = rate;
+        if (mode !== undefined) store.settings.serviceCharge.mode = mode;
+
+        await store.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Configuracao de gorjeta atualizada!",
+            data: store.settings.serviceCharge
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     createStore,
     getStores,
     getStoreById,
     updateStore,
     toggleStoreStatus,
-    getCurrentStoreSettings
+    getCurrentStoreSettings,
+    getServiceChargeConfig,
+    updateServiceChargeConfig
 };

@@ -1,17 +1,32 @@
-import React from 'react';
-import { FiCheckCircle, FiClock, FiArrowRight } from 'react-icons/fi';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { FiCheckCircle, FiClock, FiArrowRight, FiDollarSign } from 'react-icons/fi';
 import { formatDateAndTime, getAvatarName, translateOrderStatus } from '../../utils/index';
+import CounterPaymentModal from './CounterPaymentModal';
 
 const OrderCard = ({ order }) => {
+  const navigate = useNavigate();
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
   const isReady = order.orderStatus === 'Ready';
   const isCompleted = order.orderStatus === 'completed';
   const isCancelled = order.orderStatus === 'cancelled';
+  const isPaid = order.paymentStatus === 'paid';
 
   let statusColor;
   if (isCompleted) statusColor = 'bg-blue-100 text-blue-700';
   else if (isReady) statusColor = 'bg-emerald-100 text-emerald-700';
   else if (isCancelled) statusColor = 'bg-red-100 text-red-600';
   else statusColor = 'bg-amber-100 text-amber-700';
+
+  const handlePayment = () => {
+    if (order.table?._id) {
+      // Pedido de mesa - redirecionar para página de pagamento da mesa
+      navigate(`/table/${order.table._id}/bill`);
+    } else {
+      // Pedido de balcão - abrir modal de pagamento
+      setShowPaymentModal(true);
+    }
+  };
 
   return (
     <div className="w-[480px] bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
@@ -69,6 +84,25 @@ const OrderCard = ({ order }) => {
             R${(order.bills?.totalWithTax || 0).toFixed(2)}
           </span>
         </div>
+
+        {/* Payment Button */}
+        {!isPaid && !isCancelled && (
+          <button
+            onClick={handlePayment}
+            className="w-full mt-4 bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 px-4 rounded-lg font-semibold text-sm transition-colors flex items-center justify-center gap-2"
+          >
+            <FiDollarSign size={16} />
+            Pagar
+          </button>
+        )}
+
+        {/* Payment Modal for Counter Orders */}
+        {showPaymentModal && !order.table?._id && (
+          <CounterPaymentModal
+            order={order}
+            onClose={() => setShowPaymentModal(false)}
+          />
+        )}
       </div>
     </div>
   );

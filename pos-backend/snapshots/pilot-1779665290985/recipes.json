@@ -1,0 +1,176 @@
+[
+  {
+    "_id": "6a11bae4f646322a50b74438",
+    "store": "6a1101372ff5c713c1b1a147",
+    "sku": "HAMB-01",
+    "product": "6a11b68f515e85eb24eaf426",
+    "variation": "hamburgue-padrao",
+    "name": "Preparo Hamburgue",
+    "ingredients": [
+      {
+        "ingredient": "6a1101392ff5c713c1b1a17f",
+        "netQuantity": 180,
+        "lossFactor": 0,
+        "substitute": null,
+        "unit": "g"
+      },
+      {
+        "ingredient": "6a1114842444bd644f20e829",
+        "netQuantity": 1,
+        "lossFactor": 0,
+        "substitute": null,
+        "unit": "unidade"
+      },
+      {
+        "ingredient": "6a11273bad56cebe48a24c07",
+        "netQuantity": 10,
+        "lossFactor": 0,
+        "substitute": null,
+        "unit": "g"
+      }
+    ],
+    "preparationTime": 0,
+    "instructions": "",
+    "yieldQuantity": 1,
+    "version": 2,
+    "totalCost": 8.6,
+    "costPerYield": 8.6,
+    "isActive": true,
+    "recipeId": "ec02d2b5-d044-454d-a8ff-ca508fee3449",
+    "createdAt": "2026-05-23T14:34:12.050Z",
+    "updatedAt": "2026-05-24T16:17:21.167Z",
+    "__v": 1,
+    "lastCalculatedAt": "2026-05-23T14:45:57.881Z"
+  },
+  {
+    "_id": "6a11e640f646322a50b746ba",
+    "store": "6a1101372ff5c713c1b1a147",
+    "sku": "REF-TESTE-01",
+    "product": "6a11e625f646322a50b7467d",
+    "variation": "refrigerante-teste-padrao",
+    "name": "Revenda Refrigerante",
+    "ingredients": [
+      {
+        "ingredient": "6a112740ad56cebe48a24c4e",
+        "netQuantity": 1,
+        "lossFactor": 0,
+        "substitute": null,
+        "unit": "unidade"
+      }
+    ],
+    "preparationTime": 0,
+    "instructions": "",
+    "yieldQuantity": 1,
+    "version": 1,
+    "totalCost": 0,
+    "costPerYield": 0,
+    "isActive": true,
+    "recipeId": "17b5d7a6-8320-453b-9bc3-e8e22284f73a",
+    "createdAt": "2026-05-23T17:39:12.209Z",
+    "updatedAt": "2026-05-23T17:39:12.209Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a123a2c0824a97594d48d91",
+    "store": "6a1101372ff5c713c1b1a147",
+    "sku": "hambúrguer-artesanal-p",
+    "product": "6a123a2b0824a97594d48d7a",
+    "variation": "hambúrguer-artesanal-p",
+    "name": "Ficha Técnica - Hambúrguer Artesanal (P)",
+    "ingredients": [
+      {
+        "ingredient": "6a1101392ff5c713c1b1a17f",
+        "netQuantity": 180,
+        "lossFactor": 10,
+        "substitute": null,
+        "unit": "g"
+      },
+      {
+        "ingredient": "6a11273cad56cebe48a24c0b",
+        "netQuantity": 1,
+        "lossFactor": 0,
+        "substitute": null,
+        "unit": "unidade"
+      },
+      {
+        "ingredient": "6a11013b2ff5c713c1b1a1ac",
+        "netQuantity": 50,
+        "lossFactor": 5,
+        "substitute": null,
+        "unit": "g"
+      },
+      {
+        "ingredient": "6a11013b2ff5c713c1b1a1a3",
+        "netQuantity": 1,
+        "lossFactor": 10,
+        "substitute": null,
+        "unit": "unidade"
+      },
+      {
+        "ingredient": "6a11013b2ff5c713c1b1a19d",
+        "netQuantity": 40,
+        "lossFactor": 5,
+        "substitute": null,
+        "unit": "g"
+      }
+    ],
+    "preparationTime": 0,
+    "yieldQuantity": 1,
+    "version": 2,
+    "totalCost": 0,
+    "costPerYield": 0,
+    "isActive": true,
+    "recipeId": "1772e623-98d4-4bdf-bd93-6672977f2fc5",
+    "createdAt": "2026-05-23T23:37:16.678Z",
+    "updatedAt": "2026-05-24T18:27:12.231Z",
+    "__v": 1
+  },
+  {
+    "_id": "6a123a2d0824a97594d48d98",
+    "store": "6a1101372ff5c713c1b1a147",
+    "sku": "pizza-margherita-individual",
+    "product": "6a123a2b0824a97594d48d7d",
+    "variation": "Individual",
+    "name": "Pizza Margherita - Individual",
+    "ingredients": [
+      {
+        "ingredient": "6a11013a2ff5c713c1b1a197",
+        "netQuantity": 200,
+        "lossFactor": 0,
+        "substitute": null,
+        "unit": "g"
+      },
+      {
+        "ingredient": "6a11013b2ff5c713c1b1a1ac",
+        "netQuantity": 100,
+        "lossFactor": 5,
+        "substitute": null,
+        "unit": "g"
+      },
+      {
+        "ingredient": "6a11013b2ff5c713c1b1a19d",
+        "netQuantity": 100,
+        "lossFactor": 10,
+        "substitute": null,
+        "unit": "g"
+      },
+      {
+        "ingredient": "6a11013d2ff5c713c1b1a1c4",
+        "netQuantity": 15,
+        "lossFactor": 0,
+        "substitute": null,
+        "unit": "ml"
+      }
+    ],
+    "preparationTime": 0,
+    "yieldQuantity": 1,
+    "version": 1,
+    "totalCost": 0,
+    "costPerYield": 0,
+    "isActive": true,
+    "recipeId": "8e46294e-c6b7-4b04-b132-f2910fec3dcc",
+    "createdAt": "2026-05-23T23:37:17.169Z",
+    "updatedAt": "2026-05-23T23:37:17.169Z",
+    "__v": 0
+  }
+]

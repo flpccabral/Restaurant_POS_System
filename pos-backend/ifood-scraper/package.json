@@ -1,0 +1,24 @@
+{
+  "name": "ifood-scraper",
+  "version": "1.0.0",
+  "description": "Scraper automatizado do Portal do Parceiro iFood",
+  "main": "index.js",
+  "scripts": {
+    "scrape:all": "node index.js --all",
+    "scrape:orders": "node index.js --orders",
+    "scrape:financial": "node index.js --financial",
+    "scrape:menu": "node index.js --menu",
+    "scrape:reviews": "node index.js --reviews",
+    "scrape:store": "node index.js --store",
+    "login": "node index.js --login-only",
+    "postinstall": "npx playwright install chromium"
+  },
+  "keywords": ["ifood", "scraper", "playwright"],
+  "license": "ISC",
+  "dependencies": {
+    "playwright": "^1.52.0",
+    "commander": "^13.1.0",
+    "dayjs": "^1.11.13",
+    "chalk": "^4.1.2"
+  }
+}

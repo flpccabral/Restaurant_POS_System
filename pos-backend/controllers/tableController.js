@@ -161,26 +161,27 @@ const closeTable = async (req, res, next) => {
         closeStatus: 'closed',
         orderStatus: (order.orderStatus === 'Ready' || order.orderStatus === 'In Progress' || order.orderStatus === 'Preparing') ? 'completed' : order.orderStatus,
         paymentMethod: paymentMethod,
-        ...(observations ? { observations } : {}),
-        ...(paidAmount ? { 'bills.totalWithTax': paidAmount } : {})
+        ...(observations ? { observations } : {})
+        // Removido: não sobrescrever bills.totalWithTax com paidAmount global
       }, { new: true })
     );
     const updatedOrders = await Promise.all(updatePromises);
 
-    // Registrar pagamento para cada pedido
-    const paymentPromises = openOrders.map(order =>
-      Payment.create({
+    // Registrar pagamento para cada pedido usando o valor correto de cada um
+    const paymentPromises = openOrders.map(order => {
+      const orderAmount = order.bills?.totalWithTax || 0;
+      return Payment.create({
         store: storeRef,
         order: order._id,
         orderNumber: order.orderNumber || `ORD-${Date.now()}`,
-        amount: order.bills?.totalWithTax || 0,
+        amount: orderAmount,
         method: paymentMethod,
-        paidAmount: paidAmount || order.bills?.totalWithTax || 0,
+        paidAmount: orderAmount, // Usar valor do pedido, não paidAmount global
         status: 'approved',
         user: req.user._id,
         cashier: req.user._id
-      })
-    );
+      });
+    });
     await Promise.all(paymentPromises);
 
     // Liberar mesa

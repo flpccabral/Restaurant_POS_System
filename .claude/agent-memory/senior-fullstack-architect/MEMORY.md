@@ -1,0 +1,8 @@
+- [Phase 7B — Acoes assistidas](project_phase7b.md) — Operational console actions with confirmation, dismiss endpoint, purchase registration
+- [Phase 7B Checkpoint Complete](phase7b_complete.md) — All 5 actions validated in runtime, report published to Notion
+- [Phase 7C — Politicas de Estoque](phase7c_policies.md) — Policy tab CRUD, form modal, inter-store transfer bugfix
+- [Phase 8 — Hardening](phase8_hardening.md) — Permission model, audit logging, UX hardening, pilot docs
+- [Checkpoint 8.5](checkpoint_8.5_completed.md) — Fase 8.5 Console Operacional consolidado no pos-admin, pronto para Fase 9
+- [UI Refinements](ui_refinements_posadmin.md) — Phase 9 visual: card shadows, KPI accents, sidebar glow, hover lift, dashboard glow
+- [Phase 9.0A Conceptual Review](phase9_conceptual_review.md) — Product x Stock x Production x POS audit, taxonomy, Option A recommendation, 9.1 scope
+- [Phase 9.1A Completa](phase9_1a_complete.md) — Stock Impact Rule implementada, migrada (5 produtos), checkpoint runtime validado, relatorio no Notion

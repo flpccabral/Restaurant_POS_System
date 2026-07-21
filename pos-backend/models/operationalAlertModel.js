@@ -26,7 +26,9 @@ const operationalAlertSchema = new mongoose.Schema({
             'sale_without_stock_deduction',
             'product_without_recipe',
             'product_missing_stock_rule',
-            'purchase_registered'
+            'purchase_registered',
+            'cash_difference',
+            'cash_session_force_closed'
         ],
         index: true
     },

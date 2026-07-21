@@ -14,7 +14,8 @@ const ws = require("../services/websocketService");
  */
 const openCashSession = async (req, res, next) => {
     try {
-        const { initialBalance, deviceId, observations } = req.body;
+        const { initialBalance, openingBalance, deviceId, observations } = req.body;
+        const balance = initialBalance || openingBalance || 0;
 
         // Determinar loja
         const storeRef = req.user.isMasterAdmin && req.storeId ? req.storeId : req.user.store;
@@ -37,12 +38,21 @@ const openCashSession = async (req, res, next) => {
             cashier: req.user._id,
             device: deviceId || null,
             status: 'open',
-            initialBalance: initialBalance || 0,
+            initialBalance: balance,
             observations: { opening: observations }
         });
 
-        // Abrir sessão com fundo de troco
-        await session.open(initialBalance || 0);
+        // FLUXO_CAIXA: Registrar transação de abertura
+        await session.registerTransaction({
+            type: 'opening',
+            value: balance,
+            paymentMethod: 'cash',
+            description: 'Fundo de troco inicial',
+            operatorId: req.user._id
+        });
+
+        // Populareferências antes de retornar
+        await session.populate('cashier', 'name email');
 
         // Log
         await SessionLog.create({
@@ -98,10 +108,16 @@ const getActiveSession = async (req, res, next) => {
  */
 const performSangria = async (req, res, next) => {
     try {
-        const { amount, description } = req.body;
+        const { amount, description, reason } = req.body;
 
         if (!amount || amount <= 0) {
             const error = createHttpError(400, "Valid amount is required!");
+            return next(error);
+        }
+
+        // FLUXO_CAIXA: Justificativa obrigatória para sangria
+        if (!reason && !description) {
+            const error = createHttpError(400, "Justificativa é obrigatória para sangria!");
             return next(error);
         }
 
@@ -114,7 +130,15 @@ const performSangria = async (req, res, next) => {
             return next(error);
         }
 
-        await session.sangria(amount, description, req.user._id);
+        // FLUXO_CAIXA: Usar registerTransaction() com validação de saldo disponível
+        await session.registerTransaction({
+            type: 'sangria',
+            value: amount,
+            paymentMethod: 'cash',
+            description: description || reason,
+            reason: reason || description,
+            operatorId: req.user._id
+        });
 
         // Log
         await SessionLog.create({
@@ -123,7 +147,8 @@ const performSangria = async (req, res, next) => {
             action: 'sangria',
             metadata: {
                 sessionId: session.sessionId,
-                amount
+                amount,
+                reason: reason || description
             }
         });
 
@@ -142,10 +167,16 @@ const performSangria = async (req, res, next) => {
  */
 const performSuprimento = async (req, res, next) => {
     try {
-        const { amount, description } = req.body;
+        const { amount, description, reason } = req.body;
 
         if (!amount || amount <= 0) {
             const error = createHttpError(400, "Valid amount is required!");
+            return next(error);
+        }
+
+        // FLUXO_CAIXA: Justificativa obrigatória para suprimento
+        if (!reason && !description) {
+            const error = createHttpError(400, "Justificativa é obrigatória para suprimento!");
             return next(error);
         }
 
@@ -158,7 +189,15 @@ const performSuprimento = async (req, res, next) => {
             return next(error);
         }
 
-        await session.suprimento(amount, description, req.user._id);
+        // FLUXO_CAIXA: Usar registerTransaction()
+        await session.registerTransaction({
+            type: 'supply',
+            value: amount,
+            paymentMethod: 'cash',
+            description: description || reason,
+            reason: reason || description,
+            operatorId: req.user._id
+        });
 
         // Log
         await SessionLog.create({
@@ -167,7 +206,8 @@ const performSuprimento = async (req, res, next) => {
             action: 'suprimento',
             metadata: {
                 sessionId: session.sessionId,
-                amount
+                amount,
+                reason: reason || description
             }
         });
 
@@ -210,9 +250,10 @@ const processPayment = async (req, res, next) => {
             return next(error);
         }
 
-        // Se pedido já está finalizado, evitar duplicação
-        if (order.orderStatus === 'completed') {
-            const error = createHttpError(400, "Order is already completed!");
+        // Se pedido já está finalizado E pago, evitar duplicação
+        // Mas permitir pagamento de pedidos completed que estão unpaid
+        if (order.orderStatus === 'completed' && order.paymentStatus === 'paid') {
+            const error = createHttpError(400, "Order is already completed and paid!");
             return next(error);
         }
 
@@ -484,7 +525,7 @@ const refundPayment = async (req, res, next) => {
  */
 const closeCashSession = async (req, res, next) => {
     try {
-        const { finalBalance, observations } = req.body;
+        const { finalBalance, observations, differenceReason, confirmedBy } = req.body;
 
         if (finalBalance === undefined) {
             const error = createHttpError(400, "Final balance is required!");
@@ -500,7 +541,55 @@ const closeCashSession = async (req, res, next) => {
             return next(error);
         }
 
-        await session.close(finalBalance, observations, req.user._id);
+        // Calcular diferença antecipadamente para aplicar hierarquia
+        const expectedBalance = session.expectedBalance;
+        const difference = finalBalance - expectedBalance;
+        const absDifference = Math.abs(difference);
+
+        // FLUXO_CAIXA: Hierarquia de tratamento de diferenças
+        if (absDifference > 50 && !confirmedBy) {
+            const error = createHttpError(400, `Diferença de R$ ${absDifference.toFixed(2)} requer aprovação de supervisor. Envie confirmedBy com o ID do supervisor.`);
+            return next(error);
+        }
+
+        if (absDifference > 50 && !differenceReason) {
+            const error = createHttpError(400, "Diferença acima de R$ 50,00 requer justificativa (differenceReason).");
+            return next(error);
+        }
+
+        if (absDifference >= 5 && absDifference <= 50 && !differenceReason) {
+            const error = createHttpError(400, "Diferença entre R$ 5,00 e R$ 50,00 requer justificativa (differenceReason).");
+            return next(error);
+        }
+
+        // Fechar sessão
+        await session.close({
+            finalBalance,
+            observations,
+            userId: req.user._id,
+            confirmedBy: confirmedBy || null,
+            differenceReason: differenceReason || null
+        });
+
+        // FLUXO_CAIXA: Se diferença > R$ 200, criar alerta operacional
+        if (absDifference > 200) {
+            const OperationalAlert = require("../models/operationalAlertModel");
+            await OperationalAlert.create({
+                store: storeRef,
+                type: 'cash_difference',
+                severity: absDifference > 500 ? 'critical' : 'high',
+                message: `Caixa ${session.sessionNumber} fechado com diferença de R$ ${difference.toFixed(2)} (${difference > 0 ? 'sobrou' : 'faltou'}). Operador: ${req.user.name || req.user.email}. Justificativa: ${differenceReason || 'Não informada'}`,
+                metadata: {
+                    sessionId: session._id,
+                    sessionNumber: session.sessionNumber,
+                    expectedBalance,
+                    finalBalance,
+                    difference,
+                    operatorId: req.user._id,
+                    confirmedBy
+                }
+            });
+        }
 
         // Log
         await SessionLog.create({
@@ -511,13 +600,30 @@ const closeCashSession = async (req, res, next) => {
                 sessionId: session.sessionId,
                 sessionNumber: session.sessionNumber,
                 finalBalance,
-                difference: session.difference
+                expectedBalance,
+                difference,
+                differenceReason,
+                confirmedBy
             }
         });
 
+        // Mensagem baseada na diferença
+        let message = "Cash session closed successfully!";
+        if (absDifference === 0) {
+            message = "Caixa fechado com diferença zero! Perfeito!";
+        } else if (absDifference < 5) {
+            message = `Caixa fechado com pequena diferença de R$ ${absDifference.toFixed(2)}.`;
+        } else if (absDifference <= 50) {
+            message = `Caixa fechado com diferença de R$ ${absDifference.toFixed(2)}. Justificativa registrada.`;
+        } else if (absDifference <= 200) {
+            message = `Caixa fechado com diferença de R$ ${absDifference.toFixed(2)}. Aprovado por supervisor.`;
+        } else {
+            message = `Caixa fechado com diferença significativa de R$ ${absDifference.toFixed(2)}. Alerta criado no console operacional.`;
+        }
+
         res.status(200).json({
             success: true,
-            message: "Cash session closed successfully!",
+            message,
             data: session.getSummary()
         });
     } catch (error) {

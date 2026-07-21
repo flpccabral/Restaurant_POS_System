@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { MdTableBar, MdCategory } from 'react-icons/md';
+import { useNavigate } from 'react-router-dom';
+import { MdTableBar, MdCategory, MdPointOfSale, MdReceipt, MdDashboard } from 'react-icons/md';
 import { BiSolidDish } from 'react-icons/bi';
+import { FiDollarSign, FiUsers, FiPieChart } from 'react-icons/fi';
 import Metrics from '../components/dashboard/Metrics';
 import RecentOrders from '../components/dashboard/RecentOrders';
 import Modal from '../components/dashboard/Modal';
+import Commissions from './Commissions';
+import CashManagement from '../components/cash/CashManagement';
+import Payments from '../components/dashboard/Payments';
 
 const buttons = [
   { label: 'Adicionar Mesa', icon: <MdTableBar />, action: 'table' },
@@ -11,18 +16,23 @@ const buttons = [
   { label: 'Adicionar Pratos', icon: <BiSolidDish />, action: 'dishes' },
 ];
 
-const tabs = ['Metricas', 'Pedidos', 'Pagamentos'];
+const tabs = ['Metricas', 'Pedidos', 'Pagamentos', 'Comissões', 'Fluxo de Caixa'];
 
 const Dashboard = () => {
   useEffect(() => {
     document.title = 'POS | Painel Admin';
   }, []);
 
+  const navigate = useNavigate();
   const [isTableModalOpen, setIsTableModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('Metricas');
 
   const handleOpenModal = (action) => {
     if (action === 'table') setIsTableModalOpen(true);
+  };
+
+  const handleTabClick = (tab) => {
+    setActiveTab(tab);
   };
 
   return (
@@ -51,7 +61,7 @@ const Dashboard = () => {
                     ? 'bg-white text-blue-700 shadow-sm'
                     : 'text-gray-500 hover:text-gray-700'
                 }`}
-                onClick={() => setActiveTab(tab)}
+                onClick={() => handleTabClick(tab)}
               >
                 {tab}
               </button>
@@ -62,12 +72,10 @@ const Dashboard = () => {
         {/* Content */}
         {activeTab === 'Metricas' && <Metrics />}
         {activeTab === 'Pedidos' && <RecentOrders />}
-        {activeTab === 'Pagamentos' && (
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-10 text-center">
-            <p className="text-gray-400 text-sm">
-              Componente de Pagamento em Breve
-            </p>
-          </div>
+        {activeTab === 'Pagamentos' && <Payments />}
+        {activeTab === 'Comissões' && <Comissões />}
+        {activeTab === 'Fluxo de Caixa' && (
+          <CashManagement />
         )}
 
         {isTableModalOpen && <Modal setIsTableModalOpen={setIsTableModalOpen} />}

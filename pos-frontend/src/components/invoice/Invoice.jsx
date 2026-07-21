@@ -1,35 +1,57 @@
 import React, { useRef } from "react";
 import { motion } from "framer-motion";
 import { FaCheck } from "react-icons/fa6";
+import { printReceipt } from "../../https";
 
 const Invoice = ({ orderInfo, setShowInvoice }) => {
   const invoiceRef = useRef(null);
-  const handlePrint = () => {
-    const printContent = invoiceRef.current.innerHTML;
-    const WinPrint = window.open("", "", "width=900,height=650");
 
-    WinPrint.document.write(`
-            <html>
-              <head>
-                <title>Comprovante do Pedido</title>
-                <style>
-                  body { font-family: Arial, sans-serif; padding: 20px; }
-                  .receipt-container { width: 300px; border: 1px solid #ddd; padding: 10px; }
-                  h2 { text-align: center; }
-                </style>
-              </head>
-              <body>
-                ${printContent}
-              </body>
-            </html>
-          `);
-
-    WinPrint.document.close();
-    WinPrint.focus();
-    setTimeout(() => {
-      WinPrint.print();
-      WinPrint.close();
-    }, 1000);
+  const handlePrint = async () => {
+    try {
+      const res = await printReceipt({ orderId: orderInfo._id, printerType: 'receipt' });
+      if (!res.data?.success) {
+        // Fallback: impressao via navegador se nao houver impressora termica
+        const printContent = invoiceRef.current.innerHTML;
+        const WinPrint = window.open("", "", "width=900,height=650");
+        WinPrint.document.write(`
+          <html>
+            <head>
+              <title>Comprovante do Pedido</title>
+              <style>
+                body { font-family: Arial, sans-serif; padding: 20px; }
+                .receipt-container { width: 300px; border: 1px solid #ddd; padding: 10px; }
+                h2 { text-align: center; }
+              </style>
+            </head>
+            <body>${printContent}</body>
+          </html>
+        `);
+        WinPrint.document.close();
+        WinPrint.focus();
+        setTimeout(() => { WinPrint.print(); WinPrint.close(); }, 1000);
+      }
+    } catch (err) {
+      console.warn('[Invoice] Print API failed, using browser fallback:', err.message);
+      // Fallback: impressao via navegador
+      const printContent = invoiceRef.current.innerHTML;
+      const WinPrint = window.open("", "", "width=900,height=650");
+      WinPrint.document.write(`
+        <html>
+          <head>
+            <title>Comprovante do Pedido</title>
+            <style>
+              body { font-family: Arial, sans-serif; padding: 20px; }
+              .receipt-container { width: 300px; border: 1px solid #ddd; padding: 10px; }
+              h2 { text-align: center; }
+            </style>
+          </head>
+          <body>${printContent}</body>
+        </html>
+      `);
+      WinPrint.document.close();
+      WinPrint.focus();
+      setTimeout(() => { WinPrint.print(); WinPrint.close(); }, 1000);
+    }
   };
 
   return (

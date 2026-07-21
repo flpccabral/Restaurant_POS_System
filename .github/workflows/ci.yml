@@ -1,0 +1,192 @@
+name: CI
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main, dev]
+
+# Minimize permissions — only read access needed for CI
+permissions:
+  contents: read
+
+jobs:
+  backend-test:
+    name: Backend — Lint & Test
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: pos-backend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20 LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: pos-backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Detect accidentally committed secrets
+      - name: Check for hardcoded secrets
+        run: |
+          if grep -rn "your-super-secret-jwt-key\|mongodb+srv://.*:.*@" --include="*.js" --include="*.ts" .; then
+            echo "❌ Hardcoded secrets detected in source files!"
+            exit 1
+          fi
+          echo "✅ No hardcoded secrets found"
+
+      # Run tests using mongodb-memory-server (no external DB required)
+      - name: Run tests
+        run: npm test -- --ci --forceExit --detectOpenHandles
+        env:
+          NODE_ENV: test
+          JWT_SECRET: ci-test-secret-key-not-for-production
+          # MONGODB_URI is NOT needed — jest uses mongodb-memory-server
+
+      # Upload coverage report as artifact on failure
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: pos-backend/coverage/
+          retention-days: 7
+
+  backend-structure:
+    name: Backend — Structure Validation
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: pos-backend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20 LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: pos-backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Validate that all required files exist
+      - name: Validate required files
+        run: |
+          REQUIRED_FILES=(
+            "app.js"
+            "config/config.js"
+            "config/database.js"
+            ".env.example"
+            "docs/runbook.md"
+          )
+          for f in "${REQUIRED_FILES[@]}"; do
+            if [ ! -f "$f" ]; then
+              echo "❌ Required file missing: $f"
+              exit 1
+            fi
+          done
+          echo "✅ All required files present"
+
+      # Verify that .env is not committed
+      - name: Verify .env is not committed
+        run: |
+          if git ls-files --error-unmatch .env 2>/dev/null; then
+            echo "❌ .env file is tracked by Git — remove it with: git rm --cached .env"
+            exit 1
+          fi
+          echo "✅ .env is not committed"
+
+      # Check that test files referenced in package.json exist
+      - name: Validate test file references
+        run: |
+          node -e "
+          const pkg = require('./package.json');
+          const scripts = pkg.scripts || {};
+          const fs = require('fs');
+          let missing = [];
+          Object.entries(scripts).forEach(([key, val]) => {
+            const m = val.match(/jest (tests\/\S+\.test\.js)/);
+            if (m) {
+              const file = m[1];
+              if (!fs.existsSync(file)) {
+                missing.push({script: key, file});
+              }
+            }
+          });
+          if (missing.length > 0) {
+            console.warn('⚠️  Test scripts reference missing files:');
+            missing.forEach(({script, file}) => console.warn('  - npm run', script, '→', file, '(NOT FOUND)'));
+            // Warning only — not a blocking failure until files are created
+          } else {
+            console.log('✅ All test file references are valid');
+          }
+          "
+
+  frontend-build:
+    name: Frontend POS — Build Check
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: pos-frontend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20 LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: pos-frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+        env:
+          VITE_API_URL: http://localhost:8000
+
+  admin-build:
+    name: Admin Panel — Build Check
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: pos-admin
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20 LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: pos-admin/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check (TypeScript)
+        run: npx tsc --noEmit
+
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_API_URL: http://localhost:8000

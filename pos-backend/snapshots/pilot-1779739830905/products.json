@@ -1,0 +1,250 @@
+[
+  {
+    "_id": "6a11b68f515e85eb24eaf426",
+    "store": "6a1101372ff5c713c1b1a147",
+    "name": "Hamburgue",
+    "description": "Hamburgue",
+    "category": "6a11b675515e85eb24eaf40b",
+    "attributes": [],
+    "isCurrent": true,
+    "isActive": false,
+    "tags": [],
+    "productId": "a3fc2ec9-e0ae-4e8e-be38-0136f88a3cd6",
+    "variations": [
+      {
+        "name": "Padrão",
+        "price": 0,
+        "sku": "hamburgue-padrao",
+        "isActive": true,
+        "variationId": "bd1c79a8-e6fe-4d65-a3b5-2ba2d91b03c2"
+      }
+    ],
+    "createdAt": "2026-05-23T14:15:43.875Z",
+    "updatedAt": "2026-05-24T23:23:11.085Z",
+    "__v": 1,
+    "sellableType": "prepared_product",
+    "stockImpactRule": "recipe_composition",
+    "directStockQuantity": 0
+  },
+  {
+    "_id": "6a11e53cf646322a50b745e6",
+    "store": "6a1101372ff5c713c1b1a147",
+    "name": "Produto Sem Receita",
+    "description": "Produto para teste de venda sem ficha tecnica",
+    "category": "6a11b675515e85eb24eaf40b",
+    "attributes": [],
+    "isCurrent": true,
+    "isActive": false,
+    "tags": [],
+    "productId": "e949506c-cd1d-4eed-806b-5037d90ec877",
+    "variations": [
+      {
+        "name": "Padrao",
+        "price": 15,
+        "sku": "produto-sem-receita-padrao",
+        "isActive": true,
+        "variationId": "51aee884-9171-455f-b255-c56766485eaa"
+      }
+    ],
+    "createdAt": "2026-05-23T17:34:52.515Z",
+    "updatedAt": "2026-05-24T14:41:23.375Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a11e625f646322a50b7467d",
+    "store": "6a1101372ff5c713c1b1a147",
+    "name": "Refrigerante Teste",
+    "description": "Produto de revenda para teste",
+    "category": "6a11b675515e85eb24eaf40b",
+    "attributes": [],
+    "isCurrent": true,
+    "isActive": false,
+    "tags": [],
+    "productId": "3fbadc13-6ac1-495e-b166-1b4dfe2eca52",
+    "variations": [
+      {
+        "name": "Padrao",
+        "price": 8,
+        "sku": "refrigerante-teste-padrao",
+        "isActive": true,
+        "variationId": "6ffc75eb-7d7a-4c57-9c5c-257a9bed32a9"
+      }
+    ],
+    "createdAt": "2026-05-23T17:38:45.960Z",
+    "updatedAt": "2026-05-24T23:23:11.418Z",
+    "__v": 0,
+    "directStockItem": "6a112740ad56cebe48a24c4e",
+    "directStockQuantity": 1,
+    "directStockUnit": "unidade",
+    "sellableType": "industrialized_resale",
+    "stockImpactRule": "stock_item_direct"
+  },
+  {
+    "_id": "6a123a2b0824a97594d48d7a",
+    "store": "6a1101372ff5c713c1b1a147",
+    "name": "Hambúrguer Artesanal",
+    "category": "6a11b675515e85eb24eaf40b",
+    "variations": [
+      {
+        "name": "P",
+        "price": 25.9,
+        "sku": "hambúrguer-artesanal-p",
+        "isActive": true,
+        "variationId": "b007c5b2-679b-4646-ac50-55bfb32b7004"
+      },
+      {
+        "name": "M",
+        "price": 32.9,
+        "sku": "hambúrguer-artesanal-m",
+        "isActive": true,
+        "variationId": "5904b3a8-aa9a-458b-9ecf-9390a31af61e"
+      },
+      {
+        "name": "G",
+        "price": 39.9,
+        "sku": "hambúrguer-artesanal-g",
+        "isActive": true,
+        "variationId": "bef2c1b6-eabc-44e5-8aec-c6abd8f71877"
+      }
+    ],
+    "attributes": [],
+    "isCurrent": true,
+    "isActive": true,
+    "tags": [],
+    "productId": "a59f14e0-a2b9-41c9-adc5-c48eb9d24cae",
+    "createdAt": "2026-05-23T23:37:15.259Z",
+    "updatedAt": "2026-05-24T23:23:10.414Z",
+    "__v": 0,
+    "sellableType": "prepared_product",
+    "stockImpactRule": "recipe_composition",
+    "price": 25.9
+  },
+  {
+    "_id": "6a123a2b0824a97594d48d7d",
+    "store": "6a1101372ff5c713c1b1a147",
+    "name": "Pizza Margherita",
+    "category": "6a123a290824a97594d48d5a",
+    "variations": [
+      {
+        "name": "Individual",
+        "price": 45,
+        "sku": "pizza-margherita-individual",
+        "isActive": true,
+        "variationId": "220373e0-fd35-4214-a646-fb3a62d36a70"
+      },
+      {
+        "name": "Grande",
+        "price": 65,
+        "sku": "pizza-margherita-grande",
+        "isActive": true,
+        "variationId": "7690d69e-f32a-4e4a-9e47-68c384eef969"
+      }
+    ],
+    "attributes": [],
+    "isCurrent": true,
+    "isActive": true,
+    "tags": [],
+    "productId": "a44fb273-320e-4e09-84a1-bd96215be291",
+    "createdAt": "2026-05-23T23:37:15.438Z",
+    "updatedAt": "2026-05-24T23:23:10.597Z",
+    "__v": 0,
+    "description": "",
+    "sellableType": "prepared_product",
+    "stockImpactRule": "recipe_composition",
+    "price": 45
+  },
+  {
+    "_id": "6a123a2b0824a97594d48d80",
+    "store": "6a1101372ff5c713c1b1a147",
+    "name": "Refrigerante",
+    "category": "6a123a290824a97594d48d55",
+    "variations": [
+      {
+        "name": "Lata",
+        "price": 6,
+        "sku": "refrigerante-lata",
+        "isActive": true,
+        "variationId": "c6abeb3a-16ee-42df-a9ec-c527e0848cbe"
+      },
+      {
+        "name": "600ml",
+        "price": 9,
+        "sku": "refrigerante-600ml",
+        "isActive": true,
+        "variationId": "0114f673-20c3-48eb-a725-edae6a4757e4"
+      }
+    ],
+    "attributes": [],
+    "isCurrent": true,
+    "isActive": true,
+    "tags": [],
+    "productId": "d4097df8-d780-4820-b874-0da422a6ec75",
+    "createdAt": "2026-05-23T23:37:15.605Z",
+    "updatedAt": "2026-05-24T23:26:56.611Z",
+    "__v": 0,
+    "directStockItem": "6a11013e2ff5c713c1b1a1d6",
+    "directStockQuantity": 1,
+    "directStockUnit": "unidade",
+    "sellableType": "industrialized_resale",
+    "stockImpactRule": "stock_item_direct",
+    "price": 6
+  },
+  {
+    "_id": "6a132b0d21b39baba982ac7b",
+    "store": "6a1101372ff5c713c1b1a147",
+    "name": "Taxa de Servico",
+    "description": "Produto de teste para venda sem impacto em estoque",
+    "category": "6a11b675515e85eb24eaf40b",
+    "variations": [
+      {
+        "name": "Padrao",
+        "price": 10,
+        "sku": "TAXA-SERVICO-001",
+        "isActive": true,
+        "variationId": "d8ba0b46-8905-43c7-975c-bd9c87e28da5"
+      }
+    ],
+    "attributes": [],
+    "isCurrent": true,
+    "isActive": false,
+    "tags": [],
+    "sellableType": "service_fee",
+    "stockImpactRule": "no_stock_impact",
+    "directStockItem": null,
+    "directStockQuantity": 0,
+    "directStockUnit": null,
+    "productId": "5797db3e-8a46-43e9-b189-4ff9b6c574e6",
+    "createdAt": "2026-05-24T16:45:01.794Z",
+    "updatedAt": "2026-05-24T23:23:11.258Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a1343008c9807db6028fe65",
+    "store": "6a1101372ff5c713c1b1a147",
+    "name": "Taxa de Serviço",
+    "category": "6a1343008c9807db6028fe62",
+    "variations": [
+      {
+        "variationId": "var-1779647232646",
+        "name": "Padrão",
+        "price": 10,
+        "sku": "taxa-de-servico-padrao",
+        "isActive": true
+      }
+    ],
+    "attributes": [],
+    "isCurrent": true,
+    "isActive": true,
+    "tags": [],
+    "sellableType": "service_fee",
+    "stockImpactRule": "no_stock_impact",
+    "directStockItem": null,
+    "directStockQuantity": 0,
+    "directStockUnit": null,
+    "productId": "a0be913e-dabc-4f0f-b4b3-52cf34635c81",
+    "createdAt": "2026-05-24T18:27:12.650Z",
+    "updatedAt": "2026-05-24T23:23:10.923Z",
+    "__v": 0,
+    "price": 10
+  }
+]

@@ -1,0 +1,6 @@
+- [Checkpoint 8.4.2](checkpoint_8.4.2_completed.md) — Checkpoint Runtime Fase 8.4.2 completed, Fase 8.5 approved
+- [Checkpoint 8.5](checkpoint_8.5_completed.md) — Fase 8.5 Console Operacional consolidado no pos-admin, pronto para Fase 9
+- [Checkpoint 9.1C](checkpoint_9.1c_completed.md) — Fase 9.1C operational prep complete: StockBalances, Recipe, Taxa Servico, cross-store fix, stock failure alerts/UI
+- [Checkpoint 9.3C](checkpoint_9.3c_completed.md) — Fase 9.3C complete: orderType, paymentStatus, table close/bill endpoints, counter mode, product search, observations. PDV_MINIMO_APROVADO_PARA_9_4
+- [Fix: order validation 500](fix_order_validation_500.md) — Fixed 500 on order finalization: empty customer name/phone caused Mongoose ValidationError (unhandled -> 500). Added frontend validation + globalErrorHandler typed error handling
+- [Checkpoint 9.3D](checkpoint_9.3d_completed.md) — Fase 9.3D visual redesign complete: light POS theme, 5-area layout, blue topbar, colorful categories, touch-friendly grids, operational footer. Build passes. PDV_VISUAL_APROVADO_PARA_CHECKPOINT

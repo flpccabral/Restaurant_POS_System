@@ -52,7 +52,13 @@ const storeSchema = new mongoose.Schema({
     settings: {
         taxRate: { type: Number, default: 5.25 },
         currency: { type: String, default: 'BRL' },
-        timezone: { type: String, default: 'America/Sao_Paulo' }
+        timezone: { type: String, default: 'America/Sao_Paulo' },
+        // Gorjeta/Servico opcional (Prompt B.2 — Lei Brasileira)
+        serviceCharge: {
+            enabled: { type: Boolean, default: true },
+            rate: { type: Number, default: 10, min: 0, max: 100, comment: 'Percentual de gorjeta (padrao: 10%)' },
+            mode: { type: String, enum: ['optional', 'mandatory', 'disabled'], default: 'optional', comment: 'optional = cliente escolhe; mandatory = sempre cobrada; disabled = desativada' }
+        }
     }
 }, { timestamps: true });
 

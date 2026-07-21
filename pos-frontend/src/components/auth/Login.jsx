@@ -29,7 +29,9 @@ const Login = () => {
       onSuccess: (res) => {
           const { data } = res;
           const { _id, name, email, phone, role, store, isMasterAdmin } = data.data;
-          dispatch(setUser({ _id, name, email, phone, role, store, isMasterAdmin }));
+          // Extrair apenas o _id do store (pode vir como objeto populado ou string)
+          const storeId = typeof store === 'object' && store !== null ? store._id : store;
+          dispatch(setUser({ _id, name, email, phone, role, store: storeId, isMasterAdmin }));
           navigate("/menu");
       },
       onError: (error) => {

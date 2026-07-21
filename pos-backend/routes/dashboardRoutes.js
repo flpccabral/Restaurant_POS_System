@@ -8,7 +8,8 @@ const {
     getCMVReport,
     getVarianceAnalysis,
     getInventoryAnalytics,
-    getUserStats
+    getUserStats,
+    getServiceChargeSummary
 } = require("../controllers/dashboardController");
 
 // Proteger todas as rotas
@@ -24,5 +25,8 @@ router.get("/cmv", getCMVReport);
 router.get("/variance", getVarianceAnalysis);
 router.get("/inventory", getInventoryAnalytics);
 router.get("/users", getUserStats);
+
+// Prompt G — Resumo de gorjetas/servico
+router.get("/service-charge-summary", getServiceChargeSummary);
 
 module.exports = router;

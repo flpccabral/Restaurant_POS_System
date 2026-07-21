@@ -37,13 +37,19 @@ const Orders = () => {
     progress: ['In Progress', 'Preparing', 'pending', 'accepted', 'preparing'],
     ready: ['Ready', 'done'],
     completed: ['completed', 'Completed', 'paid'],
+    unpaid: ['Ready', 'completed'], // Pedidos prontos mas não pagos
   };
 
   const filteredOrders = (() => {
     const orders = resData?.data.data || [];
     const matchStatuses = STATUS_FILTER_MAP[status];
     if (!matchStatuses) return orders;
-    return orders.filter((order) => matchStatuses.includes(order.orderStatus));
+    let filtered = orders.filter((order) => matchStatuses.includes(order.orderStatus));
+    // Para filtro "unpaid", adicionalmente filtrar por paymentStatus
+    if (status === 'unpaid') {
+      filtered = filtered.filter((order) => order.paymentStatus !== 'paid');
+    }
+    return filtered;
   })();
 
   const tabs = [
@@ -51,6 +57,7 @@ const Orders = () => {
     { key: 'progress', label: 'Em Preparo' },
     { key: 'ready', label: 'Pronto' },
     { key: 'completed', label: 'Concluido' },
+    { key: 'unpaid', label: 'A Pagar' },
   ];
 
   return (
