@@ -1,19 +1,22 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { FiTrash2, FiEdit3 } from 'react-icons/fi';
+import { useEffect, useRef, useState } from 'react';
+import { FiTrash2, FiEdit3, FiShoppingBag } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
 import { removeItem, updateItemNotes } from '../../redux/slices/cartSlice';
 
+const plural = (n, singular, pluralForm) =>
+  n === 1 ? `${n} ${singular}` : `${n} ${pluralForm || singular + 's'}`;
+
 const CartInfo = () => {
   const cartData = useSelector((state) => state.cart);
-  const scrolLRef = useRef();
+  const scrollRef = useRef();
   const dispatch = useDispatch();
   const [notesOpen, setNotesOpen] = useState(null);
   const [notesText, setNotesText] = useState('');
 
   useEffect(() => {
-    if (scrolLRef.current) {
-      scrolLRef.current.scrollTo({
-        top: scrolLRef.current.scrollHeight,
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo({
+        top: scrollRef.current.scrollHeight,
         behavior: 'smooth',
       });
     }
@@ -40,24 +43,26 @@ const CartInfo = () => {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto scrollbar-hide px-4 py-3" ref={scrolLRef}>
+    <div className="flex-1 overflow-y-auto scrollbar-hide px-4 py-3" ref={scrollRef}>
       <div className="flex items-center justify-between mb-3">
-        <h2 className="text-gray-400 text-[11px] font-semibold uppercase tracking-wider">
+        <h2 className="text-gray-500 text-[11px] font-semibold uppercase tracking-wider">
           Itens do Pedido
         </h2>
-        <span className="text-gray-400 text-xs font-medium">
-          {cartData.length} item(ns)
+        <span className="text-gray-500 text-xs font-medium">
+          {plural(cartData.length, 'item', 'itens')}
         </span>
       </div>
 
       <div className="space-y-2">
         {cartData.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="text-gray-200 text-4xl mb-3">&#9744;</div>
-            <p className="text-gray-400 text-sm">
+          <div className="text-center py-16 px-2">
+            <div className="w-12 h-12 rounded-full bg-gray-100 text-gray-300 flex items-center justify-center mx-auto mb-3">
+              <FiShoppingBag size={24} />
+            </div>
+            <p className="text-gray-700 text-sm font-medium">
               Carrinho vazio
             </p>
-            <p className="text-gray-300 text-xs mt-1">
+            <p className="text-gray-500 text-xs mt-1">
               Adicione produtos pelo menu ao lado
             </p>
           </div>
@@ -73,7 +78,7 @@ const CartInfo = () => {
                     <h3 className="text-gray-900 font-semibold text-sm truncate">
                       {item.quantity}x {item.name}
                     </h3>
-                    <p className="text-gray-400 text-xs mt-0.5">
+                    <p className="text-gray-500 text-xs mt-0.5">
                       Unit. R$ {Number(
                         item.pricePerQuantity || item.price / item.quantity
                       ).toFixed(2)}
@@ -89,7 +94,6 @@ const CartInfo = () => {
                   </span>
                 </div>
 
-                {/* Notes inline input */}
                 {notesOpen === item.id && (
                   <div
                     className="mt-2 flex flex-col gap-2"
@@ -121,11 +125,10 @@ const CartInfo = () => {
                 )}
               </div>
 
-              {/* Action buttons */}
               <div className="flex items-center gap-1 px-3 py-1.5 bg-gray-50 border-t border-gray-100">
                 <button
                   onClick={() => handleRemove(item.id)}
-                  className="text-red-400 hover:text-red-600 text-xs flex items-center gap-1 px-2 py-1 rounded hover:bg-red-50 transition-colors"
+                  className="text-red-500 hover:text-red-600 text-xs flex items-center gap-1 px-2 py-1 rounded hover:bg-red-50 transition-colors"
                 >
                   <FiTrash2 size={12} />
                   Remover
@@ -135,11 +138,11 @@ const CartInfo = () => {
                   className={`text-xs flex items-center gap-1 px-2 py-1 rounded transition-colors ${
                     notesOpen === item.id || item.notes
                       ? 'text-amber-600 hover:bg-amber-50'
-                      : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
+                      : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
                   }`}
                 >
                   <FiEdit3 size={12} />
-                  {item.notes ? 'Editar obs' : 'Observacao'}
+                  {item.notes ? 'Editar obs' : 'Observação'}
                 </button>
               </div>
             </div>

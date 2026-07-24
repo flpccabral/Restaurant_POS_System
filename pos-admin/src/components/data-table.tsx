@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -72,14 +72,6 @@ export function DataTable({
 
   const totalPages = pageSize > 0 ? Math.max(1, Math.ceil(filtered.length / pageSize)) : 1;
 
-  // Reset to page 1 when search results change
-  useEffect(() => {
-    // Only reset when search is active and current page exceeds new total
-    if (currentPage > totalPages) {
-      setCurrentPage(1);
-    }
-  }, [totalPages, currentPage]);
-
   const safePage = Math.min(currentPage, totalPages);
 
   const paginatedData = useMemo(() => {
@@ -126,7 +118,7 @@ export function DataTable({
                 </TableHead>
               ))}
               {(onEdit || onDelete) && (
-                <TableHead className="w-20 text-right">Acoes</TableHead>
+                <TableHead className="w-20 text-right">Ações</TableHead>
               )}
             </TableRow>
           </TableHeader>
@@ -199,26 +191,26 @@ export function DataTable({
           </p>
           <div className="flex items-center gap-3">
             <p className="text-muted-foreground">
-              Pagina {safePage} de {totalPages}
+              Página {safePage} de {totalPages}
             </p>
             <div className="flex items-center gap-1">
               <Button
                 variant="outline"
                 size="icon-xs"
-                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                onClick={() => setCurrentPage(Math.max(1, safePage - 1))}
                 disabled={safePage <= 1}
               >
                 <ChevronLeft className="h-3.5 w-3.5" />
-                <span className="sr-only">Pagina anterior</span>
+                <span className="sr-only">Página anterior</span>
               </Button>
               <Button
                 variant="outline"
                 size="icon-xs"
-                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                onClick={() => setCurrentPage(Math.min(totalPages, safePage + 1))}
                 disabled={safePage >= totalPages}
               >
                 <ChevronRight className="h-3.5 w-3.5" />
-                <span className="sr-only">Proxima pagina</span>
+                <span className="sr-only">Próxima página</span>
               </Button>
             </div>
           </div>

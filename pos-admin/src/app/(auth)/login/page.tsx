@@ -26,7 +26,7 @@ export default function LoginPage() {
       router.push("/");
       router.refresh();
     } catch {
-      toast.error("Email ou senha invalidos");
+      toast.error("Email ou senha inválidos");
     } finally {
       setLoading(false);
     }
@@ -68,6 +68,7 @@ export default function LoginPage() {
                   className="h-10"
                   required
                   autoFocus
+                  autoComplete="email"
                 />
               </div>
               <div className="space-y-2">
@@ -89,6 +90,7 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   className="h-10"
                   required
+                  autoComplete="current-password"
                 />
               </div>
               <Button
@@ -99,11 +101,11 @@ export default function LoginPage() {
                 {loading ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Entrando...
-                  </>
-                ) : (
-                  "Entrar"
-                )}
+                  Entrando…
+                </>
+              ) : (
+                "Entrar"
+              )}
               </Button>
             </form>
           </CardContent>

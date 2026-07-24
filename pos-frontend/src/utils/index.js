@@ -25,8 +25,8 @@ export const getAvatarName = (name) => {
 
 export const formatDate = (date) => {
   const months = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
+    'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
   ];
   return `${months[date.getMonth()]} ${String(date.getDate()).padStart(2, '0')}, ${date.getFullYear()}`;
 };
@@ -34,16 +34,15 @@ export const formatDate = (date) => {
 export { translateOrderStatus, translateTableStatus } from "./orderStatus";
 
 export const formatDateAndTime = (date) => {
-  const dateAndTime = new Date(date).toLocaleString("en-US", {
-    month: "long",
-    day: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: true,
-    timeZone: "America/Sao_Paulo"
-  })
-
-  return dateAndTime;
-}
+  if (!date) return '—';
+  return new Date(date).toLocaleString('pt-BR', {
+    month: '2-digit',
+    day: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+    timeZone: 'America/Sao_Paulo',
+  });
+};

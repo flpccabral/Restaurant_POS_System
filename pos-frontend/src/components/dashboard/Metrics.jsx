@@ -1,4 +1,3 @@
-import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
   getDashboardKPIs,
@@ -65,7 +64,7 @@ const Metrics = () => {
       color: 'from-emerald-600 to-emerald-500',
     },
     {
-      title: 'Ticket Medio',
+      title: 'Ticket Médio',
       value: formatCurrency(kpi?.orders?.avgTicket),
       color: 'from-amber-500 to-amber-400',
     },
@@ -102,7 +101,7 @@ const Metrics = () => {
   if (isLoading) {
     return (
       <div className="py-10 text-center">
-        <p className="text-gray-400 text-sm">Carregando metricas...</p>
+        <p className="text-gray-400 text-sm">Carregando métricas...</p>
       </div>
     );
   }
@@ -111,22 +110,22 @@ const Metrics = () => {
     <div>
       {/* Top section */}
       <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3">
           <div>
             <h2 className="font-bold text-gray-900 text-lg">Desempenho Geral</h2>
             <p className="text-sm text-gray-400">
-              Resumo das metricas e indicadores de desempenho.
+              Resumo das métricas e indicadores de desempenho.
             </p>
           </div>
-          <button className="flex items-center gap-1 px-4 py-2 rounded-lg text-sm font-medium text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 transition-colors">
-            Ultimos 30 Dias
+          <button className="flex items-center gap-1 px-4 py-2 rounded-lg text-sm font-medium text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 transition-colors whitespace-nowrap">
+            Últimos 30 Dias
             <svg className="w-3 h-3" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
               <path d="M19 9l-7 7-7-7" />
             </svg>
           </button>
         </div>
 
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {topMetrics.map((metric, index) => (
             <div
               key={index}
@@ -140,7 +139,7 @@ const Metrics = () => {
                 <svg className="w-3 h-3" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3" fill="none">
                   <path d="M5 15l7-7 7 7" />
                 </svg>
-                Periodo
+                Período
               </div>
             </div>
           ))}
@@ -152,11 +151,11 @@ const Metrics = () => {
         <div className="mb-4">
           <h2 className="font-bold text-gray-900 text-lg">Detalhes dos Itens</h2>
           <p className="text-sm text-gray-400">
-            Resumo das metricas e indicadores de desempenho.
+            Resumo das métricas e indicadores de desempenho.
           </p>
         </div>
 
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {bottomMetrics.map((item, index) => (
             <div
               key={index}
@@ -168,7 +167,7 @@ const Metrics = () => {
               <p className="mt-2 font-bold text-2xl">{item.value}</p>
               <div className="mt-2 flex items-center gap-1 text-[10px] text-white/70">
                 <svg className="w-3 h-3" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3" fill="none">
-                  <path d="M5 15l7-7 7 7" />
+                  <path d="M5 15l-7 7 7 7" />
                 </svg>
                 Total
               </div>

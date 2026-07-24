@@ -8,12 +8,12 @@
  * - Beep ao receber novo pedido
  * - Acoes: Aceitar, Pronto, Entregar
  */
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getKDSOrders, acceptKDSOrder, markKDSReady, markKDSServed, rushKDSOrder } from '../../https';
 import { useSocket } from '../../hooks/useSocket';
 import { enqueueSnackbar } from 'notistack';
-import { FiClock, FiCheck, FiX, FiAlertTriangle, FiVolume2 } from 'react-icons/fi';
+import { FiClock, FiCheck, FiAlertTriangle, FiVolume2, FiCheckCircle } from 'react-icons/fi';
 
 // ============================================
 // SOM DE BEEP (Web Audio API)
@@ -48,7 +48,7 @@ const playBeep = () => {
 const getTimeColor = (createdAt) => {
   const elapsed = Math.floor((Date.now() - new Date(createdAt).getTime()) / 60000);
   if (elapsed >= 15) return { bg: 'bg-red-500', text: 'text-white', border: 'border-red-700', label: 'ATRASADO' };
-  if (elapsed >= 10) return { bg: 'bg-amber-400', text: 'text-black', border: 'border-amber-600', label: 'ATENCAO' };
+  if (elapsed >= 10) return { bg: 'bg-amber-400', text: 'text-black', border: 'border-amber-600', label: 'ATENÇÃO' };
   return { bg: 'bg-emerald-500', text: 'text-white', border: 'border-emerald-700', label: 'NO PRAZO' };
 };
 
@@ -363,25 +363,25 @@ const KitchenDisplay = () => {
   return (
     <div className="h-full flex flex-col bg-gray-900 text-white" onClick={handleUnlockAudio}>
       {/* Header */}
-      <div className="bg-gray-800 px-6 py-3 flex items-center justify-between border-b border-gray-700">
-        <div className="flex items-center gap-4">
-          <h1 className="text-2xl font-bold">🍳 COZINHA</h1>
+      <div className="bg-gray-800 px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3 border-b border-gray-700">
+        <div className="flex items-center gap-3 sm:gap-4">
+          <h1 className="text-lg sm:text-2xl font-bold whitespace-nowrap">🍳 COZINHA</h1>
           <div className={`flex items-center gap-2 text-sm ${connected ? 'text-emerald-400' : 'text-red-400'}`}>
             <div className={`w-2 h-2 rounded-full ${connected ? 'bg-emerald-400' : 'bg-red-400'} animate-pulse`}></div>
             {connected ? 'Online' : 'Offline'}
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
-          {/* Filtro de estacao */}
+        <div className="flex items-center gap-2 sm:gap-4">
+          {/* Filtro de estação */}
           <select
             value={filterStation}
             onChange={(e) => setFilterStation(e.target.value)}
-            className="bg-gray-700 text-white px-3 py-1.5 rounded-lg text-sm border border-gray-600"
+            className="bg-gray-700 text-white px-2 sm:px-3 py-1.5 rounded-lg text-sm border border-gray-600"
           >
             <option value="kitchen">Cozinha</option>
             <option value="bar">Bar</option>
-            <option value="expo">Expedicao</option>
+            <option value="expo">Expedição</option>
           </select>
 
           {/* Toggle som */}
@@ -397,8 +397,9 @@ const KitchenDisplay = () => {
           </button>
 
           {/* Contador de pedidos */}
-          <div className="bg-gray-700 px-3 py-1.5 rounded-lg text-sm">
-            <span className="text-gray-400">Pedidos: </span>
+          <div className="bg-gray-700 px-2 sm:px-3 py-1.5 rounded-lg text-sm">
+            <span className="text-gray-400 hidden sm:inline">Pedidos: </span>
+            <span className="text-gray-400 sm:hidden">P: </span>
             <span className="font-bold text-lg">{activeOrders.length}</span>
           </div>
         </div>
@@ -409,9 +410,9 @@ const KitchenDisplay = () => {
         {activeOrders.length === 0 ? (
           <div className="h-full flex items-center justify-center">
             <div className="text-center">
-              <p className="text-4xl mb-4">✅</p>
+              <FiCheckCircle className="mx-auto mb-4 text-emerald-500" size={48} />
               <p className="text-2xl text-gray-400">Nenhum pedido na fila</p>
-              <p className="text-sm text-gray-500 mt-2">Os pedidos aparecerao aqui automaticamente</p>
+              <p className="text-sm text-gray-500 mt-2">Os pedidos aparecerão aqui automaticamente</p>
             </div>
           </div>
         ) : (

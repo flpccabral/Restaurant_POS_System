@@ -1,5 +1,4 @@
-import React, { useState, useRef } from 'react';
-import { FiSearch, FiBell, FiGrid, FiLogOut } from 'react-icons/fi';
+import { FiBell, FiGrid, FiLogOut } from 'react-icons/fi';
 import { FaUserCircle } from 'react-icons/fa';
 import logo from '../../assets/images/logo.png';
 import { useSelector } from 'react-redux';
@@ -10,6 +9,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import PdvModeBadge from '../pdv/PdvModeBadge';
 import PdvSearchBar from '../pdv/PdvSearchBar';
+import { useCapabilities } from '../../hooks/useCapabilities';
 
 const Header = () => {
   const userData = useSelector((state) => state.user);
@@ -17,6 +17,7 @@ const Header = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+  const { can } = useCapabilities();
 
   const logoutMutation = useMutation({
     mutationFn: () => logout(),
@@ -70,12 +71,12 @@ const Header = () => {
 
       {/* Right: Operator + Actions */}
       <div className="flex items-center gap-2">
-        {/* Dashboard (Admin only) */}
-        {userData.role === 'Admin' && (
+        {/* Resumo do Turno (usuarios com acesso a relatorios) */}
+        {can('reports', 'read') && (
           <button
             onClick={() => navigate('/dashboard')}
             className="p-2 hover:bg-white/10 rounded-lg transition-colors"
-            title="Dashboard"
+            title="Resumo do Turno"
           >
             <FiGrid size={18} />
           </button>

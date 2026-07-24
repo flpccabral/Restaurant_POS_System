@@ -32,8 +32,10 @@ import type { Product } from "@/types";
 import { recipesService, type Recipe } from "@/services/api/recipes";
 import { productsService } from "@/services/api/products";
 import { ingredientsService } from "@/services/api/ingredients";
+import { useStoreContext } from "@/contexts/StoreContext";
 
 export default function RecipesPage() {
+  const { storeId } = useStoreContext();
   const queryClient = useQueryClient();
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
@@ -61,17 +63,17 @@ export default function RecipesPage() {
   const [showDetail, setShowDetail] = useState<Recipe | null>(null);
 
   const { data, isLoading, isError, refetch } = useQuery({
-    queryKey: ["recipes"],
+    queryKey: ["recipes", storeId],
     queryFn: () => recipesService.getAll().then((r) => r.data.data),
   });
 
   const { data: products } = useQuery({
-    queryKey: ["products"],
+    queryKey: ["products", storeId],
     queryFn: () => productsService.getAll().then((r) => r.data.data).catch(() => []),
   });
 
   const { data: ingredients } = useQuery({
-    queryKey: ["ingredients"],
+    queryKey: ["ingredients", storeId],
     queryFn: () => ingredientsService.getAll().then((r) => r.data.data).catch(() => []),
   });
 
@@ -84,11 +86,12 @@ export default function RecipesPage() {
   }, [data, statusFilter]);
 
   // Get available variations for the selected product
+  const selectedProductId = editing?.product;
   const selectedProductVariations = useMemo(() => {
-    if (!editing?.product || !products) return [];
-    const p = (products as Product[]).find((x) => x._id === editing.product);
+    if (!selectedProductId || !products) return [];
+    const p = (products as Product[]).find((x) => x._id === selectedProductId);
     return (p?.variations as Array<{ _id: string; name: string; sku: string; price: number }> | undefined) || [];
-  }, [editing?.product, products]);
+  }, [selectedProductId, products]);
 
   const mutation = useMutation({
     mutationFn: (vars: { method: "post" | "put"; id?: string; data: Record<string, unknown> }) => {
@@ -96,8 +99,8 @@ export default function RecipesPage() {
       return recipesService.update(vars.id!, vars.data as unknown as Parameters<typeof recipesService.update>[1]);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["recipes"] });
-      queryClient.invalidateQueries({ queryKey: ["products"] }); // Products may show recipe status
+      queryClient.invalidateQueries({ queryKey: ["recipes", storeId] });
+      queryClient.invalidateQueries({ queryKey: ["products", storeId] }); // Products may show recipe status
       toast.success("Receita salva com sucesso");
       setEditing(null);
     },
@@ -110,8 +113,8 @@ export default function RecipesPage() {
   const deleteMutation = useMutation({
     mutationFn: (id: string) => recipesService.delete(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["recipes"] });
-      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["recipes", storeId] });
+      queryClient.invalidateQueries({ queryKey: ["products", storeId] });
       toast.success("Receita excluida");
       setDeleteId(null);
     },
@@ -122,8 +125,8 @@ export default function RecipesPage() {
     mutationFn: ({ id, isActive }: { id: string; isActive: boolean }) =>
       recipesService.toggleStatus(id, isActive),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["recipes"] });
-      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["recipes", storeId] });
+      queryClient.invalidateQueries({ queryKey: ["products", storeId] });
       toast.success("Status da receita atualizado");
     },
     onError: () => toast.error("Erro ao atualizar status"),
@@ -215,7 +218,7 @@ export default function RecipesPage() {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground tracking-tight">Fichas Tecnicas</h1>
+          <h1 className="text-2xl font-bold text-foreground tracking-tight">Fichas Técnicas</h1>
           <p className="text-muted-foreground text-sm mt-0.5">
             Gerencie receitas para controle de estoque e CMV
           </p>
@@ -245,7 +248,7 @@ export default function RecipesPage() {
       {isError ? (
         <ErrorState
           message="Falha ao carregar receitas"
-          description="Verifique se o servidor backend esta rodando e tente novamente."
+          description="Verifique se o servidor backend está rodando e tente novamente."
           onRetry={refetch}
         />
       ) : (
@@ -255,7 +258,7 @@ export default function RecipesPage() {
           loading={isLoading}
           searchKey="name"
           searchPlaceholder="Pesquisar receitas..."
-          emptyMessage="Nenhuma ficha tecnica encontrada."
+          emptyMessage="Nenhuma ficha técnica encontrada."
           onEdit={handleEdit}
           onDelete={(id) => setDeleteId(id)}
           customActions={(row: unknown) => {
@@ -282,8 +285,8 @@ export default function RecipesPage() {
             <DialogTitle>{editing?._id ? "Editar Receita" : "Nova Receita"}</DialogTitle>
             <DialogDescription>
               {editing?._id
-                ? "Atualize os dados da ficha tecnica"
-                : "Crie uma ficha tecnica para vincular ingredientes ao produto"
+                ? "Atualize os dados da ficha técnica"
+                : "Crie uma ficha técnica para vincular ingredientes ao produto"
               }
             </DialogDescription>
           </DialogHeader>
